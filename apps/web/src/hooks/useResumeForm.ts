@@ -14,6 +14,7 @@ export interface ResumeFormData {
   phone_number?: string;
   company_name?: string;
   state?: string;
+  state_code?: string;
   comments?: string;
 }
 

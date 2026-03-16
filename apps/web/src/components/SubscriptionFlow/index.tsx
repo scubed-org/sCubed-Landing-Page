@@ -202,6 +202,7 @@ export default function SubscriptionFlow() {
                 DEFAULT_STAFF_COUNT,
               // Use string-based state and city from API (from Google Places)
               state: registrationData.state || prev.step1Data.state || '',
+              state_code: registrationData.state_code || prev.step1Data.state_code || '',
               city: registrationData.city || prev.step1Data.city || '',
               timezone:
                 registrationData.timezone || prev.step1Data.timezone || '',
@@ -432,6 +433,7 @@ export default function SubscriptionFlow() {
                     formState.step1Data.street_address_line_1 || '',
                   city: formState.step1Data.city || '',
                   state: formState.step1Data.state || '',
+                  state_code: formState.step1Data.state_code || '',
                   zip_code: formState.step1Data.zip_code || '',
                   timezone: formState.step1Data.timezone || 'America/New_York',
                   email: formState.step1Data.email || '',
@@ -473,6 +475,7 @@ export default function SubscriptionFlow() {
                     formState.step1Data.street_address_line_1 || '',
                   city: formState.step1Data.city || '',
                   state: formState.step1Data.state || '',
+                  state_code: formState.step1Data.state_code || '',
                   zip_code: formState.step1Data.zip_code || '',
                   timezone: formState.step1Data.timezone || 'America/New_York',
                   email: formState.step1Data.email || '',

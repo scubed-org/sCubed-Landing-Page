@@ -18,6 +18,7 @@ interface ContactFormStepData {
   // Step 3 fields
   company_name?: string;
   state?: string;
+  state_code?: string;
   comments?: string;
   specialities?: string;
   staff?: number;
