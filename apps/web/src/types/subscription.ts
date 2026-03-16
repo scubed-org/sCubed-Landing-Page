@@ -24,6 +24,7 @@ export interface LocationInfo {
   street_address_line_1: string;
   city: string; // City name (auto-populated from Google Places)
   state: string; // State name (auto-populated from Google Places)
+  state_code: string; // State code e.g. "OH" (auto-populated from Google Places)
   zip_code: string; // US zip code (auto-populated from Google Places)
   timezone: string; // Timezone ID string (e.g., "America/New_York")
 }
@@ -210,6 +211,7 @@ export interface RegistrationDataResponse {
   // String-based location fields (from Google Places API)
   city?: string;
   state?: string;
+  state_code?: string;
   zip_code?: string;
   timezone?: string;
   first_name?: string;
