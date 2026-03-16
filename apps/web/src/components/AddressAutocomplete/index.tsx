@@ -91,7 +91,13 @@ export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
             details.formatted_address
           );
 
-          setInputValue(parsed.streetAddress || details.formatted_address);
+          // For state-only results (no street address), show state name only
+          // For full addresses, show the street address
+          const hasRealStreet = parsed.streetAddress !== details.formatted_address;
+          const displayValue = hasRealStreet
+            ? parsed.streetAddress
+            : parsed.state || details.formatted_address;
+          setInputValue(displayValue);
           setIsOpen(false);
           clearPredictions();
           setActiveIndex(-1);

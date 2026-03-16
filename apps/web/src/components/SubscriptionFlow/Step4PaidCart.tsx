@@ -295,6 +295,7 @@ export default function Step4PaidCart({
           street_address_line_1: formData.street_address_line_1,
           city,
           state,
+          state_code: formData.state_code,
           zip_code: formData.zip_code,
           timezone: timezone || 'America/New_York',
           // Include admin details

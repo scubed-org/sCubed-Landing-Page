@@ -94,6 +94,7 @@ interface FormData {
   companyName: string;
   phoneNumber: string;
   state: string;
+  state_code: string;
   comments: string;
 }
 
@@ -151,6 +152,7 @@ const GetStartedForm: React.FC = () => {
   const handleAddressSelect = useCallback(
     (address: AddressComponents) => {
       setValue('state', address.state);
+      setValue('state_code', address.stateCode);
       if (address.state) {
         trigger('state');
       }
@@ -222,6 +224,9 @@ const GetStartedForm: React.FC = () => {
       }
       if (resumeData.state) {
         setValue('state', resumeData.state);
+      }
+      if (resumeData.state_code) {
+        setValue('state_code', resumeData.state_code);
       }
       if (resumeData.comments) {
         setValue('comments', resumeData.comments);
@@ -323,6 +328,7 @@ const GetStartedForm: React.FC = () => {
       if (step === 3) {
         if (formData.companyName) requestBody.company_name = formData.companyName;
         if (formData.state) requestBody.state = formData.state;
+        if (formData.state_code) requestBody.state_code = formData.state_code;
         if (formData.comments) requestBody.comments = formData.comments;
 
         // Check if reCAPTCHA is completed for step 3
@@ -987,7 +993,6 @@ const GetStartedForm: React.FC = () => {
                             error={!!errors.state || !!apiFieldErrors.state}
                             size="compact"
                             types={[...STATE_PLACE_TYPES]}
-                            skipPlaceDetails
                             className={stateAutocompleteWrapper}
                             emptyMessage="State not found"
                           />

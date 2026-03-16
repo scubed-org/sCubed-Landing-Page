@@ -41,6 +41,7 @@ interface InternalFormData {
   npi: string;
   street_address_line_1: string;
   state: string; // State name (auto-populated from Google Places)
+  state_code: string; // State code e.g. "OH" (auto-populated from Google Places)
   city: string; // City name (auto-populated from Google Places)
   zip_code: string; // ZIP code (auto-populated from Google Places)
   timezone: string; // IANA timezone ID (e.g., "America/New_York")
@@ -96,6 +97,7 @@ function Step3ClinicDetailsComponent({
       staff_count: initialData?.staff_count || DEFAULT_STAFF_COUNT,
       // String values for location (from Google Places)
       state: initialData?.state || '',
+      state_code: initialData?.state_code || '',
       city: initialData?.city || '',
       timezone: initialData?.timezone || '',
     },
@@ -125,6 +127,11 @@ function Step3ClinicDetailsComponent({
     // Sync state if API returned it
     if (initialData.state && initialData.state !== currentValues.state) {
       fieldsToSync.state = initialData.state;
+    }
+
+    // Sync state_code if API returned it
+    if (initialData.state_code && initialData.state_code !== currentValues.state_code) {
+      fieldsToSync.state_code = initialData.state_code;
     }
 
     // Sync city if API returned it
@@ -193,6 +200,7 @@ function Step3ClinicDetailsComponent({
     }
   }, [
     initialData?.state,
+    initialData?.state_code,
     initialData?.city,
     initialData?.timezone,
     initialData?.zip_code,
@@ -217,6 +225,7 @@ function Step3ClinicDetailsComponent({
       setValue('street_address_line_1', address.streetAddress);
       setValue('city', address.city);
       setValue('state', address.state);
+      setValue('state_code', address.stateCode);
 
       if (avoidTrigger) {
         setValue('zip_code', '');
@@ -278,6 +287,7 @@ function Step3ClinicDetailsComponent({
         street_address_line_1: data.street_address_line_1,
         city: data.city,
         state: data.state,
+        state_code: data.state_code,
         zip_code: data.zip_code,
         timezone: data.timezone || 'America/New_York', // Default timezone if not resolved
         email: data.email,
@@ -297,6 +307,7 @@ function Step3ClinicDetailsComponent({
         // String-based location fields (SCM-4402)
         city: data.city,
         state: data.state,
+        state_code: data.state_code,
         zip_code: data.zip_code,
         timezone: data.timezone || 'America/New_York',
         email: data.email,
