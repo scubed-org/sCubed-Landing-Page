@@ -33,7 +33,7 @@ export const TextInput = ({
   maxLength,
 }: TextInputProps) => {
   return (
-    <div className={styles.formField}>
+    <div className={styles.formField} data-field={registration.name}>
       <label className={styles.label}>
         {label}
         {required && <span className={styles.requiredIndicator}>*</span>}
@@ -52,7 +52,7 @@ export const TextInput = ({
       {helpText && !error && <div className={styles.helpText}>{helpText}</div>}
       {error && (
         <div className={`${styles.errorMessage} ${styles.fadeInUpAnimation}`} id={`${registration.name}-error`}>
-          <AlertCircle size={16} />
+          <AlertCircle size={16} className={styles.errorIcon} />
           <span>{error.message}</span>
         </div>
       )}
@@ -115,7 +115,7 @@ export const Select = ({
       {helpText && !error && <div className={styles.helpText}>{helpText}</div>}
       {error && (
         <div className={`${styles.errorMessage} ${styles.fadeInUpAnimation}`} id={`${registration.name}-error`}>
-          <AlertCircle size={16} />
+          <AlertCircle size={16} className={styles.errorIcon} />
           <span>{error.message}</span>
         </div>
       )}
@@ -171,7 +171,7 @@ export const PhoneInput = ({
   };
 
   return (
-    <div className={styles.formField}>
+    <div className={styles.formField} data-field={name}>
       <label className={styles.label}>
         {label}
         {required && <span className={styles.requiredIndicator}>*</span>}
@@ -192,7 +192,7 @@ export const PhoneInput = ({
       {helpText && !error && <div className={styles.helpText}>{helpText}</div>}
       {error && (
         <div className={`${styles.errorMessage} ${styles.fadeInUpAnimation}`} id={`${name}-error`}>
-          <AlertCircle size={16} />
+          <AlertCircle size={16} className={styles.errorIcon} />
           <span>{error.message}</span>
         </div>
       )}
@@ -231,7 +231,7 @@ export const Checkbox = ({ label, required, error, disabled, registration }: Che
       </label>
       {error && (
         <div className={styles.errorMessage}>
-          <AlertCircle size={16} />
+          <AlertCircle size={16} className={styles.errorIcon} />
           <span>{error.message}</span>
         </div>
       )}
@@ -286,7 +286,7 @@ export const Textarea = ({
       {helpText && !error && <div className={styles.helpText}>{helpText}</div>}
       {error && (
         <div className={styles.errorMessage} id={`${registration.name}-error`}>
-          <AlertCircle size={16} />
+          <AlertCircle size={16} className={styles.errorIcon} />
           <span>{error.message}</span>
         </div>
       )}

@@ -6,11 +6,11 @@ import Image from 'next/image';
 import { Calendar, User, Clock, Share2, Check, Copy } from 'lucide-react';
 
 // Import Strapi types and utilities
-import { 
-  BlogPost, 
-  getStrapiImageUrl, 
-  formatPublishDate, 
-  calculateReadTime 
+import {
+  BlogPost,
+  getStrapiImageUrl,
+  formatPublishDate,
+  calculateReadTime
 } from '../../../lib/strapi';
 import DynamicContentRenderer from '../DynamicContentRenderer';
 import BlogContactForm from '../BlogContactForm';

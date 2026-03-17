@@ -461,6 +461,10 @@ export const errorMessage = style({
   marginTop: spacing.xs,
 });
 
+export const errorIcon = style({
+  flexShrink: 0,
+});
+
 export const helpText = style({
   fontSize: typography.fontSize.sm,
   color: '#6b7280',

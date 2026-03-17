@@ -49,6 +49,20 @@ export const heroSection = style({
   },
 });
 
+export const heroImageWrapper = style({
+  position: 'absolute',
+  top: 0,
+  left: 0,
+  width: '100%',
+  height: '100%',
+
+  '@media': {
+    '(max-width: 1024px)': {
+      display: 'none',
+    },
+  },
+});
+
 export const heroImage = style({
   position: 'absolute',
   top: 0,

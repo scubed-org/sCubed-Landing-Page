@@ -355,9 +355,16 @@ const PricingComparison: React.FC = () => {
                     {section.features.map((feature) => (
                       <div key={feature.name} className={featureRow}>
                         <div className={featureName}>
-                          {feature.name}
-                          {feature.description && (
-                            <Tooltip content={feature.description} />
+                          {feature.description ? (
+                            <>
+                              {feature.name.substring(0, feature.name.lastIndexOf(' '))}{' '}
+                              <span style={{ whiteSpace: 'nowrap' }}>
+                                {feature.name.substring(feature.name.lastIndexOf(' ') + 1)}{' '}
+                                <Tooltip content={feature.description} />
+                              </span>
+                            </>
+                          ) : (
+                            feature.name
                           )}
                         </div>
                         <div className={featureCell}>
@@ -420,16 +427,17 @@ const PricingComparison: React.FC = () => {
                       <h4>{section.category}</h4>
                       {section.features.map((feature) => (
                         <div key={feature.name} className={mobileFeatureItem}>
-                          <span
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.5rem',
-                            }}
-                          >
-                            {feature.name}
-                            {feature.description && (
-                              <Tooltip content={feature.description} />
+                          <span>
+                            {feature.description ? (
+                              <>
+                                {feature.name.substring(0, feature.name.lastIndexOf(' '))}{' '}
+                                <span style={{ whiteSpace: 'nowrap' }}>
+                                  {feature.name.substring(feature.name.lastIndexOf(' ') + 1)}{' '}
+                                  <Tooltip content={feature.description} />
+                                </span>
+                              </>
+                            ) : (
+                              feature.name
                             )}
                           </span>
                           <span>

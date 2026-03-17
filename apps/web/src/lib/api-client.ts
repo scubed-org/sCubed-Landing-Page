@@ -194,6 +194,7 @@ async function handleErrorResponse(
       return message.includes('zip code') ||
              message.includes('email') ||
              message.includes('phone') ||
+             message.includes('clinic') ||
              message.includes('tax id') ||
              message.includes('npi') ||
              message.includes('city') ||
