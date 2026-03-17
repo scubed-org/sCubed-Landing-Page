@@ -13,7 +13,7 @@ const pulse = keyframes({
 });
 
 export const heroSection = style({
-  minHeight: 'calc(100vh - 80px)',
+  minHeight: '100dvh',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
