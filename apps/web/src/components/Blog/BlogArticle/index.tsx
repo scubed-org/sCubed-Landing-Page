@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Calendar, User, Clock, Share2, Check, Copy } from 'lucide-react';
@@ -15,6 +15,7 @@ import {
 import DynamicContentRenderer from '../DynamicContentRenderer';
 import BlogContactForm from '../BlogContactForm';
 import AudioButton from '../AudioButton';
+import TTSButton from '../TTSButton';
 
 import {
   articleContainer,
@@ -69,6 +70,7 @@ const BlogArticle: React.FC<BlogArticleProps> = ({ post }) => {
   const [copySuccess, setCopySuccess] = useState(false);
   const [avatarError, setAvatarError] = useState(false);
   const [currentUrl, setCurrentUrl] = useState('');
+  const articleContentRef = useRef<HTMLDivElement>(null);
 
   // Get post data
   const title = post.title;
@@ -227,22 +229,27 @@ const BlogArticle: React.FC<BlogArticleProps> = ({ post }) => {
               {' '} / <span>{title}</span>
             </nav>
 
-            {/* Audio Button - if audio version exists */}
-            {post.audio_version && (
-              <div className={audioButtonInline}>
+            {/* Audio: use uploaded file if available, otherwise browser TTS */}
+            <div className={audioButtonInline}>
+              {post.audio_version ? (
                 <AudioButton
                   audioFile={post.audio_version}
                   title={title}
                 />
-              </div>
-            )}
+              ) : (
+                <TTSButton
+                  articleRef={articleContentRef}
+                  title={title}
+                />
+              )}
+            </div>
           </div>
 
           {/* Main Content */}
           <main className={mainContent}>
             <article>
               {/* Dynamic Content Blocks */}
-              <div className={articleContent}>
+              <div className={articleContent} ref={articleContentRef}>
                 <DynamicContentRenderer content_blocks={contentBlocks} />
               </div>
 
