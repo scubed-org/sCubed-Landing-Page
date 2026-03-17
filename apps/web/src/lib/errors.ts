@@ -133,6 +133,9 @@ function inferFieldFromMessage(message: string): string | null {
   if (lowerMessage.includes('phone')) {
     return 'phone';
   }
+  if (lowerMessage.includes('clinic')) {
+    return 'clinic_name';
+  }
   if (lowerMessage.includes('tax id')) {
     return 'tax_id';
   }
@@ -146,7 +149,7 @@ function inferFieldFromMessage(message: string): string | null {
     return 'state';
   }
   if (lowerMessage.includes('address')) {
-    return 'address';
+    return 'street_address_line_1';
   }
 
   return null; // Can't infer field

@@ -1,7 +1,6 @@
 'use client';
 
 import { Check, Copy, Share2 } from 'lucide-react';
-import Image from 'next/image';
 import Link from 'next/link';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -16,6 +15,7 @@ import type { Event } from '../../../types/event';
 import BlogContactForm from '../../Blog/BlogContactForm';
 import DynamicContentRenderer from '../../Blog/DynamicContentRenderer';
 import Button from '../../Button/button';
+import ImageWithSkeleton from '../../common/ImageWithSkeleton';
 
 import * as styles from './styles.css';
 
@@ -78,17 +78,19 @@ const EventDetail: React.FC<EventDetailProps> = memo(({ event }) => {
       <section className={styles.heroSection}>
         {heroImageUrl ? (
           <>
-            <Image
+            <ImageWithSkeleton
               src={heroImageUrl}
               alt={event.title}
               fill
               className={styles.heroImage}
               priority
+              wrapperClassName={styles.heroImageWrapper}
             />
             <div className={styles.heroMobileWrapper}>
-              <img
+              <ImageWithSkeleton
                 src={heroImageUrl}
                 alt={event.title}
+                isNative
                 className={styles.heroMobileImage}
               />
             </div>

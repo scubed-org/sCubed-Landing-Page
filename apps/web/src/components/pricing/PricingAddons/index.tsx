@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, CreditCard, Video } from 'lucide-react';
-
+import Link from 'next/link';
 import { colors, spacing, typography } from '../../../styles/tokens.css';
 import Tooltip from '../../common/Tooltip';
 
@@ -28,6 +28,7 @@ interface Addon {
   price: string;
   popular?: boolean;
   tooltipContent: string;
+  href: string;
 }
 
 const addons: Addon[] = [
@@ -39,6 +40,7 @@ const addons: Addon[] = [
       price: '$99/month per clinic',
       tooltipContent:
         'Conduct secure, HIPAA-compliant video therapy sessions with features including screen sharing, session recording, waiting room, and seamless calendar integration. Perfect for remote or hybrid care delivery.',
+      href: '/telehealth-platform',
     },
   {
     icon: <CreditCard size={24} />,
@@ -49,6 +51,7 @@ const addons: Addon[] = [
     popular: true,
     tooltipContent:
       'Full-service billing management including claims submission to insurance, tracking, denial management, and reimbursement optimization. Our team handles the entire revenue cycle so you can focus on patient care.',
+    href: '/coming-soon?feature=rcm',
   },
   {
     icon: <Calendar size={24} />,
@@ -58,6 +61,7 @@ const addons: Addon[] = [
     price: '$15/year per client',
     tooltipContent:
       'Comprehensive digital VB-MAPP assessment tools with automated scoring, progress tracking, detailed reporting, and milestone tracking. Streamlines assessment workflow and provides data-driven insights for treatment planning.',
+    href: '/coming-soon?feature=vb-mapp',
   },
 ];
 
@@ -90,27 +94,24 @@ const PricingAddons: React.FC = () => {
               >
                 <div className={addonHeader}>
                   <div className={addonIcon}>{addon.icon}</div>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '0.5rem',
-                    }}
-                  >
-                    <h3 className={addonName}>{addon.name}</h3>
-                    <Tooltip content={addon.tooltipContent} />
-                  </div>
+                  <h3 className={addonName}>
+                    {addon.name.substring(0, addon.name.lastIndexOf(' '))}{' '}
+                    <span style={{ whiteSpace: 'nowrap' }}>
+                      {addon.name.substring(addon.name.lastIndexOf(' ') + 1)}{' '}
+                      <Tooltip content={addon.tooltipContent} />
+                    </span>
+                  </h3>
                 </div>
                 <p className={addonDescription}>{addon.description}</p>
                 <div className={addonPrice}>{addon.price}</div>
-                <button
+                <Link
+                  href={addon.href}
                   className={addonLearnMore}
-                  onClick={(e) => e.preventDefault()}
                   aria-label={`Learn more about ${addon.name}`}
                 >
                   Learn More
                   <ArrowRight size={16} />
-                </button>
+                </Link>
               </motion.div>
             ))}
           </div>

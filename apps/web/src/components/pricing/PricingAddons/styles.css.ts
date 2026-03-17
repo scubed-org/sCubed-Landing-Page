@@ -92,6 +92,13 @@ export const addonName = style({
   fontSize: typography.fontSize.xl,
   fontWeight: typography.fontWeight.semibold,
   color: colors.neutral[900],
+  margin: 0,
+});
+
+export const addonNameWrapper = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  gap: '0.5rem',
 });
 
 export const addonHeader = style({

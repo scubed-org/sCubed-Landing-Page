@@ -1,7 +1,7 @@
 import React from 'react';
-import Image from 'next/image';
 
 import { getStrapiImageUrl, StrapiImage } from '../../../lib/strapi';
+import ImageWithSkeleton from '../../common/ImageWithSkeleton';
 
 interface ModuleImageData {
   image?: StrapiImage;
@@ -79,19 +79,17 @@ const ModuleImage: React.FC<ModuleImageProps> = ({ data }) => {
   ].filter(Boolean).join(' ');
 
   const ImageComponent = () => (
-    <div className="relative overflow-hidden">
-      <Image
-        src={imageUrl}
-        alt={alt_text}
-        width={image?.width || 800}
-        height={image?.height || 600}
-        className={imageClasses}
-        style={{ 
-          width: '100%', 
-          height: image_size === 'thumbnail' ? '8rem' : 'auto' 
-        }}
-      />
-    </div>
+    <ImageWithSkeleton
+      src={imageUrl}
+      alt={alt_text}
+      width={image?.width || 800}
+      height={image?.height || 600}
+      className={imageClasses}
+      style={{
+        width: '100%',
+        height: image_size === 'thumbnail' ? '8rem' : 'auto',
+      }}
+    />
   );
 
   return (

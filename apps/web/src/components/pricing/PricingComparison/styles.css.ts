@@ -50,7 +50,7 @@ export const comparisonTable = style({
   background: colors.white,
   borderRadius: radius.lg,
   boxShadow: shadows.lg,
-  overflow: 'hidden',
+  overflow: 'visible',
   border: `1px solid ${colors.neutral[200]}`,
   '@media': {
     'screen and (max-width: 768px)': {
@@ -149,9 +149,6 @@ export const featureName = style({
   padding: spacing.md,
   fontSize: typography.fontSize.base,
   color: colors.neutral[700],
-  display: 'flex',
-  alignItems: 'center',
-  gap: spacing.xs,
 });
 
 export const featureCell = style({

@@ -8,12 +8,13 @@ import BlogPlaceholder from '../../../images/blog-placeholder.png';
 // Import hero background image
 import HeroBackground from '../../../images/S Cubed Insights & Updates.jpg';
 // Import Strapi utilities and types
-import { 
-  BlogPost, 
-  getStrapiImageUrl, 
-  formatPublishDate, 
-  calculateReadTime 
+import {
+  BlogPost,
+  getStrapiImageUrl,
+  formatPublishDate,
+  calculateReadTime
 } from '../../../lib/strapi';
+import ImageWithSkeleton from '../../common/ImageWithSkeleton';
 
 // Import pagination client component
 import BlogPagination from './BlogPagination';
@@ -170,11 +171,12 @@ const BlogListing: React.FC<BlogListingProps> = ({
                   <Link href={`/blog/${post.slug}`}>
                     <div className={postImage}>
                       {featuredImageUrl ? (
-                        <Image
+                        <ImageWithSkeleton
                           src={featuredImageUrl}
                           alt={post.title}
                           width={400}
                           height={280}
+                          wrapperStyle={{ width: '100%', height: '100%' }}
                           style={{ objectFit: 'cover', width: '100%', height: '100%' }}
                         />
                       ) : (

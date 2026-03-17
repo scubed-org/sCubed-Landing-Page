@@ -8,7 +8,7 @@ import {
   MapPin,
   UserCog,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import isEmail from 'validator/lib/isEmail';
 import isMobilePhone from 'validator/lib/isMobilePhone';
@@ -68,6 +68,32 @@ function Step3ClinicDetailsComponent({
   clinic_onboarding_request_id,
 }: Readonly<Step3Props>) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const scrollToFirstError = useCallback((errorFields: string[]) => {
+    if (!formRef.current || errorFields.length === 0) return;
+    for (const fieldName of errorFields) {
+      const container = formRef.current.querySelector<HTMLElement>(
+        `[data-field="${fieldName}"]`,
+      );
+      if (container) {
+        container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        const input = container.querySelector<HTMLInputElement>(
+          'input:not([type="hidden"]):not([readonly])',
+        );
+        input?.focus({ preventScroll: true });
+        return;
+      }
+    }
+  }, []);
+
+  // Scroll to first error field after API errors render
+  useEffect(() => {
+    const keys = Object.keys(fieldErrors);
+    if (keys.length > 0) {
+      scrollToFirstError(keys);
+    }
+  }, [fieldErrors, scrollToFirstError]);
 
   const {
     register,
@@ -396,7 +422,12 @@ function Step3ClinicDetailsComponent({
   const watchedStreetAddress = watch('street_address_line_1');
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form
+      ref={formRef}
+      onSubmit={handleSubmit(onSubmit, (validationErrors) => {
+        scrollToFirstError(Object.keys(validationErrors));
+      })}
+    >
       <h1 className={`${styles.formTitle} ${styles.fadeInUpAnimation}`}>
         Let's Get Started
       </h1>
@@ -511,7 +542,7 @@ function Step3ClinicDetailsComponent({
         </div>
 
         {/* Address Autocomplete */}
-        <div className={styles.formField}>
+        <div className={styles.formField} data-field="street_address_line_1">
           <AddressAutocomplete
             label="Street Address"
             required
@@ -533,7 +564,7 @@ function Step3ClinicDetailsComponent({
           {shouldShowError('street_address_line_1') &&
             getErrorMessage('street_address_line_1') && (
               <div className={styles.errorMessage}>
-                <AlertCircle size={16} />
+                <AlertCircle size={16} className={styles.errorIcon} />
                 <span>{getErrorMessage('street_address_line_1')?.message}</span>
               </div>
             )}
@@ -541,7 +572,7 @@ function Step3ClinicDetailsComponent({
 
         {/* Auto-populated location fields (read-only) */}
         <div className={styles.formGrid}>
-          <div className={styles.formField}>
+          <div className={styles.formField} data-field="state">
             <label className={styles.label}>
               State <span className={styles.requiredIndicator}>*</span>
             </label>
@@ -559,13 +590,13 @@ function Step3ClinicDetailsComponent({
             />
             {shouldShowError('state') && getErrorMessage('state') && (
               <div className={styles.errorMessage}>
-                <AlertCircle size={16} />
+                <AlertCircle size={16} className={styles.errorIcon} />
                 <span>{getErrorMessage('state')?.message}</span>
               </div>
             )}
           </div>
 
-          <div className={styles.formField}>
+          <div className={styles.formField} data-field="city">
             <label className={styles.label}>
               City <span className={styles.requiredIndicator}>*</span>
             </label>
@@ -583,14 +614,14 @@ function Step3ClinicDetailsComponent({
             />
             {shouldShowError('city') && getErrorMessage('city') && (
               <div className={styles.errorMessage}>
-                <AlertCircle size={16} />
+                <AlertCircle size={16} className={styles.errorIcon} />
                 <span>{getErrorMessage('city')?.message}</span>
               </div>
             )}
           </div>
         </div>
 
-        <div className={styles.formField}>
+        <div className={styles.formField} data-field="zip_code">
           <label className={styles.label}>
             ZIP Code <span className={styles.requiredIndicator}>*</span>
           </label>
@@ -602,7 +633,7 @@ function Step3ClinicDetailsComponent({
           />
           {shouldShowError('zip_code') && getErrorMessage('zip_code') && (
             <div className={styles.errorMessage}>
-              <AlertCircle size={16} />
+              <AlertCircle size={16} className={styles.errorIcon} />
               <span>{getErrorMessage('zip_code')?.message}</span>
             </div>
           )}

@@ -1,8 +1,8 @@
 import { style, keyframes } from '@vanilla-extract/css';
 
 const fadeIn = keyframes({
-  from: { opacity: 0, transform: 'translateY(4px)' },
-  to: { opacity: 1, transform: 'translateY(0)' },
+  from: { opacity: 0 },
+  to: { opacity: 1 },
 });
 
 export const tooltipWrapper = style({
@@ -10,6 +10,9 @@ export const tooltipWrapper = style({
   display: 'inline-flex',
   alignItems: 'center',
   justifyContent: 'center',
+  flexShrink: 0,
+  verticalAlign: 'middle',
+  marginLeft: '4px',
 });
 
 export const tooltipIcon = style({
@@ -31,6 +34,7 @@ export const tooltipContent = style({
   backgroundColor: '#1f2937',
   color: '#ffffff',
   fontSize: '0.875rem',
+  fontWeight: 400,
   lineHeight: '1.5',
   borderRadius: '8px',
   boxShadow: '0 4px 12px rgba(0, 0, 0, 0.15)',
@@ -41,13 +45,15 @@ export const tooltipContent = style({
   animation: `${fadeIn} 0.2s ease`,
   '@media': {
     'screen and (max-width: 768px)': {
-      maxWidth: '240px',
+      maxWidth: '250px',
+      width: '250px',
       fontSize: '0.8125rem',
       padding: '10px 14px',
     },
   },
 });
 
+// Arrow pointing down (tooltip is above the icon)
 export const tooltipArrow = style({
   position: 'absolute',
   top: '100%',
@@ -60,3 +66,15 @@ export const tooltipArrow = style({
   borderTop: '6px solid #1f2937',
 });
 
+// Arrow pointing up (tooltip is below the icon)
+export const tooltipArrowAbove = style({
+  position: 'absolute',
+  bottom: '100%',
+  left: '50%',
+  transform: 'translateX(-50%)',
+  width: 0,
+  height: 0,
+  borderLeft: '6px solid transparent',
+  borderRight: '6px solid transparent',
+  borderBottom: '6px solid #1f2937',
+});
