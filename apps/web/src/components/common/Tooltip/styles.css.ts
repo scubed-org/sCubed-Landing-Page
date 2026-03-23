@@ -19,8 +19,12 @@ export const tooltipIcon = style({
   cursor: 'help',
   color: '#9ca3af',
   transition: 'color 0.2s ease',
-  ':hover': {
-    color: '#6b7280',
+  '@media': {
+    '(hover: hover)': {
+      ':hover': {
+        color: '#6b7280',
+      },
+    },
   },
 });
 

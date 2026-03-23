@@ -1,7 +1,7 @@
 'use client';
 
 import { Info } from 'lucide-react';
-import { ReactNode, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { ReactNode, useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import * as styles from './styles.css';
 
@@ -27,6 +27,7 @@ export default function Tooltip({ content, children }: TooltipProps) {
   const [pos, setPos] = useState<TooltipPosition | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
+  const recentTouchRef = useRef(false);
 
   useLayoutEffect(() => {
     if (!isVisible || !wrapperRef.current || !tooltipRef.current) {
@@ -57,7 +58,7 @@ export default function Tooltip({ content, children }: TooltipProps) {
     setPos({ top, left, arrowLeft, showBelow });
   }, [isVisible]);
 
-  // Close on outside click/tap
+  // Close on outside click/tap and on scroll
   useEffect(() => {
     if (!isVisible) return;
 
@@ -67,13 +68,36 @@ export default function Tooltip({ content, children }: TooltipProps) {
       }
     };
 
+    const handleScroll = () => {
+      setIsVisible(false);
+    };
+
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('touchstart', handleClickOutside);
+    window.addEventListener('scroll', handleScroll, true);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('touchstart', handleClickOutside);
+      window.removeEventListener('scroll', handleScroll, true);
     };
   }, [isVisible]);
+
+  const handleMouseEnter = useCallback(() => {
+    if (recentTouchRef.current) return;
+    setIsVisible(true);
+  }, []);
+
+  const handleMouseLeave = useCallback(() => {
+    if (recentTouchRef.current) return;
+    setIsVisible(false);
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    recentTouchRef.current = true;
+    setTimeout(() => {
+      recentTouchRef.current = false;
+    }, 300);
+  }, []);
 
   const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
@@ -85,8 +109,9 @@ export default function Tooltip({ content, children }: TooltipProps) {
     <span
       ref={wrapperRef}
       className={styles.tooltipWrapper}
-      onMouseEnter={() => setIsVisible(true)}
-      onMouseLeave={() => setIsVisible(false)}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      onTouchEnd={handleTouchEnd}
       onFocus={() => setIsVisible(true)}
       onBlur={() => setIsVisible(false)}
       onClick={handleClick}
