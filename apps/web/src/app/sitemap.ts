@@ -1,39 +1,12 @@
 import { MetadataRoute } from 'next';
-import { unstable_cache } from 'next/cache';
 
 import { getBlogPosts } from '@/lib/strapi';
 import { getEvents } from '@/lib/events-api';
 
-// Next.js route segment config: controls how often this route is regenerated (ISR)
-// Note: must be a literal number — Next.js statically analyzes this value
-export const revalidate = 86400; // 24 hours
-
-// Cache TTL for unstable_cache (matches revalidate above)
-const CACHE_TTL = 86400;
-
-const getCachedBlogSlugs = unstable_cache(
-  async () => {
-    const response = await getBlogPosts({ page: 1, pageSize: 5000 });
-    return response.data.map((post) => ({
-      slug: post.slug,
-      updatedAt: post.updatedAt || post.publish_date,
-    }));
-  },
-  ['sitemap-blog-slugs'],
-  { revalidate: CACHE_TTL },
-);
-
-const getCachedEventSlugs = unstable_cache(
-  async () => {
-    const response = await getEvents({ page: 1, pageSize: 5000 });
-    return response.data.map((event) => ({
-      slug: event.slug,
-      updatedAt: event.updatedAt,
-    }));
-  },
-  ['sitemap-event-slugs'],
-  { revalidate: CACHE_TTL },
-);
+// Force dynamic rendering so the sitemap always reflects the latest content.
+// On AWS Amplify, ISR and on-demand revalidation (revalidateTag) are unreliable,
+// so we render fresh on every request. Sitemaps are only hit by crawlers.
+export const dynamic = 'force-dynamic';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
@@ -150,26 +123,26 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
   ];
 
-  // Fetch dynamic blog posts and events in parallel (cached for 1 hour)
-  const [blogSlugs, eventSlugs] = await Promise.all([
-    getCachedBlogSlugs().catch((error) => {
+  // Fetch dynamic blog posts and events in parallel
+  const [blogResponse, eventsResponse] = await Promise.all([
+    getBlogPosts({ page: 1, pageSize: 5000 }).catch((error: unknown) => {
       console.error('Failed to fetch blog posts for sitemap:', error);
-      return [] as { slug: string; updatedAt: string }[];
+      return { data: [] as { slug: string; updatedAt: string; publish_date: string }[] };
     }),
-    getCachedEventSlugs().catch((error) => {
+    getEvents({ page: 1, pageSize: 5000 }).catch((error: unknown) => {
       console.error('Failed to fetch events for sitemap:', error);
-      return [] as { slug: string; updatedAt: string }[];
+      return { data: [] as { slug: string; updatedAt: string }[] };
     }),
   ]);
 
-  const blogPostPages: MetadataRoute.Sitemap = blogSlugs.map((post) => ({
+  const blogPostPages: MetadataRoute.Sitemap = blogResponse.data.map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(post.updatedAt),
+    lastModified: new Date(post.updatedAt || post.publish_date),
     changeFrequency: 'monthly' as const,
     priority: 0.6,
   }));
 
-  const eventPages: MetadataRoute.Sitemap = eventSlugs.map((event) => ({
+  const eventPages: MetadataRoute.Sitemap = eventsResponse.data.map((event) => ({
     url: `${baseUrl}/events/${event.slug}`,
     lastModified: new Date(event.updatedAt),
     changeFrequency: 'monthly' as const,
