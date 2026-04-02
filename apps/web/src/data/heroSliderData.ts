@@ -9,7 +9,36 @@ import { HeroSliderItem } from '../components/HeroImageSlider';
 import BackgroundAPBASlide from '../../public/images/APBA Homepage Banner.jpg';
 import RightImageAPBASlide from '../../public/images/APBA-Text.png';
 
+// Autism Awareness
+import BackgroundAutismSlide from '../../public/images/AutismHomepageBanner.jpg';
+import AutismRightImage from '../../public/images/AutismRightImage.png';
+
 export const heroSliderData: HeroSliderItem[] = [
+  {
+    id: 'autism-awareness-2026',
+    title:
+      '<span style="font-weight: 400;">From Awareness to Acceptance, </span><span style="color: #7a7eed;">It\'s Time Autism Care Catches Up.</span>',
+    mobileTitle:
+      '<span style="font-weight: 400;">From Awareness to Acceptance, </span><span style="color: #7a7eed;">It\'s Time Autism Care Catches Up.</span>',
+    description:
+      'On World Autism Awareness Day, the conversation moves beyond awareness toward care that is structured, consistent, and designed for real-world impact.',
+    layoutMode: 'split',
+    descriptionMaxWidth: '700px',
+    backgroundImage: {
+      src: BackgroundAutismSlide,
+      alt: 'World Autism Awareness Day',
+      position: 'center center',
+    },
+    splitImage: {
+      src: AutismRightImage,
+      alt: 'World Autism Awareness Day',
+    },
+    link: {
+      href: '/blog/from-awareness-to-acceptance-how-far-the-autism-journey-has-come',
+      text: 'Learn more',
+      mobileText: 'Learn more',
+    },
+  },
   {
     id: 'apba-conference-2026',
     title:
