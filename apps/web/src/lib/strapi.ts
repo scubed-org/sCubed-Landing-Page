@@ -369,11 +369,26 @@ export function getPublishDate(post: BlogPost): string {
 
 // Helper function to format date
 export function formatDate(dateString: string): string {
+  const dateOnlyMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateString);
+
+  if (dateOnlyMatch) {
+    const [, year, month, day] = dateOnlyMatch;
+    const utcDate = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+    return new Intl.DateTimeFormat('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      timeZone: 'UTC',
+    }).format(utcDate);
+  }
+
   const date = new Date(dateString);
   return date.toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+    timeZone: 'UTC',
   });
 }
 
