@@ -279,6 +279,21 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
     }, 1000);
   };
 
+  const handleNavigationButtonClick = useCallback(
+    (
+      event:
+        | React.MouseEvent<HTMLButtonElement>
+        | React.TouchEvent<HTMLButtonElement>
+        | React.PointerEvent<HTMLButtonElement>,
+      navigate: () => void
+    ) => {
+      event.stopPropagation();
+      setIsAutoPlaying(false);
+      navigate();
+    },
+    []
+  );
+
   // Memoize computed values to prevent unnecessary recalculations
   const currentItem = useMemo(() => items[currentIndex], [items, currentIndex]);
   
@@ -693,14 +708,18 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
             <div className={heroSliderNavigation}>
               <button
                 className={heroSliderPrevButton}
-                onClick={prevSlide}
+                onClick={(event) => handleNavigationButtonClick(event, prevSlide)}
+                onTouchEnd={(event) => event.stopPropagation()}
+                onPointerUp={(event) => event.stopPropagation()}
                 aria-label="Previous slide"
               >
                 <ChevronLeft size={20} />
               </button>
               <button
                 className={heroSliderNextButton}
-                onClick={nextSlide}
+                onClick={(event) => handleNavigationButtonClick(event, nextSlide)}
+                onTouchEnd={(event) => event.stopPropagation()}
+                onPointerUp={(event) => event.stopPropagation()}
                 aria-label="Next slide"
               >
                 <ChevronRight size={20} />

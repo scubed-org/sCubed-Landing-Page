@@ -581,17 +581,23 @@ export const buttonPrimary = style({
   color: '#ffffff',
   boxShadow: shadows.purple,
   selectors: {
-    '&:hover': {
+    '&:hover:not(:disabled)': {
       backgroundColor: colors.primary[700],
       transform: 'translateY(-1px)',
       boxShadow: '0 12px 40px -10px rgba(124, 82, 255, 0.5)',
     },
-    '&:active': {
+    '&:active:not(:disabled)': {
       transform: 'translateY(0)',
+    },
+    '&:disabled': {
+      backgroundColor: '#e5e7eb',
+      color: '#6b7280',
+      boxShadow: 'none',
     },
     '&:disabled:hover': {
       transform: 'none',
-      backgroundColor: colors.primary[600],
+      backgroundColor: '#e5e7eb',
+      boxShadow: 'none',
     },
   },
 });

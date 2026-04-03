@@ -13,6 +13,7 @@ export const tooltipWrapper = style({
   flexShrink: 0,
   verticalAlign: 'middle',
   marginLeft: '4px',
+  cursor: 'pointer',
 });
 
 export const tooltipIcon = style({

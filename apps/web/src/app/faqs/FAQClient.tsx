@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion, Variants } from 'framer-motion';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 import {
   answer,
@@ -32,10 +32,63 @@ import { faqData } from '@/data/faq-data';
 
 export default function FAQClient() {
   const [openSectionIndex, setOpenSectionIndex] = useState<number>(0); // First section open by default
+  const sectionHeaderRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const preservePositionRef = useRef<{ index: number; top: number } | null>(null);
 
   const toggleSection = (index: number) => {
+    if (openSectionIndex !== index) {
+      const headerElement = sectionHeaderRefs.current[index];
+
+      if (headerElement) {
+        preservePositionRef.current = {
+          index,
+          top: headerElement.getBoundingClientRect().top
+        };
+      }
+    } else {
+      preservePositionRef.current = null;
+    }
+
     setOpenSectionIndex(openSectionIndex === index ? -1 : index);
   };
+
+  useLayoutEffect(() => {
+    if (openSectionIndex < 0 || typeof window === 'undefined') {
+      preservePositionRef.current = null;
+      return undefined;
+    }
+
+    const pendingPosition = preservePositionRef.current;
+
+    if (!pendingPosition || pendingPosition.index !== openSectionIndex) {
+      return undefined;
+    }
+
+    const syncHeaderPosition = () => {
+      const headerElement = sectionHeaderRefs.current[openSectionIndex];
+
+      if (!headerElement) {
+        return;
+      }
+
+      const currentTop = headerElement.getBoundingClientRect().top;
+      const scrollDelta = currentTop - pendingPosition.top;
+
+      if (Math.abs(scrollDelta) > 1) {
+        window.scrollBy({
+          top: scrollDelta,
+          behavior: 'auto'
+        });
+      }
+    };
+
+    syncHeaderPosition();
+    preservePositionRef.current = null;
+
+    return () => {
+      preservePositionRef.current = null;
+    };
+  }, [openSectionIndex]);
 
   // Animation variants for section content
   const sectionVariants: Variants = {
@@ -45,11 +98,10 @@ export default function FAQClient() {
       overflow: 'hidden',
       transition: {
         height: {
-          duration: 0.3,
-          ease: [0.4, 0.0, 0.2, 1]
+          duration: 0
         },
         opacity: {
-          duration: 0.2,
+          duration: 0.15,
           ease: 'easeOut'
         }
       }
@@ -60,13 +112,11 @@ export default function FAQClient() {
       overflow: 'hidden',
       transition: {
         height: {
-          duration: 0.3,
-          ease: [0.4, 0.0, 0.2, 1]
+          duration: 0
         },
         opacity: {
           duration: 0.2,
-          ease: 'easeIn',
-          delay: 0.05
+          ease: 'easeIn'
         }
       }
     }
@@ -115,12 +165,18 @@ export default function FAQClient() {
             const isOpen = openSectionIndex === sectionIndex;
             
             return (
-              <div key={sectionData.name} className={`${section} ${isOpen ? sectionExpanded : ''}`}>
+              <div
+                key={sectionData.name}
+                className={`${section} ${isOpen ? sectionExpanded : ''}`}
+              >
                 <button
                   className={sectionHeader}
                   onClick={() => toggleSection(sectionIndex)}
                   aria-expanded={isOpen}
                   aria-controls={`section-${sectionIndex}`}
+                  ref={(element) => {
+                    sectionHeaderRefs.current[sectionIndex] = element;
+                  }}
                 >
                   <h2 className={sectionTitle}>{sectionData.name}</h2>
                   <motion.span

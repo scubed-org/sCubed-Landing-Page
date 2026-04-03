@@ -500,16 +500,18 @@ const navigationButtonBase = style({
   boxShadow: shadows.md,
   transition: 'all 0.3s ease',
   pointerEvents: 'auto',
-  ':hover': {
-    backgroundColor: colors.white,
-    color: colors.primary[600],
-    transform: 'translateY(-50%) scale(1.05)',
-    boxShadow: shadows.lg,
-  },
   ':active': {
     transform: 'translateY(-50%) scale(0.95)',
   },
   '@media': {
+    '(hover: hover) and (pointer: fine)': {
+      ':hover': {
+        backgroundColor: colors.white,
+        color: colors.primary[600],
+        transform: 'translateY(-50%) scale(1.05)',
+        boxShadow: shadows.lg,
+      },
+    },
     'screen and (max-width: 768px)': {
       width: '40px',
       height: '40px',
@@ -636,12 +638,15 @@ export const heroSliderSplitImageWrapper = style({
     },
     'screen and (max-width: 767px)': {
       width: '100%',
-      height: 'auto',
+      height: '220px',
+      minHeight: '220px',
       padding: 0,
       justifyContent: 'center',
       alignItems: 'center',
     },
     'screen and (max-width: 480px)': {
+      height: '180px',
+      minHeight: '180px',
       padding: 0,
     },
   },
@@ -659,12 +664,12 @@ export const heroSliderSplitImage = style({
     },
     'screen and (max-width: 767px)': {
       maxWidth: '60%',
-      maxHeight: '220px',
+      maxHeight: '180px',
       borderRadius: radius.lg,
     },
     'screen and (max-width: 480px)': {
       maxWidth: '80%',
-      maxHeight: '180px',
+      maxHeight: '140px',
       borderRadius: radius.md,
     },
   },
