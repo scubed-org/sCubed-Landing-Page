@@ -92,14 +92,20 @@ export default function Tooltip({ content, children }: TooltipProps) {
     setIsVisible(false);
   }, []);
 
-  const handleTouchEnd = useCallback(() => {
-    recentTouchRef.current = true;
-    setTimeout(() => {
-      recentTouchRef.current = false;
-    }, 300);
-  }, []);
+  const handleTouchEnd = useCallback(
+    (e: React.TouchEvent) => {
+      e.preventDefault();
+      recentTouchRef.current = true;
+      setTimeout(() => {
+        recentTouchRef.current = false;
+      }, 300);
+      setIsVisible((prev) => !prev);
+    },
+    [],
+  );
 
-  const handleClick = (e: React.MouseEvent | React.TouchEvent) => {
+  const handleClick = (e: React.MouseEvent) => {
+    if (recentTouchRef.current) return;
     e.stopPropagation();
     e.preventDefault();
     setIsVisible((prev) => !prev);

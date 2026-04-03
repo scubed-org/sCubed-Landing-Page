@@ -181,6 +181,7 @@ export const section = style({
   marginBottom: spacing.xs,
   borderRadius: '12px',
   transition: 'background-color 0.3s ease',
+  overflowAnchor: 'none',
   ':hover': {
     backgroundColor: colors.neutral[100],
   },
