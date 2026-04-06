@@ -500,6 +500,8 @@ const navigationButtonBase = style({
   boxShadow: shadows.md,
   transition: 'all 0.3s ease',
   pointerEvents: 'auto',
+  touchAction: 'manipulation',
+  WebkitTapHighlightColor: 'transparent',
   ':active': {
     transform: 'translateY(-50%) scale(0.95)',
   },

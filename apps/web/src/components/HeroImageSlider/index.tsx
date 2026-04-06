@@ -288,6 +288,7 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
       navigate: () => void
     ) => {
       event.stopPropagation();
+      event.preventDefault();
       setIsAutoPlaying(false);
       navigate();
     },
@@ -709,7 +710,8 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
               <button
                 className={heroSliderPrevButton}
                 onClick={(event) => handleNavigationButtonClick(event, prevSlide)}
-                onTouchEnd={(event) => event.stopPropagation()}
+                onTouchStart={(event) => event.stopPropagation()}
+                onTouchEnd={(event) => handleNavigationButtonClick(event, prevSlide)}
                 onPointerUp={(event) => event.stopPropagation()}
                 aria-label="Previous slide"
               >
@@ -718,7 +720,8 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
               <button
                 className={heroSliderNextButton}
                 onClick={(event) => handleNavigationButtonClick(event, nextSlide)}
-                onTouchEnd={(event) => event.stopPropagation()}
+                onTouchStart={(event) => event.stopPropagation()}
+                onTouchEnd={(event) => handleNavigationButtonClick(event, nextSlide)}
                 onPointerUp={(event) => event.stopPropagation()}
                 aria-label="Next slide"
               >

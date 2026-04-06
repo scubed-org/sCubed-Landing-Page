@@ -1,6 +1,6 @@
 'use client';
 
-import { AnimatePresence, motion, Variants } from 'framer-motion';
+import { motion, Variants } from 'framer-motion';
 import Link from 'next/link';
 import { useLayoutEffect, useRef, useState } from 'react';
 
@@ -64,63 +64,29 @@ export default function FAQClient() {
       return undefined;
     }
 
-    const syncHeaderPosition = () => {
-      const headerElement = sectionHeaderRefs.current[openSectionIndex];
+    const headerElement = sectionHeaderRefs.current[openSectionIndex];
 
-      if (!headerElement) {
-        return;
-      }
+    if (!headerElement) {
+      preservePositionRef.current = null;
+      return undefined;
+    }
 
-      const currentTop = headerElement.getBoundingClientRect().top;
-      const scrollDelta = currentTop - pendingPosition.top;
+    const currentTop = headerElement.getBoundingClientRect().top;
+    const scrollDelta = currentTop - pendingPosition.top;
 
-      if (Math.abs(scrollDelta) > 1) {
-        window.scrollBy({
-          top: scrollDelta,
-          behavior: 'auto'
-        });
-      }
-    };
+    if (Math.abs(scrollDelta) > 1) {
+      window.scrollBy({
+        top: scrollDelta,
+        behavior: 'auto'
+      });
+    }
 
-    syncHeaderPosition();
     preservePositionRef.current = null;
 
     return () => {
       preservePositionRef.current = null;
     };
   }, [openSectionIndex]);
-
-  // Animation variants for section content
-  const sectionVariants: Variants = {
-    collapsed: {
-      height: 0,
-      opacity: 0,
-      overflow: 'hidden',
-      transition: {
-        height: {
-          duration: 0
-        },
-        opacity: {
-          duration: 0.15,
-          ease: 'easeOut'
-        }
-      }
-    },
-    expanded: {
-      height: 'auto',
-      opacity: 1,
-      overflow: 'hidden',
-      transition: {
-        height: {
-          duration: 0
-        },
-        opacity: {
-          duration: 0.2,
-          ease: 'easeIn'
-        }
-      }
-    }
-  };
 
   // Chevron animation variants
   const chevronVariants: Variants = {
@@ -142,7 +108,7 @@ export default function FAQClient() {
 
   return (
     <>
-      
+
         <div className={heroContainer}>
           <div className={heroContent}>
             <h1 className={heroTitle}>
@@ -157,13 +123,13 @@ export default function FAQClient() {
             </p>
           </div>
         </div>
-      
-      
+
+
       <div className={container}>
         <div className={wrapper}>
           {faqData.sections.map((sectionData, sectionIndex) => {
             const isOpen = openSectionIndex === sectionIndex;
-            
+
             return (
               <div
                 key={sectionData.name}
@@ -202,57 +168,49 @@ export default function FAQClient() {
                     </svg>
                   </motion.span>
                 </button>
-                
-                <AnimatePresence initial={false}>
-                  {isOpen && (
+
+                {isOpen && (
+                  <div
+                    id={`section-${sectionIndex}`}
+                    style={{ overflow: 'hidden' }}
+                  >
                     <motion.div
-                      key={`section-content-${sectionData.name}`}
-                      initial="collapsed"
-                      animate="expanded"
-                      exit="collapsed"
-                      variants={sectionVariants}
-                      id={`section-${sectionIndex}`}
-                      style={{ overflow: 'hidden' }}
+                      className={qaContainer}
+                      initial={{ y: -10, opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      transition={{ delay: 0.1, duration: 0.3 }}
                     >
-                      <motion.div
-                        className={qaContainer}
-                        initial={{ y: -10, opacity: 0 }}
-                        animate={{ y: 0, opacity: 1 }}
-                        exit={{ y: -10, opacity: 0 }}
-                        transition={{ delay: 0.1, duration: 0.3 }}
-                      >
-                        {sectionData.items.map((item) => (
-                          <div key={item.question} className={qaItem}>
-                            <h3 className={question}>{item.question}</h3>
-                            <div className={answer}>
-                              <svg 
-                                width="16" 
-                                height="16" 
-                                viewBox="0 0 16 16" 
-                                fill="none" 
-                                xmlns="http://www.w3.org/2000/svg"
-                                style={{ flexShrink: 0, marginRight: '12px', marginTop: '4px' }}
-                              >
-                                <path 
-                                  d="M3 8H13M13 8L9 4M13 8L9 12" 
-                                  stroke="#6B7280" 
-                                  strokeWidth="1.5" 
-                                  strokeLinecap="round" 
-                                  strokeLinejoin="round"
-                                />
-                              </svg>
-                              <div>{item.answer}</div>
-                            </div>
+                      {sectionData.items.map((item) => (
+                        <div key={item.question} className={qaItem}>
+                          <h3 className={question}>{item.question}</h3>
+                          <div className={answer}>
+                            <svg
+                              width="16"
+                              height="16"
+                              viewBox="0 0 16 16"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                              style={{ flexShrink: 0, marginRight: '12px', marginTop: '4px' }}
+                            >
+                              <path
+                                d="M3 8H13M13 8L9 4M13 8L9 12"
+                                stroke="#6B7280"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                            <div>{item.answer}</div>
                           </div>
-                        ))}
-                      </motion.div>
+                        </div>
+                      ))}
                     </motion.div>
-                  )}
-                </AnimatePresence>
+                  </div>
+                )}
               </div>
             );
           })}
-          
+
           <div className={contactLinkWrapper}>
             <span className={contactText}>
               Didn't find your answer?{' '}
