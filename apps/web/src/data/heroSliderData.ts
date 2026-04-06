@@ -21,7 +21,7 @@ export const heroSliderData: HeroSliderItem[] = [
     mobileTitle:
       '<span style="font-weight: 400;">From Awareness to Acceptance, </span><span style="color: #7a7eed;">It\'s Time Autism Care Catches Up.</span>',
     description:
-      'On World Autism Awareness Day, the conversation moves beyond awareness toward care that is structured, consistent, and designed for real-world impact.',
+      'On <strong>World Autism Awareness Day</strong>, the conversation moves beyond awareness toward care that is structured, consistent, and designed for real-world impact.',
     layoutMode: 'split',
     descriptionMaxWidth: '700px',
     backgroundImage: {
