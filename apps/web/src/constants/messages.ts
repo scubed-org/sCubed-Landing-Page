@@ -31,6 +31,12 @@ export const ERROR_MESSAGES = {
   // Authentication & Authorization
   UNAUTHORIZED: 'You are not authorized to perform this action.',
   SESSION_EXPIRED: 'Your session has expired. Please log in again.',
+  ONBOARDING_SESSION_EXPIRED:
+    'Your onboarding session expired. Please verify again.',
+  ONBOARDING_SERVICE_UNAVAILABLE:
+    'We could not reach the signup service. Please try again in a moment.',
+  INVALID_REQUEST_BODY: 'Invalid JSON in request body.',
+  INVALID_ONBOARDING_REQUEST: 'Invalid onboarding request.',
   INVALID_CREDENTIALS: 'Invalid email or password.',
 
   // Data Loading

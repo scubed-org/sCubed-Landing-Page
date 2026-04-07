@@ -15,9 +15,10 @@ import * as styles from './styles.css';
 
 import { API_ENDPOINTS } from '@/constants/api';
 import { fetchApi } from '@/lib/api-client';
+import { fetchOnboardingApi } from '@/lib/onboarding-api-client';
 import { showSuccessToast } from '@/lib/errors';
 import { isApiError } from '@/types/api';
-import type { Step2Props } from '@/types/subscription';
+import type { OTPVerificationResponse, Step2Props } from '@/types/subscription';
 
 interface OTPFormData {
   otp_code: string;
@@ -149,83 +150,42 @@ export default function Step2OTPVerification({
     setApiError(null);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_ADMIN_APP_API_URL}${API_ENDPOINTS.SUBSCRIPTION.VERIFY_EMAIL_CONFIRM}`,
+      // fetchOnboardingApi throws on non-2xx responses, so if we reach
+      // the lines after this call the OTP was accepted by the backend.
+      const result = await fetchOnboardingApi<OTPVerificationResponse>(
+        'verify-email/confirm',
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          body: {
             clinic_onboarding_request_id,
             otp: data.otp_code,
-          }),
+          },
+          skipErrorToast: true,
         },
       );
 
-      // Parse response
-      const result = await response.json();
+      // Clear any previous errors
+      setApiError(null);
 
-      // Log the response for debugging
-      console.log('OTP Verification Response:', {
-        status: response.status,
-        ok: response.ok,
-        result,
-      });
+      // Show success toast notification
+      showSuccessToast('Email verified successfully!');
 
-      // Extract message from response (check multiple possible fields)
-      const message = result.message || result.error || result.detail || '';
-      const lowerMessage = message.toLowerCase();
+      // Wait a brief moment to ensure state updates
+      await new Promise((resolve) => setTimeout(resolve, 100));
 
-      // Determine if this is a successful verification
-      // Check multiple indicators of success:
-      const isSuccessfulVerification =
-        // 1. Explicit success flag
-        (response.ok && result.success === true) ||
-        // 2. 200 status with data
-        (response.ok && result.data) ||
-        // 3. Message indicates success (even if status is error)
-        // These phrases indicate the email was verified (even if API returns error status)
-        (message &&
-          (lowerMessage.includes('verified successfully') ||
-            lowerMessage.includes('email verified') ||
-            lowerMessage.includes('email has been verified') ||
-            lowerMessage.includes('verification successful') ||
-            lowerMessage.includes('successfully verified') ||
-            // "Please complete your registration" is a clear success indicator
-            lowerMessage.includes('please complete') ||
-            lowerMessage.includes('complete your registration') ||
-            lowerMessage.includes('complete registration') ||
-            // Other success indicators
-            lowerMessage.includes('pending') ||
-            lowerMessage.includes('submitted successfully') ||
-            lowerMessage.includes('submission successful')));
-
-      if (isSuccessfulVerification) {
-        console.log(
-          '✅ Email verification successful - redirecting to next step',
-        );
-
-        // Clear any previous errors
-        setApiError(null);
-
-        // Show success toast notification
-        showSuccessToast('Email verified successfully!');
-
-        // Wait a brief moment to ensure state updates
-        await new Promise((resolve) => setTimeout(resolve, 100));
-
-        // Immediately transition to next step
-        onVerified(result.data || {});
-      } else {
-        // This is a genuine error - invalid OTP, expired OTP, etc.
-        console.error('❌ Email verification failed:', message);
-
-        const errorMessage =
-          message || 'Invalid verification code. Please try again.';
-        setApiError(errorMessage);
-      }
+      // Transition to next step
+      onVerified(result);
     } catch (error) {
       console.error('Failed to verify OTP:', error);
-      setApiError('Network error. Please check your connection and try again.');
+      if (isApiError(error)) {
+        setApiError(
+          error.message || 'Invalid verification code. Please try again.',
+        );
+      } else {
+        setApiError(
+          'Network error. Please check your connection and try again.',
+        );
+      }
     } finally {
       setVerifying(false);
     }

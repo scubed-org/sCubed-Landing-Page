@@ -116,6 +116,8 @@ export interface FetchApiOptions extends Omit<RequestInit, 'body'> {
   body?: Record<string, unknown> | unknown[];
   // Skip automatic error toast (useful when handling errors manually)
   skipErrorToast?: boolean;
+  // Skip automatic error toasts for specific HTTP status codes
+  skipErrorStatuses?: number[];
   // Custom error handler
   onError?: (error: ApiError) => void;
   // Base URL override (defaults to NEXT_PUBLIC_ADMIN_APP_API_URL)
