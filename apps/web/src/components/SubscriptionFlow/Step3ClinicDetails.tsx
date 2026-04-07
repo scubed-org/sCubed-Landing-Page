@@ -17,8 +17,8 @@ import {
   DEFAULT_STAFF_COUNT,
   DEFAULT_FREE_STAFF_COUNT,
 } from '../../constants/formFields';
-import { fetchApi } from '../../lib/api-client';
 import { getFieldErrors } from '../../lib/errors';
+import { fetchOnboardingApi } from '../../lib/onboarding-api-client';
 import { isApiError } from '../../types/api';
 
 import { PhoneInput, TextInput } from './FormComponents';
@@ -439,13 +439,10 @@ function Step3ClinicDetailsComponent({
           draft_mode: true,
         };
 
-        await fetchApi<RegistrationResponseData>(
-          'subscriptions/onboarding/register',
-          {
-            method: 'PUT',
-            body: draftPayload,
-          },
-        );
+        await fetchOnboardingApi<RegistrationResponseData>('register', {
+          method: 'PUT',
+          body: draftPayload,
+        });
 
         onNext(formData);
         return;
@@ -465,8 +462,8 @@ function Step3ClinicDetailsComponent({
         cancel_url,
       };
 
-      const result = await fetchApi<RegistrationResponseData>(
-        'subscriptions/onboarding/register',
+      const result = await fetchOnboardingApi<RegistrationResponseData>(
+        'register',
         {
           method: 'PUT',
           body: apiPayload,

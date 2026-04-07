@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
 
 import * as styles from '@/components/SubscriptionFlow/styles.css';
+import { clearOnboardingAccessToken } from '@/lib/onboarding-api-client';
 import { clearSession, loadSession } from '@/lib/subscriptionSessionManager';
 
 /**
@@ -41,6 +42,7 @@ function PaymentReturnContent() {
 
       // Clear session after 2 seconds and redirect to home
       setTimeout(() => {
+        void clearOnboardingAccessToken();
         clearSession();
         router.push('/');
       }, 5000);
@@ -68,6 +70,7 @@ function PaymentReturnContent() {
   };
 
   const handleStartOver = () => {
+    void clearOnboardingAccessToken();
     clearSession();
     router.push('/pricing');
   };
