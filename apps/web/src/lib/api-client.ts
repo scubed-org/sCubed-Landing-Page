@@ -76,6 +76,7 @@ export async function fetchApi<T = unknown>(
   const {
     body,
     skipErrorToast = false,
+    skipErrorStatuses = [],
     onError,
     baseUrl,
     headers = {},
@@ -83,7 +84,7 @@ export async function fetchApi<T = unknown>(
   } = options;
 
   // Construct full URL
-  const apiBaseUrl = baseUrl || getBaseUrl();
+  const apiBaseUrl = baseUrl ?? getBaseUrl();
   const url = endpoint.startsWith('http')
     ? endpoint
     : `${apiBaseUrl}${endpoint.startsWith('/') ? endpoint : `/${endpoint}`}`;
@@ -122,7 +123,12 @@ export async function fetchApi<T = unknown>(
 
     // Handle error responses (4xx, 5xx)
     // This will throw ApiError
-    await handleErrorResponse(response, skipErrorToast, onError);
+    await handleErrorResponse(
+      response,
+      skipErrorToast,
+      onError,
+      skipErrorStatuses,
+    );
   } catch (error) {
     // If it's already an ApiError, just re-throw it
     // (it was already handled by handleErrorResponse)
@@ -150,6 +156,7 @@ async function handleErrorResponse(
   response: Response,
   skipErrorToast: boolean,
   onError?: (error: ApiError) => void,
+  skipErrorStatuses: number[] = [],
 ): Promise<never> {
   let errorData: ApiErrorResponse | null = null;
 
@@ -182,7 +189,7 @@ async function handleErrorResponse(
 
   // Show error toast ONLY for non-field errors (unless skipped)
   // Field errors should be handled inline by the component
-  if (!skipErrorToast) {
+  if (!skipErrorToast && !skipErrorStatuses.includes(response.status)) {
     // Check if all errors have field properties (field validation errors)
     const hasOnlyFieldErrors = apiError.errors.every((err) => err.field);
 

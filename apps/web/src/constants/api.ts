@@ -40,14 +40,14 @@ export const API_ENDPOINTS = {
 } as const;
 
 /**
- * Build full registration data endpoint with request ID.
+ * Build the onboarding-proxy path for registration data.
  * Email is required by the API (SCM-5827) to authorize access to the record.
  */
-export function getRegistrationDataEndpoint(
+export function getRegistrationDataPath(
   requestId: number | string,
   email: string,
 ): string {
-  return `${API_ENDPOINTS.SUBSCRIPTION.REGISTRATION_DATA}/${requestId}?email=${encodeURIComponent(email)}`;
+  return `registration-data/${requestId}?email=${encodeURIComponent(email)}`;
 }
 
 /**

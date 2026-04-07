@@ -8,12 +8,13 @@ import * as styles from './styles.css';
 import TermsAcknowledgement from './TermsAcknowledgement';
 import { useCheckoutSummary } from './useCheckoutSummary';
 
-import { API_ENDPOINTS, getAddonsEndpoint } from '@/constants/api';
+import { getAddonsEndpoint } from '@/constants/api';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
 import { DEFAULT_COUNTRY_ID } from '@/constants/countries';
 import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
 import { useCurrentTerms } from '@/hooks/useCurrentTerms';
 import { fetchApi } from '@/lib/api-client';
+import { fetchOnboardingApi } from '@/lib/onboarding-api-client';
 import { showSuccessToast } from '@/lib/errors';
 import { priceSuffix } from '@/lib/pricing-helpers';
 import { ApiError, isApiError } from '@/types/api';
@@ -355,10 +356,10 @@ export default function Step4PaidCart({
         };
 
         // Call /register API
-        const result = await fetchApi<{
+        const result = await fetchOnboardingApi<{
           payment_url: string;
           payment_required: boolean;
-        }>(API_ENDPOINTS.SUBSCRIPTION.REGISTER, {
+        }>('register', {
           method: 'PUT',
           body: registrationPayload,
         });

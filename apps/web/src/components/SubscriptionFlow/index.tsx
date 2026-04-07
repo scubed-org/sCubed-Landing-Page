@@ -14,7 +14,7 @@ import Step5PaymentProcessing from './Step5PaymentProcessing';
 import StepIndicator from './StepIndicator';
 import * as styles from './styles.css';
 
-import { getRegistrationDataEndpoint } from '@/constants/api';
+import { getRegistrationDataPath } from '@/constants/api';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
 import { DEFAULT_COUNTRY_ID } from '@/constants/countries';
 import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
@@ -25,8 +25,13 @@ import {
   PLAN_TYPES,
 } from '@/constants/plans';
 import { SUBSCRIPTION_STEPS } from '@/constants/steps';
-import { fetchApi } from '@/lib/api-client';
 import { showSuccessToast, showWarningToast } from '@/lib/errors';
+import {
+  clearOnboardingAccessToken,
+  fetchOnboardingApi,
+  getOnboardingSessionState,
+  ONBOARDING_SESSION_EXPIRED_EVENT,
+} from '@/lib/onboarding-api-client';
 import {
   clearSession,
   loadSession,
@@ -84,55 +89,92 @@ export default function SubscriptionFlow({
 
   // Load plan selection from URL params and restore session with validation
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const planParam = params.get('plan');
-    const billingParam = params.get('billing');
-    const emailParam = params.get('email');
+    let isMounted = true;
 
-    if (planParam) {
-      // Fresh start with plan from URL params (from pricing page)
-      const planId = getPlanIdByName(planParam);
-      const billing = (billingParam as BillingCycle) || BILLING_CYCLES.MONTHLY;
+    const restoreSubscriptionState = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const planParam = params.get('plan');
+      const billingParam = params.get('billing');
+      const emailParam = params.get('email');
 
-      setFormState((prev) => ({
-        ...prev,
-        step1Data: {
-          ...prev.step1Data,
-          subscription_plan_id: planId,
-          ...(emailParam && { email: emailParam }),
-        },
-        billingCycle: billing,
-      }));
+      if (planParam || emailParam) {
+        // Fresh start from the pricing page or an email link: drop any old session
+        if (planParam) {
+          const planId = getPlanIdByName(planParam);
+          const billing =
+            (billingParam as BillingCycle) || BILLING_CYCLES.MONTHLY;
 
-      // Clear any old session data when starting fresh
-      clearSession();
-      setIsRestoringSession(false);
-    } else if (emailParam) {
-      // Email param provided without plan - prefill email and start fresh
-      setFormState((prev) => ({
-        ...prev,
-        step1Data: {
-          ...prev.step1Data,
-          email: emailParam,
-        },
-      }));
-      clearSession();
-      setIsRestoringSession(false);
-    } else {
+          setFormState((prev) => ({
+            ...prev,
+            step1Data: {
+              ...prev.step1Data,
+              subscription_plan_id: planId,
+              ...(emailParam && { email: emailParam }),
+            },
+            billingCycle: billing,
+          }));
+        } else if (emailParam) {
+          setFormState((prev) => ({
+            ...prev,
+            step1Data: {
+              ...prev.step1Data,
+              email: emailParam,
+            },
+          }));
+        }
+
+        void clearOnboardingAccessToken();
+        clearSession();
+        setIsRestoringSession(false);
+        return;
+      }
+
       // Try to restore session from sessionStorage with validation
       const restoredState = loadSession();
 
       if (restoredState) {
-        // Session is valid, restore the state
+        let nextState = restoredState;
+
+        // Details and checkout call guarded APIs, so they need a live onboarding cookie;
+        // the payment step only redirects to the saved Stripe URL.
+        const needsOnboardingCookie =
+          restoredState.otpVerified &&
+          (restoredState.currentStep === SUBSCRIPTION_STEPS.DETAILS ||
+            restoredState.currentStep === SUBSCRIPTION_STEPS.CHECKOUT);
+
+        if (needsOnboardingCookie) {
+          const { authenticated } = await getOnboardingSessionState();
+
+          if (!authenticated) {
+            nextState = {
+              ...restoredState,
+              otpVerified: false,
+              currentStep: SUBSCRIPTION_STEPS.EMAIL,
+              paymentUrl: null,
+              paymentRequired: false,
+            };
+          }
+        }
+
         console.log('Session restored successfully');
-        setFormState((prev) => ({ ...prev, ...restoredState }));
+        if (isMounted) {
+          setFormState((prev) => ({ ...prev, ...nextState }));
+        }
       } else {
         // Session invalid or expired, start fresh
         console.log('No valid session found, starting fresh');
       }
 
-      setIsRestoringSession(false);
-    }
+      if (isMounted) {
+        setIsRestoringSession(false);
+      }
+    };
+
+    void restoreSubscriptionState();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   // Persist form state to session storage with metadata
@@ -146,6 +188,32 @@ export default function SubscriptionFlow({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [formState.currentStep]);
+
+  // The onboarding cookie expired mid-flow: send the user back to verify their email
+  useEffect(() => {
+    const handleSessionExpired = () => {
+      setLoadingRegistrationData(false);
+      setFormState((prev) => ({
+        ...prev,
+        otpVerified: false,
+        currentStep: SUBSCRIPTION_STEPS.EMAIL,
+        paymentUrl: null,
+        paymentRequired: false,
+      }));
+    };
+
+    window.addEventListener(
+      ONBOARDING_SESSION_EXPIRED_EVENT,
+      handleSessionExpired,
+    );
+
+    return () => {
+      window.removeEventListener(
+        ONBOARDING_SESSION_EXPIRED_EVENT,
+        handleSessionExpired,
+      );
+    };
+  }, []);
 
   // Step 1: Handle email submission
   const handleStep1Complete = (
@@ -170,16 +238,17 @@ export default function SubscriptionFlow({
     if (formState.clinic_onboarding_request_id && formState.step1Data.email) {
       setLoadingRegistrationData(true);
       try {
-        const registrationData = await fetchApi<RegistrationDataResponse>(
-          getRegistrationDataEndpoint(
-            formState.clinic_onboarding_request_id,
-            formState.step1Data.email,
-          ),
-          {
-            method: 'GET',
-            skipErrorToast: true, // Don't show error if no data exists
-          },
-        );
+        const registrationData =
+          await fetchOnboardingApi<RegistrationDataResponse>(
+            getRegistrationDataPath(
+              formState.clinic_onboarding_request_id,
+              formState.step1Data.email,
+            ),
+            {
+              method: 'GET',
+              skipErrorToast: true, // Don't show error if no data exists
+            },
+          );
 
         // If we have registration data, prefill the form
         if (
@@ -246,12 +315,18 @@ export default function SubscriptionFlow({
           }));
         }
       } catch (error) {
+        if (error instanceof ApiError && error.statusCode === 401) {
+          // Session expired: the expiry listener has already reset the flow
+          return;
+        }
+
         if (
           error instanceof ApiError &&
-          (error.statusCode === 404 || error.statusCode === 422)
+          [403, 404, 422].includes(error.statusCode)
         ) {
-          // Email doesn't match the request ID (404) or is missing/malformed
-          // (422) — the stored session is stale. Restart email verification.
+          // The verified session doesn't match this request (403), the email doesn't
+          // match the request ID (404), or it is missing/malformed (422) — the stored
+          // session is stale. Restart email verification.
           showWarningToast(
             'We could not verify your signup session. Please verify your email again.',
           );
