@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import {
-  badge,
   billingToggle,
   billingToggleActive,
   billingToggleOption,
@@ -46,7 +45,6 @@ interface PricingPlan {
   description: string;
   monthlyPrice: number;
   yearlyPrice: number;
-  staffCount: string;
   features: PlanFeature[];
   isPopular?: boolean;
   ctaText: string;
@@ -59,7 +57,6 @@ const plans: PricingPlan[] = [
     description: 'Perfect for small practices just getting started',
     monthlyPrice: 19,
     yearlyPrice: 195,
-    staffCount: '5 Staff',
     savings: '15% off',
     features: [
       { text: 'Unlimited Clients', included: true },
@@ -75,7 +72,6 @@ const plans: PricingPlan[] = [
     description: 'Most popular for growing therapy practices',
     monthlyPrice: 39,
     yearlyPrice: 395,
-    staffCount: '10 Staff',
     savings: '15% off',
     isPopular: true,
     features: [
@@ -91,7 +87,6 @@ const plans: PricingPlan[] = [
     description: 'Complete solution for multi-location practices',
     monthlyPrice: 59,
     yearlyPrice: 595,
-    staffCount: '20+ Staff',
     savings: '16% off',
     features: [
       { text: 'Everything in Essential, plus:', included: true },
@@ -160,7 +155,6 @@ const PricingPlans: React.FC = () => {
               )}
 
               <div className={planName}>{plan.name}</div>
-              <div className={badge}>{plan.staffCount}</div>
               <p className={planDescription}>{plan.description}</p>
 
               <div className={planPriceWrapper}>
