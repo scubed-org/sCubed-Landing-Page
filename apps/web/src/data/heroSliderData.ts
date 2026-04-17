@@ -5,40 +5,11 @@ import RightImageThreeSlide from '../../public/images/right-image-three-slide.pn
 // import NYSABA2025Image from '../../public/images/NYSABA Event Banner.jpg';
 import { HeroSliderItem } from '../components/HeroImageSlider';
 
-// TxABA Conference
-import BackgroundTxABASlide from '../../public/images/Scubed-TxABA-Homepage-Banner.png';
-import TxABARightImage from '../../public/images/Scubed-TxABA-Homepage-Image.png';
-
 // Autism Awareness
 import BackgroundAutismSlide from '../../public/images/AutismHomepageBanner.jpg';
 import AutismRightImage from '../../public/images/AutismRightImage.png';
 
 export const heroSliderData: HeroSliderItem[] = [
-  {
-    id: 'txaba-conference-2026',
-    title:
-      '<span style="font-weight: 400;">The ABA Community Calls. </span><span style="color: #7a7eed;">TxABA, We Are Coming!</span>',
-    mobileTitle:
-      '<span style="font-weight: 400;">The ABA Community Calls. </span><span style="color: #7a7eed;">TxABA, We Are Coming!</span>',
-    description:
-      'We will be at the <strong>Hyatt Regency Riverwalk</strong> all four days, <strong>April 9-12.</strong> Bring your biggest ABA practice challenges and let\'s work through it together.',
-    layoutMode: 'split',
-    descriptionMaxWidth: '700px',
-    backgroundImage: {
-      src: BackgroundTxABASlide,
-      alt: 'TxABA Conference 2026',
-      position: 'center center',
-    },
-    splitImage: {
-      src: TxABARightImage,
-      alt: 'TxABA Conference 2026',
-    },
-    link: {
-      href: '/events/we-are-heading-to-txaba-come-find-us',
-      text: 'Discover More',
-      mobileText: 'Discover More',
-    },
-  },
   {
     id: 'autism-awareness-2026',
     title:
