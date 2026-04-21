@@ -21,10 +21,31 @@ Sitemap: ${siteUrl}/sitemap.xml`,
 
   // Allow crawling for production
   return new NextResponse(
-    `User-agent: *
-Allow: /
-Disallow: /*?tag
+    `# Allow all crawlers by default
+User-agent: *
 
+# Block Next.js internal build assets (no SEO value)
+Disallow: /_next/
+
+# Block API routes
+Disallow: /api/
+
+# Block filtered/paginated URL parameters that create duplicate content
+Disallow: /*?category=
+Disallow: /*?page=
+Disallow: /*?tag=
+Disallow: /*?ref=
+Disallow: /*?utm_
+Disallow: /*?search=
+
+# Block Next.js image optimization URLs
+Disallow: /_next/image
+
+# Optional: block any internal/admin paths if they exist on this domain
+# Disallow: /admin/
+# Disallow: /dashboard/
+
+# Sitemap
 Sitemap: ${siteUrl}/sitemap.xml`,
     {
       headers: {
