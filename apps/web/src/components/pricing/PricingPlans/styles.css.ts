@@ -293,7 +293,7 @@ export const featuresTitle = style({
 
 export const planFeature = style({
   display: 'flex',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: spacing.xs,
   fontSize: typography.fontSize.base,
   color: colors.neutral[600],
@@ -302,13 +302,12 @@ export const planFeature = style({
 
 export const planFeatureIcon = style({
   flexShrink: 0,
-  marginTop: '2px',
   color: colors.accent.green,
 });
 
 export const planFeatureHighlight = style({
   display: 'flex',
-  alignItems: 'flex-start',
+  alignItems: 'center',
   gap: spacing.xs,
   fontSize: typography.fontSize.base,
   color: colors.primary[600],

@@ -213,7 +213,6 @@ const PricingPlans: React.FC = () => {
                         style={{
                           color: '#9ca3af',
                           flexShrink: 0,
-                          marginTop: '2px',
                         }}
                       />
                     )}
