@@ -14,9 +14,8 @@ import isEmail from 'validator/lib/isEmail';
 import isMobilePhone from 'validator/lib/isMobilePhone';
 
 import { DEFAULT_STAFF_COUNT } from '../../constants/formFields';
-import { SUCCESS_MESSAGES } from '../../constants/messages';
 import { fetchApi } from '../../lib/api-client';
-import { getFieldErrors, showSuccessToast } from '../../lib/errors';
+import { getFieldErrors } from '../../lib/errors';
 import { isApiError } from '../../types/api';
 
 import { PhoneInput, TextInput } from './FormComponents';
@@ -384,7 +383,6 @@ function Step3ClinicDetailsComponent({
         },
       );
 
-      showSuccessToast(SUCCESS_MESSAGES.REGISTRATION_SUCCESS);
       onNext(formData, result);
     } catch (error) {
       if (isApiError(error)) {
