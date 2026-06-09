@@ -24,7 +24,7 @@ const BillingCTA: React.FC = () => {
           </p>
           <div className={ctaButtonWrapper}>
             <CalendlyButton
-              buttonText="Schedule Your Demo →"
+              buttonText="Book a 20-Minute Demo"
               className={primaryButton}
             />
           </div>

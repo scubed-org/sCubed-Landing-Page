@@ -2,10 +2,10 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
 import React from 'react';
 
 import guardianPortalImg from '../../../images/guardian-portal.png';
+import CalendlyButton from '../../billing/CalendlyButton';
 import { primaryButton } from '../../billing/CalendlyButton/styles.css';
 
 import {
@@ -47,12 +47,10 @@ const GuardianHero: React.FC = () => {
               progress tracking and appointments management so that guardians stay informed every step of the way.
             </p>
             <div className={ctaSection}>
-              <Link 
-                href={process.env.NEXT_PUBLIC_GUARDIAN_APP_URL + `auth/login`}
+              <CalendlyButton
+                buttonText="Book a 20-Minute Demo"
                 className={`${primaryButton} ${mobileButton}`}
-              >
-                Login as Guardian →
-              </Link>
+              />
             </div>
           </motion.div>
 

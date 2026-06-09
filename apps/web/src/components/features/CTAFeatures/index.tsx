@@ -41,7 +41,8 @@ const CTAFeatures: React.FC = () => {
             <CalendlyWidget
               buttonColor="#fff"
               buttonBackground="#7a7eed"
-              buttonWidth="200px"
+              buttonWidth="270px"
+              buttonText="BOOK A 20-MINUTE DEMO"
             />
           </div>
         </div>

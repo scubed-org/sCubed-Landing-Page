@@ -68,7 +68,7 @@ Meet S Cubed, your prior authorization software with heart.
               <div className={ctaSection}>
                 <div>
                   <CalendlyButton
-                    buttonText="Start 30 Days Free Trial Today →"
+                    buttonText="Book a 20-Minute Demo"
                     className={primaryButton}
                   />
                 </div>

@@ -51,7 +51,7 @@ const SchedulingCTA: React.FC = () => {
             transition={{ duration: 0.6, delay: 0.4, ease: 'easeOut' }}
           >
             <CalendlyButton
-              buttonText="Schedule Your Demo →"
+              buttonText="Book a 20-Minute Demo"
               className={primaryButton}
             />
           </motion.div>

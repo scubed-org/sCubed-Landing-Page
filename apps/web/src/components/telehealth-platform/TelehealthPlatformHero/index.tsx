@@ -2,10 +2,10 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
 import React from 'react';
 
 import telehealthBannerImg from '../../../images/telehealth-banner-banner.gif';
+import CalendlyButton from '../../billing/CalendlyButton';
 import { primaryButton } from '../../billing/CalendlyButton/styles.css';
 
 import {
@@ -51,12 +51,10 @@ const TelehealthPlatformHero: React.FC = () => {
             <span className={actionWord}>Fast to join. Simple to use. Built on trust.</span>
             </p>
             <div className={ctaSection}>
-              <Link 
-                href="/get-started"
+              <CalendlyButton
+                buttonText="Book a 20-Minute Demo"
                 className={`${primaryButton} ${mobileButton}`}
-              >
-                Start 30 Days Free Trial Today  →
-              </Link>
+              />
             </div>
           </motion.div>
 
