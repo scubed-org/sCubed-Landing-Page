@@ -2,11 +2,11 @@
 
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
 import React from 'react';
 
 import billingImg from '../../../images/Billing.jpg';
 import dataCollectionImg from '../../../images/scheduling/hero.jpg';
+import CalendlyButton from '../../billing/CalendlyButton';
 import { primaryButton } from '../../billing/CalendlyButton/styles.css';
 import FeaturesCarousel from '../Carousel/index';
 
@@ -66,11 +66,10 @@ const DataCollectionHero: React.FC = () => {
               Our therapy appointment software is built to handle the complexities of therapy work like shifting availability, recurring sessions, and urgent changes. Scheduling you can rely on because care can't afford delays.
               </p>
               <div className={ctaSection}>
-                
-                <Link href="/get-started" className={primaryButton}>
-                  Get Your 30 Days Free Trial →
-                </Link>                
-                
+                <CalendlyButton
+                  buttonText="Book a 20-Minute Demo"
+                  className={primaryButton}
+                />
               </div>
             </motion.div>
 

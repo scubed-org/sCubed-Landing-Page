@@ -47,7 +47,7 @@ const DataCollectionCTA: React.FC = () => {
           transition={{ duration: 0.6, delay: 0.6 }}
         >
           <CalendlyButton
-            buttonText="Request a Demo →"
+            buttonText="Book a 20-Minute Demo"
             className={primaryButton}
           />
         </motion.div>

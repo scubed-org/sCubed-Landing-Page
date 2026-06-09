@@ -208,7 +208,7 @@ export default async function DataCollectionPage() {
           />
         ))}
 
-        <CTA title="Authorization Management <br/>Shouldn’t Be A Full-time Job" description="We know the struggle of tracking expirations, renewing on time, and keeping billing compliant. S Cubed takes the complexity out of authorization management with smart automation and built-in alerts. Our prior authorization software gives your team time back to focus on what really matters." buttonText="Schedule a Demo →" />
+        <CTA title="Authorization Management <br/>Shouldn’t Be A Full-time Job" description="We know the struggle of tracking expirations, renewing on time, and keeping billing compliant. S Cubed takes the complexity out of authorization management with smart automation and built-in alerts. Our prior authorization software gives your team time back to focus on what really matters." buttonText="Book a 20-Minute Demo" />
       </Container>
     </>
   );

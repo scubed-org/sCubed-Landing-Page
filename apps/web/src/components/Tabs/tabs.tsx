@@ -149,7 +149,6 @@ const Tabs: React.FC = () => {
                 buttonBackground="#66e3ed"
                 buttonWidth="210px"
                 buttonText="BOOK A FREE DEMO"
-                navigateTo="/get-started"
               />
             </div>
           </div>

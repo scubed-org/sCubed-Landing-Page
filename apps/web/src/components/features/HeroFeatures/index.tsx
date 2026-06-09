@@ -93,7 +93,7 @@ const HeroFeatures: React.FC = () => {
             <div className={buttonContainer}>
               <CalendlyButton
                 className={primaryButton}
-                buttonText="Schedule Free Demo →"
+                buttonText="Book a 20-Minute Demo"
               />
               <button className={secondaryButton} onClick={handleWatchDemo}>
                 <Play className={playIcon} size={16} />

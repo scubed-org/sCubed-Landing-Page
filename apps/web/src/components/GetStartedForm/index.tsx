@@ -503,12 +503,18 @@ const GetStartedForm: React.FC = () => {
                 style={{ width: '32px', height: '32px', color: '#059669' }}
               />
             </div>
-            <h2 className={successTitle}>🎉 Thank You!</h2>
+            <h2 className={successTitle}>🎉 Thanks for your interest!</h2>
             <p className={successText}>
-              We&apos;ve received your information and our team will be in touch
-              within 24 hours to discuss how we can help transform your
-              practice.
+              While we get your account set up, book a 20-minute intro call so
+              you can hit the ground running.
             </p>
+            <div style={{ margin: '0 auto 1.5rem auto' }}>
+              <CalendlyButton
+                buttonText="Book a 20-Minute Demo"
+                className={primaryButton}
+                url="https://calendly.com/scubed-info"
+              />
+            </div>
             <button
               className={submitButton}
               onClick={() => {

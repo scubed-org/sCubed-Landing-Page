@@ -141,7 +141,7 @@ const BillingHero: React.FC = () => {
               </p>
               <div className={ctaSection}>
                 <CalendlyButton
-                  buttonText="Get Your Free Demo →"
+                  buttonText="Book a 20-Minute Demo"
                   className={primaryButton}
                 />
               </div>

@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, ExternalLink, Calendar, MapPin } from 'lucid
 import Image, { StaticImageData } from 'next/image';
 import Link from 'next/link';
 import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import { PopupModal } from 'react-calendly';
 
 import {
   heroSliderSection,
@@ -24,6 +25,7 @@ import {
   heroSliderTitle,
   heroSliderDescription,
   heroSliderDescriptionVisible,
+  heroSliderSupportingText,
   heroSliderButton,
   heroSliderSecondaryButton,
   heroSliderButtonContainer,
@@ -52,7 +54,8 @@ export interface HeroSliderItem {
   title: string;
   mobileTitle?: string; // Optional mobile-specific title without line breaks
   description: string | React.ReactNode; // Allow JSX/HTML in description
-  
+  supportingText?: string | React.ReactNode; // Optional reassurance text rendered below the CTA button
+
   // Layout mode determines how the slide is displayed
   layoutMode?: 'split' | 'fullBackground' | 'gradient';
   
@@ -96,6 +99,7 @@ export interface HeroSliderItem {
     text: string;
     mobileText?: string;
     external?: boolean;
+    calendlyPopup?: boolean; // Open the Calendly scheduling modal instead of navigating
   };
   secondaryLink?: {
     href: string;
@@ -135,6 +139,15 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const { openModal } = useFreeTrialModal();
+
+  // Calendly scheduling popup (mirrors the BillingHero CalendlyButton behavior)
+  const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
+  const [calendlyLoaded, setCalendlyLoaded] = useState(false);
+  const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL;
+  const openCalendly = useCallback(() => {
+    setIsCalendlyOpen(true);
+    setCalendlyLoaded(true);
+  }, []);
 
   // Memoize slide navigation functions to prevent unnecessary re-renders
   const nextSlide = useCallback(() => {
@@ -606,6 +619,10 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
                 }),
                 ...(currentItem.descriptionMaxWidth && !isMobile && {
                   maxWidth: currentItem.descriptionMaxWidth,
+                  ...((layoutMode === 'gradient' || currentItem.contentAlign === 'center') && {
+                    marginLeft: 'auto',
+                    marginRight: 'auto',
+                  }),
                 }),
               }}
             >
@@ -650,7 +667,14 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
                     )
                   )}
                   {currentItem.link && (
-                    currentItem.link.external ? (
+                    currentItem.link.calendlyPopup ? (
+                      <button
+                        onClick={openCalendly}
+                        className={heroSliderButton}
+                      >
+                        {currentLinkText}
+                      </button>
+                    ) : currentItem.link.external ? (
                       <a
                         href={currentItem.link.href}
                         target="_blank"
@@ -674,6 +698,30 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
                     )
                   )}
                 </div>
+              </motion.div>
+            )}
+
+            {currentItem.supportingText && (
+              <motion.div
+                className={heroSliderSupportingText}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.6 }}
+                style={{
+                  ...(currentItem.descriptionMaxWidth && !isMobile && {
+                    maxWidth: currentItem.descriptionMaxWidth,
+                    ...((layoutMode === 'gradient' || currentItem.contentAlign === 'center') && {
+                      marginLeft: 'auto',
+                      marginRight: 'auto',
+                    }),
+                  }),
+                }}
+              >
+                {typeof currentItem.supportingText === 'string' ? (
+                  <div dangerouslySetInnerHTML={{ __html: currentItem.supportingText }} />
+                ) : (
+                  currentItem.supportingText
+                )}
               </motion.div>
             )}
           </motion.div>
@@ -747,6 +795,16 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
           )}
         </div>
       </div>
+
+      {calendlyLoaded && calendlyUrl && typeof document !== 'undefined' && (
+        <PopupModal
+          url={calendlyUrl}
+          rootElement={document.body}
+          onModalClose={() => setIsCalendlyOpen(false)}
+          open={isCalendlyOpen}
+          prefill={{}}
+        />
+      )}
     </header>
   );
 };

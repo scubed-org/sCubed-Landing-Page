@@ -140,7 +140,7 @@ export const heroSliderTextContent = style({
   textAlign: 'left',
   color: colors.neutral[900],
   maxWidth: '800px',
-  padding: `0 ${spacing.lg}`,
+  padding: `${spacing['3xl']} ${spacing.lg} 0`, // Top padding pushes content down to balance the slide
   marginLeft: '5%', // Add left margin to move content from edge
   marginRight: '5%', // Add right margin to prevent overlap with right button
   '@media': {
@@ -264,7 +264,7 @@ export const heroSliderTitle = style({
   fontWeight: typography.fontWeight.bold,
   fontFamily: typography.fontFamily.heading,
   lineHeight: typography.lineHeight.tight,
-  marginBottom: spacing.lg,
+  marginBottom: '2.5rem', // 40px — between lg and xl
   whiteSpace: 'pre-line', // This allows \n characters to create line breaks
   '@media': {
     // Large tablets / small desktops
@@ -292,22 +292,41 @@ export const heroSliderTitle = style({
 });
 
 export const heroSliderDescription = style({
-  fontSize: typography.fontSize.lg,
+  fontSize: typography.fontSize['2xl'],
   fontFamily: typography.fontFamily.body,
+  fontWeight: typography.fontWeight.medium,
   lineHeight: typography.lineHeight.relaxed,
-  marginBottom: spacing.lg,
+  marginBottom: '2.5rem', // 40px — between lg and xl
   opacity: 0.9,
   '@media': {
     'screen and (max-width: 1200px)': {
-      fontSize: typography.fontSize.base,
+      fontSize: typography.fontSize.xl,
       marginBottom: spacing.md,
     },
     'screen and (max-width: 1024px)': {
-      fontSize: typography.fontSize.sm,
+      fontSize: typography.fontSize.lg,
       marginBottom: spacing.sm,
     },
     'screen and (max-width: 767px)': {
       display: 'none', // Hide description on mobile
+    },
+  },
+});
+
+// Reassurance text shown below the CTA button — intentionally demoted (smaller, muted)
+export const heroSliderSupportingText = style({
+  fontSize: typography.fontSize.base,
+  fontFamily: typography.fontFamily.body,
+  lineHeight: typography.lineHeight.relaxed,
+  marginTop: '2.5rem', // 40px — between lg and xl
+  opacity: 0.7,
+  '@media': {
+    'screen and (max-width: 1200px)': {
+      fontSize: typography.fontSize.sm,
+      marginTop: spacing.md,
+    },
+    'screen and (max-width: 767px)': {
+      display: 'none', // Keep mobile hero compact, matching description
     },
   },
 });

@@ -6,11 +6,13 @@ import { PopupModal } from 'react-calendly';
 type Props = {
   buttonText?: string;
   className?: string;
+  url?: string; // Optional override for the Calendly scheduling link
 };
 
 const CalendlyButton: FC<Props> = ({
   buttonText = 'BOOK A DEMO',
   className,
+  url,
 }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -25,7 +27,7 @@ const CalendlyButton: FC<Props> = ({
     setCalendlyLoaded(true);
   };
 
-  const calendlyUrl = process.env.NEXT_PUBLIC_CALENDLY_URL;
+  const calendlyUrl = url ?? process.env.NEXT_PUBLIC_CALENDLY_URL;
 
   if (!calendlyUrl) {
     console.warn('Calendly URL is not set in environment variables');
