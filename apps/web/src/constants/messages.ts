@@ -53,6 +53,7 @@ export const SUCCESS_MESSAGES = {
   // Form Submissions
   FORM_SUBMITTED: 'Form submitted successfully!',
   CONTACT_SUBMITTED: 'Thank you for your interest! Our team will be in touch shortly.',
+  GET_STARTED_SUBMITTED: 'Thanks for your interest! Book your 20-minute demo below to get started.',
   REGISTRATION_SUCCESS: 'Registration successful! Check your email for verification code.',
   SUBSCRIPTION_SUCCESS: 'Subscription successful!',
 

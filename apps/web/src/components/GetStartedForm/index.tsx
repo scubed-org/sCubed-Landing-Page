@@ -378,7 +378,7 @@ const GetStartedForm: React.FC = () => {
           setRecaptchaError(null);
           recaptchaRef.current?.reset();
           reset();
-          showSuccessToast(SUCCESS_MESSAGES.CONTACT_SUBMITTED);
+          showSuccessToast(SUCCESS_MESSAGES.GET_STARTED_SUBMITTED);
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
