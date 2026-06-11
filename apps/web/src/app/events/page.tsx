@@ -3,8 +3,8 @@ import type { Metadata } from 'next';
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Container from '../../components/Container';
 import { ErrorBoundary } from '../../components/ErrorBoundary';
-import EventsGrid from '../../components/events/EventsGrid';
-import EventsHero from '../../components/events/EventsHero';
+import EventsGrid from '../../components/Events/EventsGrid';
+import EventsHero from '../../components/Events/EventsHero';
 import { getEvents } from '../../lib/events-api';
 
 export const metadata: Metadata = {
