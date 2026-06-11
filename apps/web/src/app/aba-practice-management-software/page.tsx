@@ -2,9 +2,9 @@ import type { Metadata } from 'next';
 
 import BreadcrumbSchema from '../../components/BreadcrumbSchema';
 import Container from '../../components/Container';
-import CTAFeatures from '../../components/features/CTAFeatures';
-import FeaturesComprehensive from '../../components/features/FeaturesComprehensive';
-import HeroFeatures from '../../components/features/HeroFeatures';
+import CTAFeatures from '../../components/Features/CTAFeatures';
+import FeaturesComprehensive from '../../components/Features/FeaturesComprehensive';
+import HeroFeatures from '../../components/Features/HeroFeatures';
 
 export const metadata: Metadata = {
   title: 'ABA Therapy Practice Management Software',
