@@ -127,3 +127,9 @@ export const tabPanelImage = style({
   width: '100%',
   padding: `0 20px`,
 });
+
+export const ctaWrapper = style({
+  display: 'flex',
+  width: '100%',
+  justifyContent: 'center',
+});

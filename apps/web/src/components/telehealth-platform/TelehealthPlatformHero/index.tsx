@@ -21,7 +21,6 @@ import {
   heroTextContent,
   heroTitle,
   heroTitleHighlight,
-  mobileButton
 } from './styles.css';
 
 const TelehealthPlatformHero: React.FC = () => {
@@ -53,7 +52,7 @@ const TelehealthPlatformHero: React.FC = () => {
             <div className={ctaSection}>
               <CalendlyButton
                 buttonText="Book a 20-Minute Demo"
-                className={`${primaryButton} ${mobileButton}`}
+                className={primaryButton}
               />
             </div>
           </motion.div>

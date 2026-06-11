@@ -1,6 +1,7 @@
 import React from 'react';
 
-import CalendlyWidget from '../../CalendlyWidget';
+import CalendlyButton from '../../billing/CalendlyButton';
+import { primaryButton } from '../../billing/CalendlyButton/styles.css';
 
 import {
   ctaActions,
@@ -38,11 +39,9 @@ const CTAFeatures: React.FC = () => {
           </p>
 
           <div className={ctaActions}>
-            <CalendlyWidget
-              buttonColor="#fff"
-              buttonBackground="#7a7eed"
-              buttonWidth="270px"
-              buttonText="BOOK A 20-MINUTE DEMO"
+            <CalendlyButton
+              className={primaryButton}
+              buttonText="Book a 20-Minute Demo"
             />
           </div>
         </div>

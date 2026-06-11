@@ -5,9 +5,8 @@ import { Suspense } from 'react';
 // Critical components loaded immediately
 import Container from '../components/Container';
 import Header from '../components/Header/header';
-import HeroImageSlider from '../components/HeroImageSlider';
+import HomeHero from '../components/HomeHero';
 import ReviewPlatforms from '../components/ReviewPlatforms';
-import { heroSliderData } from '../data/heroSliderData';
 import AbaFeature from '../components/abaFeature';
 import LocalBusinessSchema from '../components/LocalBusinessSchema';
 
@@ -82,7 +81,7 @@ export default function HomePage() {
   return (
     <>
       <LocalBusinessSchema />
-      <HeroImageSlider items={heroSliderData} />
+      <HomeHero />
       <AbaFeature />
       <ReviewPlatforms />
       <Container>

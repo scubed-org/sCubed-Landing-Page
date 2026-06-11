@@ -13,7 +13,8 @@ import appointmentPanel from '../../images/tabs/appointment.png';
 import dashboardPanel from '../../images/tabs/dashboard.jpg';
 import collectionPanel from '../../images/tabs/data-collection.png';
 import treatmentPanel from '../../images/tabs/treatment-plan.png';
-import CalendlyWidget from '../CalendlyWidget';
+import CalendlyButton from '../features/CalendlyButton';
+import { primaryButton } from '../HomeHero/style.css';
 import {
   InnerContainerStyle,
   panelContent,
@@ -22,6 +23,7 @@ import {
 } from '../Container/style.css';
 
 import {
+  ctaWrapper,
   hidePanel,
   panelHeading,
   sectionDescription,
@@ -144,12 +146,12 @@ const Tabs: React.FC = () => {
             <div className={panelContent}>
               <div className={panelHeading}>{content.heading}</div>
               <div className={sectionDescription}>{content.description}</div>
-              <CalendlyWidget
-                buttonColor="#333"
-                buttonBackground="#66e3ed"
-                buttonWidth="210px"
-                buttonText="BOOK A FREE DEMO"
-              />
+              <div className={ctaWrapper}>
+                <CalendlyButton
+                  className={primaryButton}
+                  buttonText="Book a 20-Minute Demo"
+                />
+              </div>
             </div>
           </div>
         ))}
