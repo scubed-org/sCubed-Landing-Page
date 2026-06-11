@@ -24,7 +24,7 @@ export const heroSection = style({
       height: '70vh',
       minHeight: '550px',
       maxHeight: '700px',
-      paddingTop: '40px',
+      paddingTop: '140px',
     },
     // On phones the stacked content (3-line title + subtitle + two buttons +
     // supporting text) is taller than a fixed vh, so let the section grow with
@@ -35,11 +35,11 @@ export const heroSection = style({
       maxHeight: 'none',
       overflow: 'visible',
       marginTop: '0',
-      paddingTop: '150px',
+      paddingTop: '180px',
       paddingBottom: '40px',
     },
     'screen and (max-width: 480px)': {
-      paddingTop: '160px',
+      paddingTop: '190px',
     },
   },
 });
@@ -90,6 +90,10 @@ export const heroTitle = style({
       fontSize: '60px',
       lineHeight: 1.25,
       marginBottom: '32px',
+    },
+    // Tablet (iPad): smaller than desktop so the 3-line title fits cleanly.
+    'screen and (min-width: 768px) and (max-width: 1024px)': {
+      fontSize: '44px',
     },
   },
 });
