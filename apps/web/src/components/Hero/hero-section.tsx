@@ -3,7 +3,7 @@ import React from 'react';
 
 import heroImg from '../../images/Image.jpg';
 import { InnerContainerStyle } from '../Container/style.css';
-import CalendlyButton from '../features/CalendlyButton';
+import CalendlyButton from '../Features/CalendlyButton';
 import { primaryButtonLight } from '../HomeHero/style.css';
 
 import {

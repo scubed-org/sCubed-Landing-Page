@@ -13,7 +13,7 @@ import appointmentPanel from '../../images/tabs/appointment.png';
 import dashboardPanel from '../../images/tabs/dashboard.jpg';
 import collectionPanel from '../../images/tabs/data-collection.png';
 import treatmentPanel from '../../images/tabs/treatment-plan.png';
-import CalendlyButton from '../features/CalendlyButton';
+import CalendlyButton from '../Features/CalendlyButton';
 import { primaryButton } from '../HomeHero/style.css';
 import {
   InnerContainerStyle,

@@ -5,8 +5,8 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 
 import bgImage from '../../images/Banner.jpg';
-import CalendlyButton from '../features/CalendlyButton';
-import VideoModal from '../features/VideoModal';
+import CalendlyButton from '../Features/CalendlyButton';
+import VideoModal from '../Features/VideoModal';
 
 import {
   backgroundImage,
