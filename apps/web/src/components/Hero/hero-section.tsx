@@ -2,8 +2,9 @@ import Image from 'next/image';
 import React from 'react';
 
 import heroImg from '../../images/Image.jpg';
-import CalendlyWidget from '../CalendlyWidget';
 import { InnerContainerStyle } from '../Container/style.css';
+import CalendlyButton from '../features/CalendlyButton';
+import { primaryButtonLight } from '../HomeHero/style.css';
 
 import {
   heroHeading,
@@ -30,12 +31,12 @@ const Hero: React.FC = () => {
             Ready to scale your business with our easy-to-use clinical and
             practice management platform?
           </p>
-          <CalendlyWidget
-            buttonColor="#000"
-            buttonBackground="#fff"
-            buttonText="BOOK A FREE DEMO"
-            buttonWidth="210px"
-          />
+          <div style={{ textAlign: 'center' }}>
+            <CalendlyButton
+              className={primaryButtonLight}
+              buttonText="Book a 20-Minute Demo"
+            />
+          </div>
         </div>
       </div>
     </main>
