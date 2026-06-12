@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react';
 import desktopLogoImg from '../../images/scubed-logo.webp';
 import mobileLogoImg from '../../images/scubed-logo-small.png';
 import { formatPhone } from '../../utils/phoneFormatter';
+import CalendlyButton from '../Features/CalendlyButton';
 
 import MobileNavDropdown from './MobileNavDropdown';
 import NavDropdown, { DropdownItem } from './NavDropdown';
@@ -26,6 +27,7 @@ import {
   crossLine1,
   crossLine2,
   desktopLogo,
+  desktopLogoImage,
   hamburger,
   headerContentStyles,
   iconWrapper,
@@ -37,12 +39,14 @@ import {
   mobileLogo,
   mobileOverlay,
   mobileOverlayOpen,
+  navCenter,
   navMenu,
   navMenuOpen,
   navStyle,
   socialIconWrapper,
   socialIconsContainer,
   tryForFreeButton,
+  tryForFreeLink,
 } from './styles.css';
 
 import { useFreeTrialModal } from '@/contexts/FreeTrialModalContext';
@@ -264,7 +268,7 @@ const Navigation: React.FC<NavigationProps> = ({
                 width={120}
                 height={120}
                 quality={100}
-                style={{ width: 'auto', height: '120px' }}
+                className={desktopLogoImage}
               />
             </div>
             <div className={mobileLogo}>
@@ -278,6 +282,7 @@ const Navigation: React.FC<NavigationProps> = ({
             </div>
           </div>
           <nav className={`${navMenu} ${menuOpen ? navMenuOpen : ''}`}>
+            <div className={navCenter}>
             <Link
               href="/"
               className={`${navStyle} ${pathname === '/' ? mobileActiveNavStyle : ''}`}
@@ -412,11 +417,16 @@ const Navigation: React.FC<NavigationProps> = ({
               Login
             </button>
             <button
-              className={tryForFreeButton}
+              className={tryForFreeLink}
               onClick={() => router.push('/subscribe?plan=free')}
             >
               Try for Free
             </button>
+            </div>
+            <CalendlyButton
+              className={tryForFreeButton}
+              buttonText="Book a 20-Minute Demo"
+            />
           </nav>
           {!menuOpen ? (
             <div

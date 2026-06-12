@@ -165,16 +165,14 @@ export const logoImage = style({
 });
 
 export const navStyle = style({
-  fontSize: '18px',
+  fontSize: '16px',
   color: '#474747',
   fontWeight: '400',
   textDecoration: 'none',
-  marginRight: '50px',
   position: 'relative',
   '@media': {
     'screen and (max-width: 1200px)': {
-      fontSize: '16px',
-      marginRight: '30px',
+      fontSize: '14px',
     },
     'screen and (max-width: 1024px)': {
       fontSize: '18px',
@@ -198,7 +196,6 @@ export const navStyle = style({
     'screen and (max-height: 700px)': {
       padding: '8px 12px',
       fontSize: '15px',
-      marginRight: '10px',
     },
   },
 });
@@ -246,9 +243,13 @@ export const navMenu = style({
   display: 'flex',
   alignItems: 'center',
   '@media': {
-    // Large screens (1025px+) - Desktop: Horizontal menu
+    // Large screens (1025px+) - Desktop: Horizontal menu.
+    // navMenu fills the row between the logo and the right edge; the centered
+    // link group (navCenter) grows to push the demo CTA to the far right.
     '(min-width: 1025px)': {
       display: 'flex',
+      flex: 1,
+      alignItems: 'center',
     },
     // Tablets and smaller - Hidden unless open
     '(max-width: 1024px)': {
@@ -302,6 +303,23 @@ export const navMenuOpen = style({
   '@media': {
     '(max-width: 1024px)': {
       transform: 'translateY(0) !important',
+    },
+  },
+});
+
+// Centered link group (Home … Try for Free) on desktop. It grows to fill the
+// space between the logo and the demo CTA, centering the links via a fluid gap.
+// On tablet/mobile it collapses to `display: contents` so its children flow
+// directly into the navMenu dropdown column (preserving the existing layout).
+export const navCenter = style({
+  display: 'flex',
+  flex: 1,
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: 'clamp(18px, 2.2vw, 50px)',
+  '@media': {
+    'screen and (max-width: 1024px)': {
+      display: 'contents',
     },
   },
 });
@@ -409,7 +427,7 @@ export const contactInfoDivider = style({
 });
 
 export const loginButton = style({
-  padding: '12px 32px',
+  padding: '0',
   fontSize: '16px',
   fontWeight: '600',
   color: '#7a7eed',
@@ -428,6 +446,9 @@ export const loginButton = style({
   },
   ':active': { transform: 'scale(0.98)' },
   '@media': {
+    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+      fontSize: '14px',
+    },
     'screen and (max-width: 1024px)': {
       padding: '12px 40px',
       fontSize: '16px',
@@ -454,9 +475,60 @@ export const loginButton = style({
   },
 });
 
-export const tryForFreeButton = style({
-  padding: '12px 32px',
+// Secondary, text-only "Try for Free" link — visually subordinate to the
+// primary "Book a 20-Minute Demo" CTA so the demo stays the single front door.
+export const tryForFreeLink = style({
+  padding: '0',
   fontSize: '16px',
+  fontWeight: '600',
+  color: '#7a7eed',
+  background: 'transparent',
+  border: 'none',
+  borderRadius: '8px',
+  cursor: 'pointer',
+  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  position: 'relative',
+  flexShrink: 0,
+  textAlign: 'center',
+  display: 'inline-block',
+  ':hover': {
+    color: '#7a7eed',
+    textDecoration: 'underline',
+  },
+  ':active': { transform: 'scale(0.98)' },
+  '@media': {
+    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+      fontSize: '14px',
+    },
+    'screen and (max-width: 1024px)': {
+      padding: '12px 40px',
+      fontSize: '16px',
+      width: '200px',
+      border: '2px solid #7a7eed',
+      marginTop: '10px',
+      textAlign: 'center',
+      display: 'block',
+    },
+    'screen and (max-width: 768px)': {
+      padding: '10px 35px',
+      fontSize: '15px',
+      width: '180px',
+      textAlign: 'center',
+      display: 'block',
+    },
+    'screen and (max-height: 700px)': {
+      padding: '8px 12px',
+      fontSize: '14px',
+      width: '90px',
+      textAlign: 'center',
+      display: 'block',
+    },
+  },
+});
+
+export const tryForFreeButton = style({
+  padding: '11px 18px',
+  fontSize: '15px',
   fontWeight: '600',
   color: '#ffffff',
   background: 'linear-gradient(135deg, #7a7eed 0%, #9f7aea 100%)',
@@ -467,8 +539,8 @@ export const tryForFreeButton = style({
   position: 'relative',
   overflow: 'hidden',
   boxShadow: '0 2px 8px rgba(122, 126, 237, 0.3)',
-  marginLeft: '15px',
   flexShrink: 0,
+  whiteSpace: 'nowrap',
   textAlign: 'center',
   display: 'inline-block',
   ':hover': {
@@ -491,41 +563,58 @@ export const tryForFreeButton = style({
   },
   selectors: { '&:hover:before': { width: '300px', height: '300px' } },
   '@media': {
+    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+      padding: '8px 11px',
+      fontSize: '13px',
+    },
     'screen and (max-width: 1024px)': {
-      padding: '14px 40px',
+      padding: '14px 32px',
       fontSize: '16px',
       marginLeft: '0',
       marginTop: '10px',
       marginBottom: '20px',
-      width: '200px',
+      width: 'auto',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
     'screen and (max-width: 768px)': {
-      padding: '12px 35px',
+      padding: '12px 28px',
       fontSize: '15px',
       marginLeft: '0',
-      width: '180px',
+      width: 'auto',
       marginBottom: '20px',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
     'screen and (max-height: 700px)': {
-      padding: '10px',
+      padding: '10px 20px',
       fontSize: '14px',
-      width: '140px',
+      width: 'auto',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
   },
 });
 
 export const desktopLogo = style({
-  display: 'block',
-  width: '120px',
-  height: '120px',
+  display: 'flex',
+  alignItems: 'center',
+  width: 'auto',
   '@media': {
     'screen and (max-width: 932px)': { display: 'none' },
+  },
+});
+
+// Explicit pixel height on the image (not a percentage) so the size is
+// unambiguous; width: auto keeps the aspect ratio. Smaller in the 1025–1200px
+// band so the logo doesn't crowd the row.
+export const desktopLogoImage = style({
+  width: 'auto',
+  height: '120px',
+  '@media': {
+    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+      height: '90px',
+    },
   },
 });
 
