@@ -12,11 +12,10 @@ export const dropdownContainer = style({
 });
 
 export const dropdownTrigger = style({
-  fontSize: '18px',
+  fontSize: '16px',
   color: '#474747',
   fontWeight: '400',
   cursor: 'pointer',
-  marginRight: '50px',
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
@@ -27,12 +26,8 @@ export const dropdownTrigger = style({
   },
   '@media': {
     'screen and (max-width: 1200px)': {
-      fontSize: '16px',
-      marginRight: '30px',
+      fontSize: '14px',
     },
-    'screen and (max-height: 700px)': {
-      marginRight: '10px',  
-    }
   },
   
 });
