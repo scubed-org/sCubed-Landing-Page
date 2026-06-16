@@ -1,7 +1,6 @@
 'use client';
 
 import { Pencil } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 import PlanBadge from './PlanBadge';
@@ -43,7 +42,6 @@ import type {
  * - Paid Plan: Step 1 (Email) → Step 2 (OTP) → Step 3 (Details) → Step 4 (Cart+Register) → Step 5 (Payment)
  */
 export default function SubscriptionFlow() {
-  const searchParams = useSearchParams();
   const [isRestoringSession, setIsRestoringSession] = useState(true);
 
   // Initialize state from URL params (plan selection from pricing page)
@@ -67,9 +65,10 @@ export default function SubscriptionFlow() {
 
   // Load plan selection from URL params and restore session with validation
   useEffect(() => {
-    const planParam = searchParams.get('plan');
-    const billingParam = searchParams.get('billing');
-    const emailParam = searchParams.get('email');
+    const params = new URLSearchParams(window.location.search);
+    const planParam = params.get('plan');
+    const billingParam = params.get('billing');
+    const emailParam = params.get('email');
 
     if (planParam) {
       // Fresh start with plan from URL params (from pricing page)
@@ -115,7 +114,7 @@ export default function SubscriptionFlow() {
 
       setIsRestoringSession(false);
     }
-  }, [searchParams]);
+  }, []);
 
   // Persist form state to session storage with metadata
   useEffect(() => {
@@ -331,10 +330,12 @@ export default function SubscriptionFlow() {
   // Show loading state while restoring session
   if (isRestoringSession) {
     return (
-      <div className={styles.container}>
-        <div className={styles.stepContent}>
-          <div style={{ textAlign: 'center', padding: '3rem' }}>
-            <p>Loading...</p>
+      <div className={styles.pageWrapper}>
+        <div className={styles.container}>
+          <div className={styles.stepContent}>
+            <div style={{ textAlign: 'center', padding: '3rem' }}>
+              <p>Loading...</p>
+            </div>
           </div>
         </div>
       </div>

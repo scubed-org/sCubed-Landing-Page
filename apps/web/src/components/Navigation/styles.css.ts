@@ -24,6 +24,17 @@ export const headerContentStyles = style({
   position: 'relative',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   '@media': {
+    // Desktop: logo, every nav link, and the demo CTA are all direct flex
+    // children here (navMenu/navCenter collapse to display:contents). The
+    // space-between distribution above then gives an EXACTLY equal gap between
+    // every adjacent item — logo→link, link→link, and link→demo are identical.
+    // columnGap acts as a minimum so items never collide on narrower desktops.
+    'screen and (min-width: 1101px)': {
+      columnGap: '24px',
+    },
+    'screen and (min-width: 1101px) and (max-width: 1340px)': {
+      columnGap: '10px',
+    },
     'screen and (max-width: 932px)': {
       padding: '0 15px',
       background: `#fff`,
@@ -147,6 +158,10 @@ export const contactInfoLink = style({
 
 export const logoOuter = style({
   cursor: 'pointer',
+  // Never let the header flex row shrink the logo — without this the <img>
+  // (a replaceable element) gets compressed horizontally on tighter tablet
+  // widths, distorting its aspect ratio.
+  flexShrink: 0,
   '@media': {
     'screen and (max-width: 768px)': {
       display: 'flex',
@@ -170,11 +185,18 @@ export const navStyle = style({
   fontWeight: '400',
   textDecoration: 'none',
   position: 'relative',
+  whiteSpace: 'nowrap',
+  // Keep links at their natural width in the header flex row so space-between
+  // can hand out exactly-equal gaps; without this they shrink unevenly on
+  // tablet widths and the spacing reads as lopsided.
+  flexShrink: 0,
   '@media': {
-    'screen and (max-width: 1200px)': {
-      fontSize: '14px',
+    // Low-desktop band just above the hamburger breakpoint: shrink links so the
+    // full horizontal row fits on one line with even spacing.
+    'screen and (min-width: 1101px) and (max-width: 1340px)': {
+      fontSize: '13px',
     },
-    'screen and (max-width: 1024px)': {
+    'screen and (max-width: 1100px)': {
       fontSize: '18px',
       marginRight: '0',
       padding: '12px 30px',
@@ -205,7 +227,7 @@ export const activeNavStyle = style([navStyle, { color: '#000' }]);
 // Style for active nav items on mobile
 export const mobileActiveNavStyle = style({
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       backgroundColor: 'rgba(122, 126, 237, 0.08)',
       color: '#7a7eed',
       fontWeight: '600',
@@ -220,11 +242,11 @@ export const hamburger = style({
   zIndex: 10002,
   '@media': {
     // Large screens (1025px+) - Desktop: Hidden
-    '(min-width: 1025px)': {
+    '(min-width: 1101px)': {
       display: 'none',
     },
     // Tablets and smaller - Show hamburger
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       display: 'flex',
       marginRight: '15px',
     },
@@ -243,16 +265,14 @@ export const navMenu = style({
   display: 'flex',
   alignItems: 'center',
   '@media': {
-    // Large screens (1025px+) - Desktop: Horizontal menu.
-    // navMenu fills the row between the logo and the right edge; the centered
-    // link group (navCenter) grows to push the demo CTA to the far right.
-    '(min-width: 1025px)': {
-      display: 'flex',
-      flex: 1,
-      alignItems: 'center',
+    // Large screens (1025px+) - Desktop: collapse the <nav> box so its children
+    // (the links + demo CTA) flow up as direct flex children of the header row,
+    // letting headerContentStyles' space-between space everything equally.
+    '(min-width: 1101px)': {
+      display: 'contents',
     },
     // Tablets and smaller - Hidden unless open
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       display: 'none',
       flexDirection: 'column',
       alignItems: 'center',
@@ -278,7 +298,7 @@ export const navMenu = style({
       // Ensure buttons at bottom are reachable when scrolling
       paddingBottom: '80px',
     },
-    '(min-width: 933px) and (max-width:1024px)': {
+    '(min-width: 933px) and (max-width:1100px)': {
       top: '120px',
       // Fix height to match header offset
       height: 'calc(100vh - 120px)',
@@ -301,27 +321,18 @@ export const navMenu = style({
 export const navMenuOpen = style({
   display: 'flex !important',
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       transform: 'translateY(0) !important',
     },
   },
 });
 
-// Centered link group (Home … Try for Free) on desktop. It grows to fill the
-// space between the logo and the demo CTA, centering the links via a fluid gap.
-// On tablet/mobile it collapses to `display: contents` so its children flow
-// directly into the navMenu dropdown column (preserving the existing layout).
+// Link group wrapper (Home … Try for Free). It is a layout-neutral pass-through
+// in every breakpoint: `display: contents` removes its own box so the links
+// become direct children of the header row on desktop (for equal space-between
+// spacing) and of the navMenu dropdown column on tablet/mobile.
 export const navCenter = style({
-  display: 'flex',
-  flex: 1,
-  alignItems: 'center',
-  justifyContent: 'center',
-  gap: 'clamp(18px, 2.2vw, 50px)',
-  '@media': {
-    'screen and (max-width: 1024px)': {
-      display: 'contents',
-    },
-  },
+  display: 'contents',
 });
 
 export const activeLinkStyle = style({
@@ -335,7 +346,7 @@ export const activeLinkStyle = style({
   left: '50%',
   transform: 'translateX(-50%)',
   '@media': {
-    'screen and (max-width: 1024px)': {
+    'screen and (max-width: 1100px)': {
       width: '60px',
       height: '3px',
       bottom: '-5px',
@@ -357,11 +368,11 @@ export const closeButtonWrapper = style({
   zIndex: 10002,
   '@media': {
     // Large screens (1025px+) - Desktop: Hidden
-    '(min-width: 1025px)': {
+    '(min-width: 1101px)': {
       display: 'none',
     },
     // Tablets and smaller - Show close button when menu is open
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       display: 'flex',
       marginRight: '15px',
     },
@@ -446,31 +457,31 @@ export const loginButton = style({
   },
   ':active': { transform: 'scale(0.98)' },
   '@media': {
-    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+    'screen and (min-width: 1101px) and (max-width: 1340px)': {
       fontSize: '14px',
     },
-    'screen and (max-width: 1024px)': {
-      padding: '12px 40px',
+    'screen and (max-width: 1100px)': {
+      padding: '12px 32px',
       fontSize: '16px',
-      width: '200px',
+      width: 'auto',
       border: '2px solid #7a7eed',
       marginTop: '10px',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
     'screen and (max-width: 768px)': {
-      padding: '10px 35px',
+      padding: '10px 28px',
       fontSize: '15px',
-      width: '180px',
+      width: 'auto',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
     'screen and (max-height: 700px)': {
-      padding: '8px 12px',
+      padding: '8px 24px',
       fontSize: '14px',
-      width: '70px',
+      width: 'auto',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
   },
 });
@@ -490,6 +501,7 @@ export const tryForFreeLink = style({
   position: 'relative',
   flexShrink: 0,
   textAlign: 'center',
+  whiteSpace: 'nowrap',
   display: 'inline-block',
   ':hover': {
     color: '#7a7eed',
@@ -497,31 +509,31 @@ export const tryForFreeLink = style({
   },
   ':active': { transform: 'scale(0.98)' },
   '@media': {
-    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+    'screen and (min-width: 1101px) and (max-width: 1340px)': {
       fontSize: '14px',
     },
-    'screen and (max-width: 1024px)': {
-      padding: '12px 40px',
+    'screen and (max-width: 1100px)': {
+      padding: '12px 32px',
       fontSize: '16px',
-      width: '200px',
+      width: 'auto',
       border: '2px solid #7a7eed',
       marginTop: '10px',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
     'screen and (max-width: 768px)': {
-      padding: '10px 35px',
+      padding: '10px 28px',
       fontSize: '15px',
-      width: '180px',
+      width: 'auto',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
     'screen and (max-height: 700px)': {
-      padding: '8px 12px',
+      padding: '8px 24px',
       fontSize: '14px',
-      width: '90px',
+      width: 'auto',
       textAlign: 'center',
-      display: 'block',
+      display: 'inline-block',
     },
   },
 });
@@ -563,11 +575,11 @@ export const tryForFreeButton = style({
   },
   selectors: { '&:hover:before': { width: '300px', height: '300px' } },
   '@media': {
-    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+    'screen and (min-width: 1101px) and (max-width: 1340px)': {
       padding: '8px 11px',
       fontSize: '13px',
     },
-    'screen and (max-width: 1024px)': {
+    'screen and (max-width: 1100px)': {
       padding: '14px 32px',
       fontSize: '16px',
       marginLeft: '0',
@@ -612,7 +624,7 @@ export const desktopLogoImage = style({
   width: 'auto',
   height: '120px',
   '@media': {
-    'screen and (min-width: 1025px) and (max-width: 1200px)': {
+    'screen and (min-width: 1101px) and (max-width: 1340px)': {
       height: '90px',
     },
   },
@@ -633,7 +645,7 @@ export const mobileLogo = style({
 export const mobileOverlay = style({
   display: 'none',
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       position: 'fixed',
       top: '0',
       left: '0',
@@ -650,7 +662,7 @@ export const mobileOverlay = style({
 
 export const mobileOverlayOpen = style({
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       opacity: 1,
       visibility: 'visible',
       display: 'block',
@@ -661,7 +673,7 @@ export const mobileOverlayOpen = style({
 // Mobile header wrapper that moves to top
 export const mobileHeaderWrapper = style({
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       position: 'relative',
       zIndex: 10000,
       transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -671,7 +683,7 @@ export const mobileHeaderWrapper = style({
 
 export const mobileHeaderWrapperOpen = style({
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       position: 'fixed',
       top: '0',
       left: '0',
@@ -685,7 +697,7 @@ export const mobileHeaderWrapperOpen = style({
 // Webkit scrollbar styling for mobile nav menu
 globalStyle(`.${navMenu}::-webkit-scrollbar`, {
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       width: '6px',
     },
   },
@@ -693,7 +705,7 @@ globalStyle(`.${navMenu}::-webkit-scrollbar`, {
 
 globalStyle(`.${navMenu}::-webkit-scrollbar-track`, {
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       background: '#f0f0f0',
       borderRadius: '3px',
     },
@@ -702,7 +714,7 @@ globalStyle(`.${navMenu}::-webkit-scrollbar-track`, {
 
 globalStyle(`.${navMenu}::-webkit-scrollbar-thumb`, {
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       background: '#7a7eed',
       borderRadius: '3px',
     },
@@ -711,7 +723,7 @@ globalStyle(`.${navMenu}::-webkit-scrollbar-thumb`, {
 
 globalStyle(`.${navMenu}::-webkit-scrollbar-thumb:hover`, {
   '@media': {
-    '(max-width: 1024px)': {
+    '(max-width: 1100px)': {
       background: '#6c6ee5',
     },
   },

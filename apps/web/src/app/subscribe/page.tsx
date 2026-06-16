@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import { Suspense } from 'react';
 
 import SubscriptionFlow from '@/components/SubscriptionFlow';
 
@@ -21,9 +20,5 @@ export const metadata: Metadata = {
  * 2. "Buy Now" button from Pricing page (with plan selection)
  */
 export default function SubscribePage() {
-  return (
-    <Suspense fallback={<div style={{ textAlign: 'center', padding: '3rem' }}>Loading...</div>}>
-      <SubscriptionFlow />
-    </Suspense>
-  );
+  return <SubscriptionFlow />;
 }

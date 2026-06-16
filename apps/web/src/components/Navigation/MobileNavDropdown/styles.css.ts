@@ -3,7 +3,9 @@ import { style } from '@vanilla-extract/css';
 export const mobileDropdownContainer = style({
   display: 'none',
   '@media': {
-    'screen and (max-width: 1024px)': {
+    // Show the collapsible mobile dropdown wherever the hamburger menu is used
+    // (tablet and below) — matches the nav's 1100px breakpoint.
+    'screen and (max-width: 1100px)': {
       display: 'flex',
       flexDirection: 'column',
       width: '100%',
