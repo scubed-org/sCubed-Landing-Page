@@ -4,8 +4,13 @@ export const dropdownContainer = style({
   position: 'relative',
   display: 'flex',
   alignItems: 'center',
+  // Hold natural width in the header flex row (matches navStyle) so the
+  // Features/Resources triggers don't compress and skew the equal spacing.
+  flexShrink: 0,
   '@media': {
-    'screen and (max-width: 1024px)': {
+    // Tablet and below use the hamburger menu (MobileNavDropdown), so hide the
+    // hover dropdown trigger here to match the nav's 1100px breakpoint.
+    'screen and (max-width: 1100px)': {
       display: 'none',
     },
   },
@@ -20,16 +25,17 @@ export const dropdownTrigger = style({
   display: 'flex',
   alignItems: 'center',
   gap: '4px',
+  whiteSpace: 'nowrap',
   transition: 'color 0.2s ease',
   ':hover': {
     color: '#7a7eed',
   },
   '@media': {
-    'screen and (max-width: 1200px)': {
-      fontSize: '14px',
+    // Match navStyle in the low-desktop band so labels stay aligned.
+    'screen and (min-width: 1101px) and (max-width: 1340px)': {
+      fontSize: '13px',
     },
   },
-  
 });
 
 export const dropdownTriggerActive = style({
