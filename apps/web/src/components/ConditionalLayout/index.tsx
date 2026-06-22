@@ -28,6 +28,7 @@ export default function ConditionalLayout({
     pathname === '/aba-practice-management-software' ||
     pathname === '/guardian-portal' ||
     pathname === '/aba-data-collection-software' ||
+    pathname === '/demo-booked' ||
     pathname === '/pricing' ||
     pathname === '/events' ||
     pathname.startsWith('/events/') ||
@@ -45,6 +46,7 @@ export default function ConditionalLayout({
     pathname === '/guardian-portal' ||
     pathname === '/telehealth-platform' ||
     pathname === '/aba-data-collection-software' ||
+    pathname === '/demo-booked' ||
     pathname === '/pricing' ||
     pathname === '/events' ||
     pathname === '/scheduling-and-appointments' ||

@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Calendar, CreditCard, Video } from 'lucide-react';
 import Link from 'next/link';
+
 import { colors, spacing, typography } from '../../../styles/tokens.css';
 import Tooltip from '../../common/Tooltip';
 
