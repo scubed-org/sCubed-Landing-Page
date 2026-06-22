@@ -9,7 +9,6 @@ import billingImg from '../../../images/Billing.jpg';
 import billingBannerImg from '../../../images/billing-banner.png';
 import CalendlyButton from '../CalendlyButton';
 import { primaryButton } from '../CalendlyButton/styles.css';
-
 import BillingMetrics from '../BillingMetrics';
 
 import {
