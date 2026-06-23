@@ -2847,7 +2847,10 @@ export const sectionIcon = style({
 // ============================================================================
 
 export const termsSection = style({
-  marginBottom: spacing.lg,
+  // Clear separation from the "Next charge" line above (this is a distinct,
+  // legal step — not part of the price breakdown).
+  marginTop: spacing.lg,
+  marginBottom: spacing.md,
 });
 
 export const termsHeader = style({
@@ -2865,11 +2868,13 @@ export const termsVersion = style({
 });
 
 export const scrollableTerms = style({
-  maxHeight: '280px',
+  maxHeight: '300px',
   overflowY: 'auto',
   border: `1px solid ${colors.neutral[200]}`,
   borderRadius: radius.md,
-  padding: spacing.md,
+  // Tighter padding than a content page so the narrow column keeps a usable
+  // reading width for the legal copy.
+  padding: spacing.sm,
   backgroundColor: '#ffffff',
   fontSize: typography.fontSize.sm,
   color: '#374151',
@@ -2896,14 +2901,147 @@ globalStyle(`${scrollableTerms} > div > *:first-child`, {
   marginTop: 0,
 });
 
-export const termsCheckboxRow = style({
-  marginTop: spacing.md,
+// DynamicContentRenderer is the blog/article renderer: its headings are sized
+// for full-width pages (h1 = 2.5rem) via inline styles. Inside this narrow box
+// that produces a giant hero title. Scale every heading down to compact,
+// legal-document proportions. !important is required to beat the renderer's
+// inline styles.
+globalStyle(`${scrollableTerms} h1`, {
+  fontSize: '1.0625rem !important',
+  fontWeight: '700 !important',
+  lineHeight: '1.35 !important',
+  marginTop: '0 !important',
+  marginBottom: `${spacing.xs} !important`,
 });
 
-export const termsHint = style({
+globalStyle(`${scrollableTerms} h2`, {
+  fontSize: '0.9375rem !important',
+  fontWeight: '600 !important',
+  lineHeight: '1.4 !important',
+  marginTop: `${spacing.sm} !important`,
+  marginBottom: '0.4rem !important',
+});
+
+globalStyle(
+  `${scrollableTerms} h3, ${scrollableTerms} h4, ${scrollableTerms} h5, ${scrollableTerms} h6`,
+  {
+    fontSize: '0.875rem !important',
+    fontWeight: '600 !important',
+    lineHeight: '1.4 !important',
+    marginTop: '0.85rem !important',
+    marginBottom: '0.3rem !important',
+  },
+);
+
+globalStyle(`${scrollableTerms} p`, {
+  lineHeight: '1.6 !important',
+  marginBottom: '0.6rem !important',
+});
+
+globalStyle(`${scrollableTerms} li`, {
+  lineHeight: '1.55 !important',
+  marginBottom: '0.25rem !important',
+});
+
+// The terms document repeats its own title as the first heading, but the
+// section header above the box already shows it (with version). Hide the
+// in-box duplicate so the box opens straight into the actual terms.
+globalStyle(`${scrollableTerms} > div > h1:first-child`, {
+  display: 'none !important',
+});
+
+// Wraps the scroll box so the bottom fade can be absolutely positioned over it.
+export const termsScrollWrapper = style({
+  position: 'relative',
+});
+
+// A soft fade at the bottom edge signals there is more content to scroll. The
+// component only renders it while the reader has not yet reached the end.
+export const termsScrollFade = style({
+  position: 'absolute',
+  left: '1px',
+  right: '10px', // clear the scrollbar track
+  bottom: '1px',
+  height: '52px',
+  borderRadius: `0 0 ${radius.md} ${radius.md}`,
+  background:
+    'linear-gradient(to bottom, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.9) 70%, #ffffff 100%)',
+  pointerEvents: 'none',
+});
+
+// Scroll-progress / confirmation line shown between the box and the checkbox.
+export const termsStatus = style({
+  display: 'flex',
+  alignItems: 'center',
+  gap: spacing.xs,
+  marginTop: spacing.sm,
   fontSize: typography.fontSize.sm,
-  color: '#6b7280',
-  marginTop: spacing.xs,
+  fontWeight: typography.fontWeight.medium,
+  transition: 'color 0.2s ease',
+});
+
+globalStyle(`${termsStatus} svg`, {
+  flexShrink: 0,
+});
+
+export const termsStatusPending = style({
+  color: colors.neutral[500],
+});
+
+export const termsStatusDone = style({
+  color: '#059669',
+});
+
+// Branded consent row. Reads as a clear, deliberate gate: muted/disabled until
+// the terms are read, then it lifts to the brand purple and tints when checked.
+export const termsConsent = style({
+  display: 'flex',
+  alignItems: 'flex-start',
+  gap: spacing.sm,
+  marginTop: spacing.sm,
+  padding: '12px 14px',
+  border: `1px solid ${colors.neutral[200]}`,
+  borderRadius: radius.md,
+  backgroundColor: '#ffffff',
+  cursor: 'pointer',
+  userSelect: 'none',
+  transition: 'border-color 0.2s ease, background-color 0.2s ease',
+});
+
+export const termsConsentDisabled = style({
+  cursor: 'not-allowed',
+  backgroundColor: colors.neutral[50],
+});
+
+export const termsConsentReady = style({
+  borderColor: colors.primary[300],
+});
+
+export const termsConsentAccepted = style({
+  borderColor: colors.primary[600],
+  backgroundColor: colors.primary[50],
+});
+
+export const termsCheckbox = style({
+  width: '20px',
+  height: '20px',
+  marginTop: '1px',
+  flexShrink: 0,
+  cursor: 'pointer',
+  accentColor: colors.primary[600],
+  ':disabled': {
+    cursor: 'not-allowed',
+  },
+});
+
+export const termsConsentText = style({
+  fontSize: typography.fontSize.sm,
+  color: '#374151',
+  lineHeight: 1.5,
+});
+
+globalStyle(`${termsConsentDisabled} ${termsConsentText}`, {
+  color: colors.neutral[500],
 });
 
 export const termsLoading = style({
