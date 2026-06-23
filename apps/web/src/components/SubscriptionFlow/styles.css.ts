@@ -2843,6 +2843,120 @@ export const sectionIcon = style({
 });
 
 // ============================================================================
+// TERMS & CONDITIONS ACKNOWLEDGEMENT (paid checkout gate)
+// ============================================================================
+
+export const termsSection = style({
+  marginBottom: spacing.lg,
+});
+
+export const termsHeader = style({
+  fontSize: typography.fontSize.base,
+  fontWeight: typography.fontWeight.semibold,
+  color: '#111827',
+  marginBottom: spacing.sm,
+});
+
+export const termsVersion = style({
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeight.normal,
+  color: '#6b7280',
+  marginLeft: spacing.xs,
+});
+
+export const scrollableTerms = style({
+  maxHeight: '280px',
+  overflowY: 'auto',
+  border: `1px solid ${colors.neutral[200]}`,
+  borderRadius: radius.md,
+  padding: spacing.md,
+  backgroundColor: '#ffffff',
+  fontSize: typography.fontSize.sm,
+  color: '#374151',
+  scrollbarWidth: 'thin',
+  scrollbarColor: `${colors.primary[600]} ${colors.neutral[100]}`,
+});
+
+globalStyle(`${scrollableTerms}::-webkit-scrollbar`, {
+  width: '8px',
+});
+
+globalStyle(`${scrollableTerms}::-webkit-scrollbar-track`, {
+  background: colors.neutral[100],
+  borderRadius: radius.full,
+});
+
+globalStyle(`${scrollableTerms}::-webkit-scrollbar-thumb`, {
+  background: colors.primary[600],
+  borderRadius: radius.full,
+});
+
+// Tighten the markdown renderer's default spacing inside the compact terms box
+globalStyle(`${scrollableTerms} > div > *:first-child`, {
+  marginTop: 0,
+});
+
+export const termsCheckboxRow = style({
+  marginTop: spacing.md,
+});
+
+export const termsHint = style({
+  fontSize: typography.fontSize.sm,
+  color: '#6b7280',
+  marginTop: spacing.xs,
+});
+
+export const termsLoading = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  justifyContent: 'center',
+  gap: spacing.sm,
+  padding: spacing.lg,
+  color: '#6b7280',
+  fontSize: typography.fontSize.sm,
+});
+
+export const termsSpinner = style({
+  display: 'inline-block',
+  width: '28px',
+  height: '28px',
+  border: `3px solid ${colors.neutral[200]}`,
+  borderTopColor: colors.primary[600],
+  borderRadius: '50%',
+  animation: `${spin} 0.8s linear infinite`,
+});
+
+export const termsErrorBox = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  gap: spacing.sm,
+  padding: spacing.lg,
+  border: `1px solid ${colors.neutral[200]}`,
+  borderRadius: radius.md,
+  backgroundColor: '#fef2f2',
+  color: '#dc2626',
+  fontSize: typography.fontSize.sm,
+  textAlign: 'center',
+});
+
+export const termsRetryButton = style({
+  padding: '8px 20px',
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeight.semibold,
+  color: '#ffffff',
+  backgroundColor: colors.primary[600],
+  border: 'none',
+  borderRadius: radius.md,
+  cursor: 'pointer',
+  transition: 'opacity 0.2s ease',
+  ':hover': {
+    opacity: 0.9,
+  },
+});
+
+// ============================================================================
 // EXPORT ANIMATION KEYFRAMES (for use in components)
 // ============================================================================
 

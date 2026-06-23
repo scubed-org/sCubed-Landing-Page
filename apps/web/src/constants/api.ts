@@ -15,6 +15,7 @@ export const API_ENDPOINTS = {
     PAID_PLAN: 'subscriptions/paid-plan',
     REGISTRATION_DATA: 'subscriptions/onboarding/registration-data',
     VERIFY_PAYMENT: 'subscriptions/onboarding/verify-payment',
+    CURRENT_TERMS: 'subscriptions/onboarding/terms/current',
   },
 
   // Public API endpoints
