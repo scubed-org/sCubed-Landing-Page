@@ -5,13 +5,15 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import * as styles from './styles.css';
+import TermsAcknowledgement from './TermsAcknowledgement';
 
 import { API_ENDPOINTS, getAddonsEndpoint } from '@/constants/api';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
 import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
+import { useCurrentTerms } from '@/hooks/useCurrentTerms';
 import { fetchApi } from '@/lib/api-client';
 import { showSuccessToast } from '@/lib/errors';
-import { isApiError } from '@/types/api';
+import { ApiError, isApiError } from '@/types/api';
 import type {
   AddonApiData,
   PlanApiData,
@@ -60,6 +62,30 @@ const calculateNextChargeDate = (cycle: BillingCycle): string => {
   });
 };
 
+// Backend error codes returned by the paid T&C gate (SCM-5367) when the
+// accepted version is missing, stale, or the active version has changed.
+const TERMS_ERROR_CODES = [
+  'TERMS_VERSION_STALE',
+  'TERMS_NOT_FOUND',
+  'TERMS_ACKNOWLEDGEMENT_REQUIRED',
+];
+
+// Detect a Terms & Conditions failure from the register response so we can
+// prompt the user to re-review and re-accept rather than showing a raw error.
+const isTermsError = (error: ApiError): boolean => {
+  const haystack = [error.message, ...error.errors.map((e) => e.message)]
+    .filter(Boolean)
+    .join(' ')
+    .toUpperCase();
+
+  if (TERMS_ERROR_CODES.some((code) => haystack.includes(code))) {
+    return true;
+  }
+
+  // Fallback: any terms-related 422 from the paid gate.
+  return error.statusCode === 422 && haystack.includes('TERMS');
+};
+
 /**
  * Step 4 (Paid Plan): Cart/Checkout
  * Optimized component with proper React hooks usage and performance improvements
@@ -76,6 +102,16 @@ export default function Step4PaidCart({
   const [loadingData, setLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
+
+  // Terms & Conditions gate (paid checkout only). Acceptance is ephemeral —
+  // it is re-confirmed on every visit and never persisted to the session.
+  const {
+    terms,
+    loading: termsLoading,
+    error: termsError,
+    refetch: refetchTerms,
+  } = useCurrentTerms();
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
 
   const { handleSubmit, control, setValue } = useForm<CartFormData>({
     defaultValues: {
@@ -271,6 +307,13 @@ export default function Step4PaidCart({
           return;
         }
 
+        // T&C gate: the active version must be loaded and accepted before the
+        // paid register call (the backend fails closed without it).
+        if (!terms?.id) {
+          setApiError('Unable to load Terms & Conditions. Please retry.');
+          return;
+        }
+
         // Construct URLs for Stripe redirect
         // Note: session_id parameter is added by the backend when creating Stripe session
         const baseUrl =
@@ -282,6 +325,7 @@ export default function Step4PaidCart({
         const registrationPayload = {
           clinic_onboarding_request_id,
           draft_mode: false,
+          accepted_terms_id: terms.id,
           subscription_plan_id: formData.subscription_plan_id,
           staff_count: data.staff_count,
           billing_cycle: data.billing_cycle,
@@ -330,7 +374,15 @@ export default function Step4PaidCart({
         }
       } catch (error) {
         console.error('Registration failed:', error);
-        if (isApiError(error)) {
+        if (isApiError(error) && isTermsError(error)) {
+          // The active T&C version changed (or was removed) since it loaded.
+          // Re-fetch, force re-acknowledgement, and prompt the user.
+          refetchTerms();
+          setAcceptedTerms(false);
+          setApiError(
+            'The Terms & Conditions were updated — please review and accept again.',
+          );
+        } else if (isApiError(error)) {
           setApiError(
             error.message || 'Registration failed. Please try again.',
           );
@@ -341,7 +393,7 @@ export default function Step4PaidCart({
         setIsSubmitting(false);
       }
     },
-    [formData, clinic_onboarding_request_id, onNext],
+    [formData, clinic_onboarding_request_id, onNext, terms, refetchTerms],
   );
 
   if (loadingData) {
@@ -758,10 +810,21 @@ export default function Step4PaidCart({
                 </div>
               </div>
 
+              <TermsAcknowledgement
+                terms={terms}
+                loading={termsLoading}
+                error={termsError}
+                accepted={acceptedTerms}
+                onAcceptedChange={setAcceptedTerms}
+                onRetry={refetchTerms}
+              />
+
               <button
                 type="submit"
                 className={styles.proceedButton}
-                disabled={isSubmitting}
+                disabled={
+                  isSubmitting || termsLoading || !terms || !acceptedTerms
+                }
               >
                 {isSubmitting ? (
                   <>

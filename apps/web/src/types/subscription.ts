@@ -97,6 +97,19 @@ export interface PaidSubscriptionPayload
     SubscriptionInfo,
     PaymentInfo {}
 
+/**
+ * Public Terms & Conditions View
+ * Response from GET subscriptions/onboarding/terms/current (no auth).
+ * Surfaces the active T&C version that must be accepted before paid checkout.
+ */
+export interface PublicTermsView {
+  id: number;
+  version: string;
+  title: string;
+  content: string;
+  effective_from: string;
+}
+
 // ============================================================================
 // PLAN TYPES
 // ============================================================================
