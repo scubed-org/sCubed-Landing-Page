@@ -1,7 +1,7 @@
 'use client';
 
 import DOMPurify from 'isomorphic-dompurify';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, ArrowDown, Check } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import DynamicContentRenderer from '../DynamicContentRenderer';
@@ -116,6 +116,12 @@ export default function TermsAcknowledgement({
     );
   }
 
+  const consentStateClass = accepted
+    ? styles.termsConsentAccepted
+    : hasReachedEnd
+      ? styles.termsConsentReady
+      : styles.termsConsentDisabled;
+
   return (
     <div className={styles.termsSection}>
       <div className={styles.termsHeader}>
@@ -123,37 +129,55 @@ export default function TermsAcknowledgement({
         <span className={styles.termsVersion}>(v{terms.version})</span>
       </div>
 
-      <div
-        ref={scrollRef}
-        className={styles.scrollableTerms}
-        onScroll={handleScroll}
-        tabIndex={0}
-        role="region"
-        aria-label="Terms and Conditions content"
-      >
-        <DynamicContentRenderer content={sanitizedContent} />
-      </div>
-
-      <div className={styles.termsCheckboxRow}>
-        <label className={styles.checkboxLabel}>
-          <input
-            type="checkbox"
-            className={styles.checkbox}
-            checked={accepted}
-            disabled={!hasReachedEnd}
-            onChange={(e) => onAcceptedChange(e.target.checked)}
-            aria-describedby={!hasReachedEnd ? 'terms-scroll-hint' : undefined}
-          />
-          <span className={styles.checkboxText}>
-            I have read and agree to the Terms &amp; Conditions
-          </span>
-        </label>
+      <div className={styles.termsScrollWrapper}>
+        <div
+          ref={scrollRef}
+          className={styles.scrollableTerms}
+          onScroll={handleScroll}
+          tabIndex={0}
+          role="region"
+          aria-label="Terms and Conditions content"
+        >
+          <DynamicContentRenderer content={sanitizedContent} />
+        </div>
         {!hasReachedEnd && (
-          <div id="terms-scroll-hint" className={styles.termsHint}>
-            Please scroll to the end to continue
-          </div>
+          <div className={styles.termsScrollFade} aria-hidden="true" />
         )}
       </div>
+
+      <div
+        id="terms-scroll-hint"
+        className={`${styles.termsStatus} ${
+          hasReachedEnd ? styles.termsStatusDone : styles.termsStatusPending
+        }`}
+        aria-live="polite"
+      >
+        {hasReachedEnd ? (
+          <>
+            <Check size={16} aria-hidden="true" />
+            <span>You&apos;ve reviewed the full Terms &amp; Conditions</span>
+          </>
+        ) : (
+          <>
+            <ArrowDown size={16} aria-hidden="true" />
+            <span>Scroll to the bottom to continue</span>
+          </>
+        )}
+      </div>
+
+      <label className={`${styles.termsConsent} ${consentStateClass}`}>
+        <input
+          type="checkbox"
+          className={styles.termsCheckbox}
+          checked={accepted}
+          disabled={!hasReachedEnd}
+          onChange={(e) => onAcceptedChange(e.target.checked)}
+          aria-describedby={!hasReachedEnd ? 'terms-scroll-hint' : undefined}
+        />
+        <span className={styles.termsConsentText}>
+          I have read and agree to the Terms &amp; Conditions
+        </span>
+      </label>
     </div>
   );
 }
