@@ -2854,10 +2854,22 @@ export const termsSection = style({
 });
 
 export const termsHeader = style({
+  // Flex row so the title sits left and the "expand" affordance sits right.
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: spacing.sm,
   fontSize: typography.fontSize.base,
   fontWeight: typography.fontWeight.semibold,
   color: '#111827',
   marginBottom: spacing.sm,
+});
+
+// Keeps the title and version badge together as the left-hand flex item.
+export const termsHeaderTitle = style({
+  display: 'inline-flex',
+  alignItems: 'baseline',
+  flexWrap: 'wrap',
 });
 
 export const termsVersion = style({
@@ -2865,6 +2877,33 @@ export const termsVersion = style({
   fontWeight: typography.fontWeight.normal,
   color: '#6b7280',
   marginLeft: spacing.xs,
+});
+
+// Icon button that opens the full Terms in the larger reading modal.
+export const termsExpandButton = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  width: '28px',
+  height: '28px',
+  padding: 0,
+  border: `1px solid ${colors.neutral[200]}`,
+  borderRadius: radius.md,
+  backgroundColor: '#ffffff',
+  color: colors.neutral[500],
+  cursor: 'pointer',
+  transition:
+    'color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease',
+  ':hover': {
+    color: colors.primary[600],
+    borderColor: colors.primary[300],
+    backgroundColor: colors.primary[50],
+  },
+  ':focus-visible': {
+    outline: `2px solid ${colors.primary[600]}`,
+    outlineOffset: '2px',
+  },
 });
 
 export const scrollableTerms = style({
@@ -2899,6 +2938,15 @@ globalStyle(`${scrollableTerms}::-webkit-scrollbar-thumb`, {
 // Tighten the markdown renderer's default spacing inside the compact terms box
 globalStyle(`${scrollableTerms} > div > *:first-child`, {
   marginTop: 0,
+});
+
+// First visible block follows the hidden title; even out the top/bottom inset.
+globalStyle(`${scrollableTerms} > div > h1:first-child + *`, {
+  marginTop: '0 !important',
+});
+
+globalStyle(`${scrollableTerms} > div > *:last-child`, {
+  marginBottom: '0 !important',
 });
 
 // DynamicContentRenderer is the blog/article renderer: its headings are sized
@@ -3092,6 +3140,161 @@ export const termsRetryButton = style({
   ':hover': {
     opacity: 0.9,
   },
+});
+
+// ----------------------------------------------------------------------------
+// Expanded ("view larger") Terms & Conditions modal
+// ----------------------------------------------------------------------------
+
+// Keep the modal off the viewport edges on small screens.
+export const termsModalOverlay = style({
+  padding: spacing.md,
+});
+
+export const termsModal = style({
+  width: 'min(900px, 100%)',
+  maxWidth: '900px',
+  maxHeight: '88vh',
+  display: 'flex',
+  flexDirection: 'column',
+  // Header and body manage their own padding; the box itself has none so the
+  // header's bottom border spans edge to edge.
+  padding: 0,
+  borderRadius: radius.lg,
+  overflow: 'hidden',
+});
+
+export const termsModalHeader = style({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: spacing.md,
+  padding: `${spacing.md} ${spacing.lg}`,
+  borderBottom: `1px solid ${colors.neutral[200]}`,
+  flexShrink: 0,
+});
+
+export const termsModalTitle = style({
+  margin: 0,
+  fontSize: typography.fontSize.lg,
+  fontWeight: typography.fontWeight.semibold,
+  color: '#111827',
+});
+
+export const termsModalVersion = style({
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeight.normal,
+  color: '#6b7280',
+  marginLeft: spacing.xs,
+});
+
+export const termsModalClose = style({
+  display: 'inline-flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  flexShrink: 0,
+  width: '36px',
+  height: '36px',
+  padding: 0,
+  border: 'none',
+  borderRadius: radius.md,
+  backgroundColor: 'transparent',
+  color: colors.neutral[500],
+  cursor: 'pointer',
+  transition: 'color 0.2s ease, background-color 0.2s ease',
+  ':hover': {
+    color: colors.neutral[900],
+    backgroundColor: colors.neutral[100],
+  },
+  ':focus-visible': {
+    outline: `2px solid ${colors.primary[600]}`,
+    outlineOffset: '2px',
+  },
+});
+
+export const termsModalBody = style({
+  flex: 1,
+  overflowY: 'auto',
+  padding: spacing.lg,
+  fontSize: typography.fontSize.base,
+  color: '#374151',
+  scrollbarWidth: 'thin',
+  scrollbarColor: `${colors.primary[600]} ${colors.neutral[100]}`,
+});
+
+globalStyle(`${termsModalBody}::-webkit-scrollbar`, {
+  width: '8px',
+});
+
+globalStyle(`${termsModalBody}::-webkit-scrollbar-track`, {
+  background: colors.neutral[100],
+  borderRadius: radius.full,
+});
+
+globalStyle(`${termsModalBody}::-webkit-scrollbar-thumb`, {
+  background: colors.primary[600],
+  borderRadius: radius.full,
+});
+
+// Drop the top margin of the first rendered block so the body opens cleanly.
+globalStyle(`${termsModalBody} > div > *:first-child`, {
+  marginTop: 0,
+});
+
+// First visible block follows the hidden title; even out the top/bottom inset.
+globalStyle(`${termsModalBody} > div > h1:first-child + *`, {
+  marginTop: '0 !important',
+});
+
+globalStyle(`${termsModalBody} > div > *:last-child`, {
+  marginBottom: '0 !important',
+});
+
+// The terms document repeats its own title as the first heading; the modal
+// header already shows it, so hide the in-body duplicate.
+globalStyle(`${termsModalBody} > div > h1:first-child`, {
+  display: 'none !important',
+});
+
+// DynamicContentRenderer sizes headings for full-width pages (h1 = 2.5rem) via
+// inline styles. Scale them down to comfortable—but not hero—proportions for
+// this reading modal. !important is required to beat the renderer's inline
+// styles. These are larger than the cramped inline box for easier reading.
+globalStyle(`${termsModalBody} h1`, {
+  fontSize: '1.5rem !important',
+  fontWeight: '700 !important',
+  lineHeight: '1.3 !important',
+  marginTop: '0 !important',
+  marginBottom: `${spacing.sm} !important`,
+});
+
+globalStyle(`${termsModalBody} h2`, {
+  fontSize: '1.25rem !important',
+  fontWeight: '600 !important',
+  lineHeight: '1.35 !important',
+  marginTop: `${spacing.md} !important`,
+  marginBottom: `${spacing.xs} !important`,
+});
+
+globalStyle(
+  `${termsModalBody} h3, ${termsModalBody} h4, ${termsModalBody} h5, ${termsModalBody} h6`,
+  {
+    fontSize: '1.0625rem !important',
+    fontWeight: '600 !important',
+    lineHeight: '1.4 !important',
+    marginTop: `${spacing.sm} !important`,
+    marginBottom: `${spacing.xs} !important`,
+  },
+);
+
+globalStyle(`${termsModalBody} p`, {
+  lineHeight: '1.7 !important',
+  marginBottom: '0.9rem !important',
+});
+
+globalStyle(`${termsModalBody} li`, {
+  lineHeight: '1.65 !important',
+  marginBottom: '0.35rem !important',
 });
 
 // ============================================================================
