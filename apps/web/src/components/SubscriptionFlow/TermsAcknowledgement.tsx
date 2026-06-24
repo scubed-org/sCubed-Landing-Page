@@ -1,11 +1,12 @@
 'use client';
 
 import DOMPurify from 'isomorphic-dompurify';
-import { AlertCircle, ArrowDown, Check } from 'lucide-react';
+import { AlertCircle, ArrowDown, Check, Maximize2 } from 'lucide-react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 import DynamicContentRenderer from '../DynamicContentRenderer';
 
+import TermsModal from './TermsModal';
 import * as styles from './styles.css';
 
 import type { PublicTermsView } from '@/types/subscription';
@@ -41,6 +42,7 @@ export default function TermsAcknowledgement({
 }: TermsAcknowledgementProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [hasReachedEnd, setHasReachedEnd] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   // Sanitize server-controlled content as defense-in-depth: DynamicContentRenderer
   // uses rehype-raw, which renders raw HTML.
@@ -125,8 +127,19 @@ export default function TermsAcknowledgement({
   return (
     <div className={styles.termsSection}>
       <div className={styles.termsHeader}>
-        {terms.title}
-        <span className={styles.termsVersion}>(v{terms.version})</span>
+        <span className={styles.termsHeaderTitle}>
+          {terms.title}
+          <span className={styles.termsVersion}>(v{terms.version})</span>
+        </span>
+        <button
+          type="button"
+          className={styles.termsExpandButton}
+          onClick={() => setExpanded(true)}
+          aria-label="Expand Terms & Conditions to a larger view"
+          title="Expand"
+        >
+          <Maximize2 size={16} aria-hidden="true" />
+        </button>
       </div>
 
       <div className={styles.termsScrollWrapper}>
@@ -178,6 +191,15 @@ export default function TermsAcknowledgement({
           I have read and agree to the Terms &amp; Conditions
         </span>
       </label>
+
+      <TermsModal
+        open={expanded}
+        title={terms.title}
+        version={terms.version}
+        content={sanitizedContent}
+        onClose={() => setExpanded(false)}
+        onReachedEnd={() => setHasReachedEnd(true)}
+      />
     </div>
   );
 }
