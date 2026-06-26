@@ -229,16 +229,6 @@ export default function Step4PaidCart({
         // Fallback to generic addons if no plan ID (shouldn't happen in normal flow)
         setAddons(plansResult.addons || []);
       }
-
-      // Set default staff count from the selected plan's max_staff field
-      if (formData.subscription_plan_id && plansResult.plans) {
-        const selectedPlan = plansResult.plans.find(
-          (p) => p.id === formData.subscription_plan_id,
-        );
-        if (selectedPlan && selectedPlan.max_staff > 0) {
-          setValue('staff_count', selectedPlan.max_staff);
-        }
-      }
     } catch (error) {
       console.error('Failed to load plans and add-ons:', error);
       setApiError(
@@ -247,7 +237,7 @@ export default function Step4PaidCart({
     } finally {
       setLoadingData(false);
     }
-  }, [formData.subscription_plan_id, formData.staff_count, setValue]);
+  }, [formData.subscription_plan_id]);
 
   useEffect(() => {
     fetchPlansAndAddons();
@@ -267,20 +257,16 @@ export default function Step4PaidCart({
   );
 
   const incrementStaff = useCallback(() => {
-    // Users can add more staff beyond the plan's minimum requirement
-    // Set a reasonable maximum of 100 staff to prevent accidental excessive clicks
-    const MAX_STAFF_LIMIT = 100;
-    if (staffCount < MAX_STAFF_LIMIT) {
-      setValue('staff_count', staffCount + 1);
-    }
+    // No upper limit — users can add as many staff members as they need
+    setValue('staff_count', staffCount + 1);
   }, [staffCount, setValue]);
 
   const decrementStaff = useCallback(() => {
-    const minStaffCount = currentPlan?.max_staff || 1;
-    if (staffCount > minStaffCount) {
+    // Minimum of 1 staff member
+    if (staffCount > 1) {
       setValue('staff_count', staffCount - 1);
     }
-  }, [currentPlan, staffCount, setValue]);
+  }, [staffCount, setValue]);
 
   const onSubmit = useCallback(
     async (data: CartFormData) => {
@@ -470,9 +456,7 @@ export default function Step4PaidCart({
                   <button
                     type="button"
                     onClick={decrementStaff}
-                    disabled={
-                      !currentPlan || staffCount <= (currentPlan.max_staff || 1)
-                    }
+                    disabled={staffCount <= 1}
                     className={styles.counterButton}
                     aria-label="Decrease staff count"
                   >
@@ -482,7 +466,6 @@ export default function Step4PaidCart({
                   <button
                     type="button"
                     onClick={incrementStaff}
-                    disabled={staffCount >= 100}
                     className={styles.counterButton}
                     aria-label="Increase staff count"
                   >
@@ -520,12 +503,9 @@ export default function Step4PaidCart({
               </div>
               <div className={styles.staffLabel}>
                 Staff Member
-                {currentPlan.max_staff > 0 && (
-                  <span className={styles.staffLabelHint}>
-                    (Plan requires minimum {currentPlan.max_staff} staff, can
-                    add more)
-                  </span>
-                )}
+                <span className={styles.staffLabelHint}>
+                  (Plan requires minimum 1 staff, can add more)
+                </span>
               </div>
 
               {/* Billing Cycle Selection */}

@@ -4,9 +4,10 @@
  */
 
 /**
- * Default staff count used as fallback when no value is provided
+ * Default staff count used as fallback when no value is provided.
+ * Minimum allowed is 1 staff member; users can add more without limit.
  */
-export const DEFAULT_STAFF_COUNT = 5;
+export const DEFAULT_STAFF_COUNT = 1;
 
 export const FORM_FIELDS = {
   // Clinic Information
