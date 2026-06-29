@@ -6,6 +6,7 @@ import { Controller, useForm, useWatch } from 'react-hook-form';
 
 import * as styles from './styles.css';
 import TermsAcknowledgement from './TermsAcknowledgement';
+import { useCheckoutSummary } from './useCheckoutSummary';
 
 import { API_ENDPOINTS, getAddonsEndpoint } from '@/constants/api';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
@@ -36,6 +37,20 @@ const parsePrice = (value: string | undefined | null): number => {
   if (!value) return 0;
   const parsed = Number.parseFloat(value);
   return Number.isNaN(parsed) ? 0 : parsed;
+};
+
+// Resolve an add-on's unit price and the amount actually billed for the current
+// cycle and staff count. Per-staff add-ons multiply by staff; flat ones don't.
+const getAddonPricing = (
+  addon: AddonData,
+  cycle: BillingCycle,
+  staff: number,
+): { unit: number; billed: number; perStaff: boolean } => {
+  const unit = parsePrice(
+    cycle === BILLING_CYCLES.MONTHLY ? addon.monthly_price : addon.yearly_price,
+  );
+  const perStaff = addon.billing_basis === 'per_staff';
+  return { unit, billed: perStaff ? unit * staff : unit, perStaff };
 };
 
 // Helper function to calculate next charge date
@@ -132,8 +147,9 @@ export default function Step4PaidCart({
     return plans.find((p) => p.id === formData.subscription_plan_id) || null;
   }, [formData.subscription_plan_id, plans]);
 
-  // Memoized total calculation - THIS FIXES THE MAIN BUG
-  const total = useMemo(() => {
+  // Client-side estimate, used only as a fallback while the API summary is
+  // loading or if the pricing request fails.
+  const fallbackTotal = useMemo(() => {
     if (!currentPlan) return 0;
 
     const pricePerStaff = parsePrice(
@@ -147,18 +163,27 @@ export default function Step4PaidCart({
     const addonsTotal = selectedAddons.reduce((sum, addonId) => {
       const addon = addons.find((a) => a.id === addonId);
       if (addon) {
-        const addonPrice = parsePrice(
-          billingCycle === BILLING_CYCLES.MONTHLY
-            ? addon.monthly_price
-            : addon.yearly_price,
-        );
-        return sum + addonPrice;
+        return sum + getAddonPricing(addon, billingCycle, staffCount).billed;
       }
       return sum;
     }, 0);
 
     return basePrice + addonsTotal;
   }, [currentPlan, billingCycle, staffCount, selectedAddons, addons]);
+
+  // Backend is the source of truth for pricing.
+  const { summary: checkoutSummary, loading: summaryLoading } =
+    useCheckoutSummary({
+    planId: currentPlan?.id ?? null,
+    billingCycle,
+    staffCount,
+    addOns: selectedAddons,
+    enabled: !!currentPlan,
+  });
+
+  // Prefer the API amount; fall back to the local estimate until it resolves
+  // (or if it errors) so the user never sees $0.00 flicker.
+  const total = checkoutSummary?.amount_due ?? fallbackTotal;
 
   // Memoized savings percentage calculation
   const savingsPercentage = useMemo((): string => {
@@ -590,10 +615,10 @@ export default function Step4PaidCart({
                   </h3>
                   <div className={styles.addonsGrid}>
                     {selectedAddonsList.map((addon, index) => {
-                      const price = parsePrice(
-                        billingCycle === 'monthly'
-                          ? addon.monthly_price
-                          : addon.yearly_price,
+                      const { unit, billed, perStaff } = getAddonPricing(
+                        addon,
+                        billingCycle,
+                        staffCount,
                       );
 
                       return (
@@ -620,11 +645,12 @@ export default function Step4PaidCart({
                           </p>
                           <div className={styles.addonPriceRow}>
                             <span className={styles.addonPrice}>
-                              ${price}/
+                              ${unit}/
                               {billingCycle === 'monthly' ? 'month' : 'year'}
+                              {perStaff ? ' per staff' : ''}
                             </span>
                             <span className={styles.addonBilledInfo}>
-                              ${price} billed{' '}
+                              ${billed} billed{' '}
                               {billingCycle === 'monthly'
                                 ? 'monthly'
                                 : 'annually'}
@@ -648,10 +674,10 @@ export default function Step4PaidCart({
                   </h3>
                   <div className={styles.addonsGrid}>
                     {recommendedAddonsList.map((addon, index) => {
-                      const price = parsePrice(
-                        billingCycle === 'monthly'
-                          ? addon.monthly_price
-                          : addon.yearly_price,
+                      const { unit, billed, perStaff } = getAddonPricing(
+                        addon,
+                        billingCycle,
+                        staffCount,
                       );
 
                       return (
@@ -678,11 +704,12 @@ export default function Step4PaidCart({
                           </p>
                           <div className={styles.addonPriceRow}>
                             <span className={styles.addonPrice}>
-                              ${price}/
+                              ${unit}/
                               {billingCycle === 'monthly' ? 'month' : 'year'}
+                              {perStaff ? ' per staff' : ''}
                             </span>
                             <span className={styles.addonBilledInfo}>
-                              ${price} billed{' '}
+                              ${billed} billed{' '}
                               {billingCycle === 'monthly'
                                 ? 'monthly'
                                 : 'annually'}
@@ -711,80 +738,170 @@ export default function Step4PaidCart({
               </div>
 
               <div className={styles.orderSummaryContent}>
-                <div className={styles.orderSummaryItem}>
-                  <span>Plan ({staffCount} staff)</span>
-                  {billingCycle === BILLING_CYCLES.YEARLY ? (
-                    <div className={styles.summaryPriceWrapper}>
-                      <span className={styles.summaryOriginalPrice}>
-                        $
-                        {(
-                          parsePrice(currentPlan.yearly_price_per_staff) *
-                          staffCount
-                        ).toFixed(2)}
-                      </span>
-                      <span className={styles.summaryDiscountedPrice}>
-                        $
-                        {(
-                          parsePrice(
-                            currentPlan.discounted_yearly_price_per_staff,
-                          ) * staffCount
-                        ).toFixed(2)}
-                      </span>
+                {checkoutSummary ? (
+                  <>
+                    {/* Backend breakdown — each line is what the clinic is
+                        actually charged (per-staff add-ons already multiplied). */}
+                    {checkoutSummary.line_items.map((item) => (
+                      <div
+                        key={item.description}
+                        className={styles.orderSummaryItem}
+                      >
+                        <span className={styles.summaryItemLeft}>
+                          <span>{item.description}</span>
+                          {item.calculation && (
+                            <span className={styles.summaryLineCalculation}>
+                              {item.calculation}
+                            </span>
+                          )}
+                        </span>
+                        <span>${item.amount.toFixed(2)}</span>
+                      </div>
+                    ))}
+
+                    {(checkoutSummary.total_deductions ?? 0) > 0 && (
+                      <>
+                        <div className={styles.orderSummaryItem}>
+                          <span>Subtotal</span>
+                          <span>${checkoutSummary.subtotal.toFixed(2)}</span>
+                        </div>
+                        {(checkoutSummary.deductions ?? []).map((deduction) => (
+                          <div
+                            key={deduction.description}
+                            className={styles.orderSummaryItem}
+                          >
+                            <span>{deduction.description}</span>
+                            <span className={styles.summaryDeduction}>
+                              -${Math.abs(deduction.amount).toFixed(2)}
+                            </span>
+                          </div>
+                        ))}
+                      </>
+                    )}
+
+                    <div className={styles.orderSummaryDivider} />
+
+                    <div className={styles.orderSummaryTotal}>
+                      <div className={styles.summaryTotalRow}>
+                        <span>
+                          Total ({checkoutSummary.line_items.length} items)
+                        </span>
+                        {billingCycle === BILLING_CYCLES.YEARLY ? (
+                          <div className={styles.summaryPriceWrapper}>
+                            <span className={styles.summaryOriginalPrice}>
+                              $
+                              {(
+                                total +
+                                (parsePrice(currentPlan.yearly_price_per_staff) -
+                                  parsePrice(
+                                    currentPlan.discounted_yearly_price_per_staff,
+                                  )) *
+                                  staffCount
+                              ).toFixed(2)}
+                            </span>
+                            <span
+                              className={styles.summaryDiscountedPrice}
+                              style={
+                                summaryLoading ? { opacity: 0.5 } : undefined
+                              }
+                            >
+                              ${total.toFixed(2)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span
+                            className={styles.summaryTotalAmount}
+                            style={summaryLoading ? { opacity: 0.5 } : undefined}
+                          >
+                            ${total.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  ) : (
-                    <span>
-                      $
-                      {(
-                        parsePrice(currentPlan.monthly_price_per_staff) *
-                        staffCount
-                      ).toFixed(2)}
-                    </span>
-                  )}
-                </div>
-
-                {selectedAddonsList.map((addon) => (
-                  <div key={addon.id} className={styles.orderSummaryItem}>
-                    <span>{addon.feature_name}</span>
-                    <span>
-                      $
-                      {parsePrice(
-                        billingCycle === 'monthly'
-                          ? addon.monthly_price
-                          : addon.yearly_price,
-                      ).toFixed(2)}
-                    </span>
-                  </div>
-                ))}
-
-                <div className={styles.orderSummaryDivider} />
-
-                <div className={styles.orderSummaryTotal}>
-                  <div className={styles.summaryTotalRow}>
-                    <span>Total ({selectedAddons.length + 1} items)</span>
-                    {billingCycle === BILLING_CYCLES.YEARLY ? (
-                      <div className={styles.summaryPriceWrapper}>
-                        <span className={styles.summaryOriginalPrice}>
+                  </>
+                ) : (
+                  <>
+                    {/* Fallback: client-side estimate while the API summary
+                        loads or if it errors. */}
+                    <div className={styles.orderSummaryItem}>
+                      <span>Plan ({staffCount} staff)</span>
+                      {billingCycle === BILLING_CYCLES.YEARLY ? (
+                        <div className={styles.summaryPriceWrapper}>
+                          <span className={styles.summaryOriginalPrice}>
+                            $
+                            {(
+                              parsePrice(currentPlan.yearly_price_per_staff) *
+                              staffCount
+                            ).toFixed(2)}
+                          </span>
+                          <span className={styles.summaryDiscountedPrice}>
+                            $
+                            {(
+                              parsePrice(
+                                currentPlan.discounted_yearly_price_per_staff,
+                              ) * staffCount
+                            ).toFixed(2)}
+                          </span>
+                        </div>
+                      ) : (
+                        <span>
                           $
                           {(
-                            parsePrice(currentPlan.yearly_price_per_staff) *
-                              staffCount +
-                            selectedAddonsList.reduce((sum, addon) => {
-                              // For add-ons, use yearly price directly (no discount)
-                              return sum + parsePrice(addon.yearly_price);
-                            }, 0)
+                            parsePrice(currentPlan.monthly_price_per_staff) *
+                            staffCount
                           ).toFixed(2)}
                         </span>
-                        <span className={styles.summaryDiscountedPrice}>
-                          ${total.toFixed(2)}
+                      )}
+                    </div>
+
+                    {selectedAddonsList.map((addon) => (
+                      <div key={addon.id} className={styles.orderSummaryItem}>
+                        <span>{addon.feature_name}</span>
+                        <span>
+                          $
+                          {getAddonPricing(
+                            addon,
+                            billingCycle,
+                            staffCount,
+                          ).billed.toFixed(2)}
                         </span>
                       </div>
-                    ) : (
-                      <span className={styles.summaryTotalAmount}>
-                        ${total.toFixed(2)}
-                      </span>
-                    )}
-                  </div>
-                </div>
+                    ))}
+
+                    <div className={styles.orderSummaryDivider} />
+
+                    <div className={styles.orderSummaryTotal}>
+                      <div className={styles.summaryTotalRow}>
+                        <span>Total ({selectedAddons.length + 1} items)</span>
+                        {billingCycle === BILLING_CYCLES.YEARLY ? (
+                          <div className={styles.summaryPriceWrapper}>
+                            <span className={styles.summaryOriginalPrice}>
+                              $
+                              {(
+                                parsePrice(currentPlan.yearly_price_per_staff) *
+                                  staffCount +
+                                selectedAddonsList.reduce(
+                                  (sum, addon) =>
+                                    sum +
+                                    getAddonPricing(addon, billingCycle, staffCount)
+                                      .billed,
+                                  0,
+                                )
+                              ).toFixed(2)}
+                            </span>
+                            <span className={styles.summaryDiscountedPrice}>
+                              ${total.toFixed(2)}
+                            </span>
+                          </div>
+                        ) : (
+                          <span className={styles.summaryTotalAmount}>
+                            ${total.toFixed(2)}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </>
+                )}
                 <div className={styles.summaryNextBilling}>
                   Next charge on {nextChargeDate}
                 </div>
