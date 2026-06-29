@@ -174,6 +174,8 @@ export interface AddonApiData {
   stripe_monthly_price_id?: string | null;
   stripe_yearly_price_id?: string | null;
   display_order: number;
+  /** How the add-on is priced: a flat fee or multiplied per staff member. */
+  billing_basis?: 'flat' | 'per_staff';
 }
 
 // ============================================================================
@@ -392,4 +394,60 @@ export interface SuccessPageProps {
   isPaidPlan: boolean;
   clinicName: string;
   email: string;
+}
+
+/**
+ * Line item in a checkout summary (mirrors backend OrderSummary.line_items).
+ */
+export interface CheckoutSummaryLineItem {
+  description: string;
+  amount: number;
+  calculation: string;
+}
+
+/**
+ * Credit/discount row in a checkout summary (e.g. coupon or proration credit).
+ */
+export interface CheckoutSummaryDeduction {
+  description: string;
+  amount: number;
+}
+
+/**
+ * Add-on row in a checkout summary (mirrors backend OrderSummaryAddon).
+ */
+export interface CheckoutSummaryAddon {
+  id: number;
+  name: string;
+  unit_price: number;
+  quantity: number;
+  total_price: number;
+  billing_basis: 'flat' | 'per_staff';
+}
+
+/**
+ * Response from POST subscriptions/onboarding/checkout-summary (public, no auth).
+ * fetchApi unwraps the `data` envelope, so this is the object returned directly.
+ */
+export interface CheckoutSummary {
+  line_items: CheckoutSummaryLineItem[];
+  deductions?: CheckoutSummaryDeduction[];
+  total_deductions?: number;
+  subtotal: number;
+  amount_due: number;
+  per_staff_price?: number;
+  billing_cycle?: string;
+  staff_count?: number;
+  addons?: CheckoutSummaryAddon[];
+  next_billing_date?: string;
+}
+
+/**
+ * Request body for the public checkout-summary endpoint.
+ */
+export interface CheckoutSummaryRequest {
+  plan_id: number;
+  billing_cycle: 'monthly' | 'yearly';
+  staff_count: number;
+  add_ons?: number[];
 }

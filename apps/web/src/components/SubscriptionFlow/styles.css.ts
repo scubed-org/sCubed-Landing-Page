@@ -1667,6 +1667,25 @@ export const priceEquals = style({
   fontWeight: typography.fontWeight.medium,
 });
 
+// Left side of an order-summary row: description stacked over its calculation.
+export const summaryItemLeft = style({
+  display: 'flex',
+  flexDirection: 'column',
+  gap: '2px',
+  minWidth: 0,
+});
+
+// Muted "5 staff × $9.00/month" subtext under a line-item description.
+export const summaryLineCalculation = style({
+  fontSize: typography.fontSize.xs,
+  color: '#9ca3af',
+});
+
+// Deduction rows render as a credit (negative amount) in green.
+export const summaryDeduction = style({
+  color: '#059669',
+});
+
 export const totalPrice = style({
   fontSize: typography.fontSize['2xl'],
   fontWeight: typography.fontWeight.bold,
