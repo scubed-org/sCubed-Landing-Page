@@ -1,5 +1,6 @@
 'use client';
 
+import { motion } from 'framer-motion';
 import { Play } from 'lucide-react';
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -51,7 +52,12 @@ const HomeHero: React.FC = () => {
         </div>
 
         <div className={heroContainer}>
-          <div className={heroContent}>
+          <motion.div
+            className={heroContent}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
             <h1 className={heroTitle}>
               All-in-One ABA Platform
               <br />
@@ -81,7 +87,7 @@ const HomeHero: React.FC = () => {
               other systems easy and helps your team deliver quality care from
               day one.
             </p>
-          </div>
+          </motion.div>
         </div>
       </section>
 
