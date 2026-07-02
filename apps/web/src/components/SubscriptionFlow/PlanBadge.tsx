@@ -1,7 +1,6 @@
 'use client';
 
 import { Star } from 'lucide-react';
-import { useEffect, useState, useCallback } from 'react';
 
 import * as styles from './styles.css';
 
@@ -10,8 +9,6 @@ import {
   getPlanNameById,
   PLAN_IDS,
 } from '@/constants/plans';
-import { API_ENDPOINTS } from '@/constants/api';
-import { fetchApi } from '@/lib/api-client';
 import type { PlanApiData } from '@/types/subscription';
 
 // Helper function to safely parse prices
@@ -24,35 +21,25 @@ const parsePrice = (value: string | undefined | null): number => {
 interface PlanBadgeProps {
   readonly planId: number;
   readonly billingCycle?: 'monthly' | 'yearly';
+  /** Plans fetched server-side (from the plans-and-addons endpoint). */
+  readonly plans: PlanApiData[];
 }
 
 /**
  * PlanBadge - Displays the selected subscription plan
  * Shows at the top of the subscription flow for context
  */
-export default function PlanBadge({ planId, billingCycle }: PlanBadgeProps) {
+export default function PlanBadge({
+  planId,
+  billingCycle,
+  plans,
+}: PlanBadgeProps) {
   const planName = getPlanNameById(planId);
   const colors = getPlanColorsById(planId);
   const isFree = planId === PLAN_IDS.FREE;
-  const [planData, setPlanData] = useState<PlanApiData | null>(null);
-
-  const fetchPlanData = useCallback(async () => {
-    if (isFree) return;
-    try {
-      const result = await fetchApi<{ plans: PlanApiData[] }>(
-        API_ENDPOINTS.SUBSCRIPTION.PLANS_AND_ADDONS,
-        { method: 'GET' },
-      );
-      const plan = result.plans?.find((p) => p.id === planId);
-      if (plan) setPlanData(plan);
-    } catch (error) {
-      console.error('Failed to load plan data:', error);
-    }
-  }, [planId, isFree]);
-
-  useEffect(() => {
-    fetchPlanData();
-  }, [fetchPlanData]);
+  const planData = isFree
+    ? null
+    : (plans.find((p) => p.id === planId) ?? null);
 
   return (
     <div

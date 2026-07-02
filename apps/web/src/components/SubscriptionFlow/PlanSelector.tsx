@@ -1,14 +1,12 @@
 'use client';
 
 import { X, Check, Star } from 'lucide-react';
-import { useState, useEffect, useCallback } from 'react';
+import { useState } from 'react';
 
 import * as styles from './styles.css';
 
 import { PLAN_IDS, PLAN_NAMES, PLAN_COLORS } from '@/constants/plans';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
-import { API_ENDPOINTS } from '@/constants/api';
-import { fetchApi } from '@/lib/api-client';
 import type { PlanApiData } from '@/types/subscription';
 
 // Helper function to safely parse prices
@@ -23,6 +21,8 @@ interface PlanSelectorProps {
   currentBillingCycle: BillingCycle;
   onSelectPlan: (planId: number, billingCycle: BillingCycle) => void;
   onClose: () => void;
+  /** Plans fetched server-side (from the plans-and-addons endpoint). */
+  plans: PlanApiData[];
 }
 
 /**
@@ -34,37 +34,16 @@ export default function PlanSelector({
   currentBillingCycle,
   onSelectPlan,
   onClose,
+  plans,
 }: PlanSelectorProps) {
   // Track the user's intended plan choice (what they actually want)
   const [intendedPlanId, setIntendedPlanId] = useState(currentPlanId);
   const [selectedBillingCycle, setSelectedBillingCycle] =
     useState<BillingCycle>(currentBillingCycle);
-  const [plansData, setPlansData] = useState<PlanApiData[]>([]);
-  const [loadingPlans, setLoadingPlans] = useState(true);
-
-  // Fetch plans from API
-  const fetchPlans = useCallback(async () => {
-    setLoadingPlans(true);
-    try {
-      const result = await fetchApi<{ plans: PlanApiData[] }>(
-        API_ENDPOINTS.SUBSCRIPTION.PLANS_AND_ADDONS,
-        { method: 'GET' },
-      );
-      setPlansData(result.plans || []);
-    } catch (error) {
-      console.error('Failed to load plans:', error);
-    } finally {
-      setLoadingPlans(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    fetchPlans();
-  }, [fetchPlans]);
 
   // Helper to get plan data by ID
   const getPlanData = (planId: number): PlanApiData | undefined => {
-    return plansData.find((p) => p.id === planId);
+    return plans.find((p) => p.id === planId);
   };
 
   const freePlan = { id: PLAN_IDS.FREE, name: PLAN_NAMES[PLAN_IDS.FREE] };
@@ -190,13 +169,8 @@ export default function PlanSelector({
             <h3 style={{ fontSize: '14px', fontWeight: '600', color: '#6b7280', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
               Paid Plans
             </h3>
-            {loadingPlans ? (
-              <div style={{ textAlign: 'center', padding: '2rem' }}>
-                <p>Loading plans...</p>
-              </div>
-            ) : (
-              <div className={styles.planOptionsGrid}>
-                {paidPlans.map((plan) => {
+            <div className={styles.planOptionsGrid}>
+              {paidPlans.map((plan) => {
                   const isSelected = selectedPlanId === plan.id;
                   const colors = PLAN_COLORS[plan.id as keyof typeof PLAN_COLORS];
                   const planData = getPlanData(plan.id);
@@ -258,8 +232,7 @@ export default function PlanSelector({
                     </div>
                   );
                 })}
-              </div>
-            )}
+            </div>
           </div>
         </div>
 

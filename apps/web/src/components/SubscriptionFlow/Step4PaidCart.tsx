@@ -111,8 +111,9 @@ export default function Step4PaidCart({
   onNext,
   onBack,
   clinic_onboarding_request_id,
+  plans,
+  addons: genericAddons,
 }: Step4PaidProps) {
-  const [plans, setPlans] = useState<PlanData[]>([]);
   const [addons, setAddons] = useState<AddonData[]>([]);
   const [loadingData, setLoadingData] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -222,23 +223,13 @@ export default function Step4PaidCart({
     [billingCycle],
   );
 
-  // Fetch plans and addons with proper error handling
-  const fetchPlansAndAddons = useCallback(async () => {
+  // Plans come from the server (passed as props). Only the plan-specific
+  // add-ons are fetched client-side, since they depend on the chosen plan.
+  const fetchPlanAddons = useCallback(async () => {
     setLoadingData(true);
     setApiError(null);
 
     try {
-      // Fetch plans from the plans-and-addons endpoint
-      const plansResult = await fetchApi<{
-        plans: PlanData[];
-        addons: AddonData[];
-      }>(API_ENDPOINTS.SUBSCRIPTION.PLANS_AND_ADDONS, {
-        method: 'GET',
-      });
-
-      setPlans(plansResult.plans || []);
-
-      // Fetch plan-specific addons using the subscription_plan_id
       if (formData.subscription_plan_id) {
         // The API returns { success, message, data: { count, rows } }
         // fetchApi automatically unwraps the .data field, so we get { count, rows }
@@ -252,21 +243,21 @@ export default function Step4PaidCart({
         setAddons(addonsResult?.rows || []);
       } else {
         // Fallback to generic addons if no plan ID (shouldn't happen in normal flow)
-        setAddons(plansResult.addons || []);
+        setAddons(genericAddons);
       }
     } catch (error) {
-      console.error('Failed to load plans and add-ons:', error);
+      console.error('Failed to load add-ons:', error);
       setApiError(
         'Failed to load pricing information. Please refresh the page.',
       );
     } finally {
       setLoadingData(false);
     }
-  }, [formData.subscription_plan_id]);
+  }, [formData.subscription_plan_id, genericAddons]);
 
   useEffect(() => {
-    fetchPlansAndAddons();
-  }, [fetchPlansAndAddons]);
+    fetchPlanAddons();
+  }, [fetchPlanAddons]);
 
   // Optimized event handlers with useCallback
   const toggleAddon = useCallback(
@@ -421,7 +412,7 @@ export default function Step4PaidCart({
       <div className={styles.errorContainer}>
         <AlertCircle size={48} />
         <p>Unable to load plan information. Please refresh the page.</p>
-        <button onClick={fetchPlansAndAddons} className={styles.button}>
+        <button onClick={fetchPlanAddons} className={styles.button}>
           Retry
         </button>
       </div>

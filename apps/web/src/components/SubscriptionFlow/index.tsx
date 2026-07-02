@@ -27,7 +27,9 @@ import {
   saveSession,
 } from '@/lib/subscriptionSessionManager';
 import type {
+  AddonApiData,
   OTPVerificationResponse,
+  PlanApiData,
   RegistrationDataResponse,
   RegistrationResponseData,
   Step1FormData,
@@ -41,7 +43,17 @@ import type {
  * - Free Plan: Step 1 (Email) → Step 2 (OTP) → Step 3 (Details+Register) → Step 4 (Success)
  * - Paid Plan: Step 1 (Email) → Step 2 (OTP) → Step 3 (Details) → Step 4 (Cart+Register) → Step 5 (Payment)
  */
-export default function SubscriptionFlow() {
+interface SubscriptionFlowProps {
+  /** Plans fetched server-side on the /subscribe page. */
+  readonly plans: PlanApiData[];
+  /** Generic add-ons fetched server-side (fallback for the paid cart). */
+  readonly addons: AddonApiData[];
+}
+
+export default function SubscriptionFlow({
+  plans,
+  addons,
+}: SubscriptionFlowProps) {
   const [isRestoringSession, setIsRestoringSession] = useState(true);
 
   // Initialize state from URL params (plan selection from pricing page)
@@ -352,6 +364,7 @@ export default function SubscriptionFlow() {
               <PlanBadge
                 planId={formState.step1Data.subscription_plan_id}
                 billingCycle={formState.billingCycle}
+                plans={plans}
               />
               <button
                 onClick={() => setShowPlanSelector(true)}
@@ -460,6 +473,8 @@ export default function SubscriptionFlow() {
                 clinic_onboarding_request_id={
                   formState.clinic_onboarding_request_id
                 }
+                plans={plans}
+                addons={addons}
               />
             )}
 
@@ -504,6 +519,7 @@ export default function SubscriptionFlow() {
           currentBillingCycle={formState.billingCycle}
           onSelectPlan={handlePlanChange}
           onClose={() => setShowPlanSelector(false)}
+          plans={plans}
         />
       )}
     </div>
