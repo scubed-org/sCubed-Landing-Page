@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 
 import SubscriptionFlow from '@/components/SubscriptionFlow';
+import { getPlansAndAddons } from '@/lib/pricing-api';
 
 export const metadata: Metadata = {
   title: 'Subscribe | S Cubed - Start Your Free Trial or Choose a Plan',
@@ -19,6 +20,13 @@ export const metadata: Metadata = {
  * 1. "Try for Free" button from site header
  * 2. "Buy Now" button from Pricing page (with plan selection)
  */
-export default function SubscribePage() {
-  return <SubscriptionFlow />;
+export default async function SubscribePage() {
+  const pricingData = await getPlansAndAddons();
+
+  return (
+    <SubscriptionFlow
+      plans={pricingData?.plans ?? []}
+      addons={pricingData?.addons ?? []}
+    />
+  );
 }

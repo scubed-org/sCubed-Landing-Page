@@ -8,6 +8,7 @@ import PricingAddons from '../../components/pricing/PricingAddons';
 import PricingComparison from '../../components/pricing/PricingComparison';
 import PricingHero from '../../components/pricing/PricingHero';
 import PricingPlans from '../../components/pricing/PricingPlans';
+import { getPlansAndAddons } from '../../lib/pricing-api';
 
 export const metadata: Metadata = {
   title:
@@ -57,7 +58,7 @@ const fallbackFAQData = {
         {
           question: 'What happens if I exceed my plan limits?',
           answer:
-            "If you exceed your staff count, we'll automatically upgrade you to the appropriate tier. You'll be notified before any billing changes occur, and you can always manage your staff count to stay within your plan limits.",
+            "If your staff count exceeds the number of licenses included in your subscription, you'll see a notification prompting you to increase your staff license count. You'll need to purchase additional staff licenses before you can add more staff members. Once your license count is increased, you can proceed with adding the new staff member. You can manage and update your staff license count at any time from your subscription settings.",
         },
       ],
     },
@@ -92,12 +93,12 @@ const fallbackFAQData = {
         {
           question: "What's included in the free trial?",
           answer:
-            'Our 30-day free trial includes full access to all features in your selected plan. No credit card required to start, and you can import your existing data to test the complete workflow. Our team will help you get set up and answer any questions.',
+            'Our 30-day free trial includes full access to all features. No credit card required to start, and you can import your existing data to test the complete workflow. Our team will help you get set up and answer any questions.',
         },
         {
           question: 'Can I get a demo before signing up?',
           answer:
-            "Absolutely! We offer personalized demos tailored to your practice needs. Schedule a 30-minute demo with our team to see how S Cubed can transform your practice management, and we'll answer all your questions.",
+            "Absolutely! We offer personalized demos tailored to your practice needs. Schedule a 20-minute demo with our team to see how S Cubed can transform your practice management, and we'll answer all your questions.",
         },
         {
           question: 'Can you help migrate our existing data?',
@@ -122,7 +123,10 @@ async function getPricingFAQs() {
 }
 
 export default async function PricingPage() {
-  const faqData = await getPricingFAQs();
+  const [faqData, pricingData] = await Promise.all([
+    getPricingFAQs(),
+    getPlansAndAddons(),
+  ]);
 
   // Flatten all FAQ items for schema
   const allFAQs = faqData.sections.flatMap((section) => section.items);
@@ -138,9 +142,12 @@ export default async function PricingPage() {
       <FAQSchema faqs={allFAQs} pageSlug="pricing" />
       <PricingHero />
       <Container>
-        <PricingPlans />
-        <PricingComparison />
-        <PricingAddons />
+        <PricingPlans apiPlans={pricingData?.plans ?? null} />
+        <PricingComparison
+          apiPlans={pricingData?.plans ?? null}
+          apiAddons={pricingData?.addons ?? null}
+        />
+        <PricingAddons apiAddons={pricingData?.addons ?? null} />
 
         {faqData.sections.map((section, index) => (
           <FAQSection

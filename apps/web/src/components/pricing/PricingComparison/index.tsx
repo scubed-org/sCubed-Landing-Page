@@ -6,6 +6,13 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { colors, spacing } from '../../../styles/tokens.css';
+import {
+  addonRowPrice,
+  findAddon,
+  findPlan,
+  formatMoney,
+} from '../../../lib/pricing-helpers';
+import type { AddonApiData, PlanApiData } from '../../../types/subscription';
 
 import {
   buyNowButton,
@@ -33,6 +40,7 @@ import {
 } from './styles.css';
 
 import Tooltip from '@/components/common/Tooltip';
+
 
 interface Feature {
   name: string;
@@ -173,7 +181,7 @@ const featureComparison: FeatureSection[] = [
         name: 'Clock In, Clock Out',
         description:
           'Track staff hours with GPS verification, automatic timesheets, and payroll-ready reports',
-        starter: 'Add-on $9/month',
+        starter: 'Add-on $9/license/month',
         essential: true,
         growth: true,
       },
@@ -181,7 +189,7 @@ const featureComparison: FeatureSection[] = [
         name: 'Guardian Portal',
         description:
           'Secure family portal for viewing progress reports, session notes, and direct communication with therapists',
-        starter: 'Add-on $19/month',
+        starter: 'Add-on $19/license/month',
         essential: true,
         growth: true,
       },
@@ -189,8 +197,8 @@ const featureComparison: FeatureSection[] = [
         name: 'Billing Portal',
         description:
           'Electronic claims submission to insurance companies with automated eligibility checks and clearinghouse integration',
-        starter: 'Add-on $49/month',
-        essential: 'Add-on $49/month',
+        starter: 'Add-on $49/license/month',
+        essential: 'Add-on $49/license/month',
         growth: true,
       },
       {
@@ -213,8 +221,82 @@ const featureComparison: FeatureSection[] = [
   },
 ];
 
-const PricingComparison: React.FC = () => {
+// Maps Advanced Features row names to API add-on feature_keys.
+// Rows without an entry (e.g. Full Revenue Cycle Management) stay static.
+const ADVANCED_ADDON_KEYS: Record<string, string> = {
+  'Clock In, Clock Out': 'clock_in_out',
+  'Guardian Portal': 'guardian_portal',
+  'Billing Portal': 'billing_portal',
+  'Telehealth/HIPAA Compliant Meetings': 'telehealth',
+};
+
+// Default static yearly prices for the comparison plan headers.
+const STATIC_PLAN_HEADER_PRICES: Record<
+  string,
+  { original: number; discounted: number }
+> = {
+  starter: { original: 228, discounted: 195 },
+  essential: { original: 468, discounted: 395 },
+  growth: { original: 708, discounted: 595 },
+};
+
+interface PricingComparisonProps {
+  apiPlans?: PlanApiData[] | null;
+  apiAddons?: AddonApiData[] | null;
+}
+
+const PricingComparison: React.FC<PricingComparisonProps> = ({
+  apiPlans = null,
+  apiAddons = null,
+}) => {
   const router = useRouter();
+
+  const planHeaderPrices = (
+    ['starter', 'essential', 'growth'] as const
+  ).reduce<Record<string, { original: number; discounted: number }>>(
+    (acc, slug) => {
+      const fallback = STATIC_PLAN_HEADER_PRICES[slug];
+      const apiPlan = findPlan(apiPlans, slug);
+      acc[slug] = {
+        original:
+          formatMoney(apiPlan?.yearly_price_per_staff) ?? fallback.original,
+        discounted:
+          formatMoney(apiPlan?.discounted_yearly_price_per_staff) ??
+          fallback.discounted,
+      };
+      return acc;
+    },
+    {},
+  );
+
+  const dynamicFeatureComparison: FeatureSection[] = featureComparison.map(
+    (section) => {
+      if (section.category !== 'Advanced Features') {
+        return section;
+      }
+      return {
+        ...section,
+        features: section.features.map((feature) => {
+          const key = ADVANCED_ADDON_KEYS[feature.name];
+          if (!key) {
+            return feature; // e.g. Full Revenue Cycle Management — stays static
+          }
+          const addon = findAddon(apiAddons, key);
+          if (!addon) {
+            return feature;
+          }
+          const replaceIfString = (value: boolean | string) =>
+            typeof value === 'string' ? addonRowPrice(addon, value) : value;
+          return {
+            ...feature,
+            starter: replaceIfString(feature.starter),
+            essential: replaceIfString(feature.essential),
+            growth: replaceIfString(feature.growth),
+          };
+        }),
+      };
+    },
+  );
   const [expandedSections, setExpandedSections] = useState<string[]>([
     'Core Features',
   ]);
@@ -286,8 +368,12 @@ const PricingComparison: React.FC = () => {
               <div className={planHeader}>
                 <strong>Starter</strong>
                 <div className={priceContainer}>
-                  <span className={originalPriceSmall}>$228/year</span>
-                  <span className={discountedPriceSmall}>$195/year</span>
+                  <span className={originalPriceSmall}>
+                    ${planHeaderPrices.starter.original}/year
+                  </span>
+                  <span className={discountedPriceSmall}>
+                    ${planHeaderPrices.starter.discounted}/year
+                  </span>
                   <span className={discountBadgeSmall}>(15% off)</span>
                 </div>
                 <button
@@ -301,8 +387,12 @@ const PricingComparison: React.FC = () => {
               <div className={planHeader}>
                 <strong>Essential</strong>
                 <div className={priceContainer}>
-                  <span className={originalPriceSmall}>$468/year</span>
-                  <span className={discountedPriceSmall}>$395/year</span>
+                  <span className={originalPriceSmall}>
+                    ${planHeaderPrices.essential.original}/year
+                  </span>
+                  <span className={discountedPriceSmall}>
+                    ${planHeaderPrices.essential.discounted}/year
+                  </span>
                   <span className={discountBadgeSmall}>(15% off)</span>
                 </div>
                 <button
@@ -316,8 +406,12 @@ const PricingComparison: React.FC = () => {
               <div className={planHeader}>
                 <strong>Growth</strong>
                 <div className={priceContainer}>
-                  <span className={originalPriceSmall}>$708/year</span>
-                  <span className={discountedPriceSmall}>$595/year</span>
+                  <span className={originalPriceSmall}>
+                    ${planHeaderPrices.growth.original}/year
+                  </span>
+                  <span className={discountedPriceSmall}>
+                    ${planHeaderPrices.growth.discounted}/year
+                  </span>
                   <span className={discountBadgeSmall}>(16% off)</span>
                 </div>
                 <button
@@ -330,7 +424,7 @@ const PricingComparison: React.FC = () => {
               </div>
             </div>
 
-            {featureComparison.map((section) => (
+            {dynamicFeatureComparison.map((section) => (
               <div key={section.category} className={featureCategory}>
                 <button
                   className={expandButton}
@@ -392,22 +486,10 @@ const PricingComparison: React.FC = () => {
                   <h3>{plan}</h3>
                   <div className={priceContainer}>
                     <span className={originalPriceSmall}>
-                      $
-                      {plan === 'Starter'
-                        ? '228'
-                        : plan === 'Essential'
-                          ? '468'
-                          : '708'}
-                      /year
+                      ${planHeaderPrices[plan.toLowerCase()].original}/year
                     </span>
                     <span className={discountedPriceSmall}>
-                      $
-                      {plan === 'Starter'
-                        ? '195'
-                        : plan === 'Essential'
-                          ? '395'
-                          : '595'}
-                      /year
+                      ${planHeaderPrices[plan.toLowerCase()].discounted}/year
                     </span>
                     <span className={discountBadgeSmall}>
                       ({plan === 'Growth' ? '16' : '15'}% off)
@@ -422,7 +504,7 @@ const PricingComparison: React.FC = () => {
                   <ArrowRight size={16} />
                 </button>
                 <div className={mobileFeatureList}>
-                  {featureComparison.map((section) => (
+                  {dynamicFeatureComparison.map((section) => (
                     <div key={section.category}>
                       <h4>{section.category}</h4>
                       {section.features.map((feature) => (

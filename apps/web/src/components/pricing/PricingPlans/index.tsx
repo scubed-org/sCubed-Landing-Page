@@ -5,6 +5,10 @@ import { ArrowRight, Check, Minus, Star } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
+
+import { findPlan, formatMoney } from '../../../lib/pricing-helpers';
+import type { PlanApiData } from '../../../types/subscription';
+
 import {
   billingToggle,
   billingToggleActive,
@@ -97,7 +101,25 @@ const plans: PricingPlan[] = [
   },
 ];
 
-const PricingPlans: React.FC = () => {
+interface PricingPlansProps {
+  apiPlans?: PlanApiData[] | null;
+}
+
+const PricingPlans: React.FC<PricingPlansProps> = ({ apiPlans = null }) => {
+  const resolvedPlans: PricingPlan[] = plans.map((plan) => {
+    const apiPlan = findPlan(apiPlans, plan.name.toLowerCase());
+    if (!apiPlan) {
+      return plan;
+    }
+    const monthly = formatMoney(apiPlan.monthly_price_per_staff);
+    const yearly = formatMoney(apiPlan.discounted_yearly_price_per_staff);
+    return {
+      ...plan,
+      monthlyPrice: monthly ?? plan.monthlyPrice,
+      yearlyPrice: yearly ?? plan.yearlyPrice,
+    };
+  });
+
   const router = useRouter();
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'yearly'>(
     'monthly',
@@ -139,7 +161,7 @@ const PricingPlans: React.FC = () => {
 
         {/* Pricing Cards */}
         <div className={plansGrid}>
-          {plans.map((plan, index) => (
+          {resolvedPlans.map((plan, index) => (
             <motion.div
               key={plan.name}
               initial={{ opacity: 0, y: 20 }}

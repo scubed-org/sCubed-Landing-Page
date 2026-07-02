@@ -376,6 +376,10 @@ export interface Step4PaidProps {
   }) => void;
   readonly onBack: () => void;
   readonly clinic_onboarding_request_id?: number;
+  /** Plans fetched server-side (from the plans-and-addons endpoint). */
+  readonly plans: PlanApiData[];
+  /** Generic add-ons fetched server-side; used as a fallback when no plan id. */
+  readonly addons: AddonApiData[];
 }
 
 /**

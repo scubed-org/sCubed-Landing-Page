@@ -6,6 +6,12 @@ import Link from 'next/link';
 
 import { colors, spacing, typography } from '../../../styles/tokens.css';
 import Tooltip from '../../common/Tooltip';
+import {
+  addonMonthlySuffix,
+  findAddon,
+  formatMoney,
+} from '../../../lib/pricing-helpers';
+import type { AddonApiData } from '../../../types/subscription';
 
 import {
   addonCard,
@@ -66,7 +72,24 @@ const addons: Addon[] = [
   },
 ];
 
-const PricingAddons: React.FC = () => {
+interface PricingAddonsProps {
+  apiAddons?: AddonApiData[] | null;
+}
+
+const PricingAddons: React.FC<PricingAddonsProps> = ({ apiAddons = null }) => {
+  const telehealthAddon = findAddon(apiAddons, 'telehealth');
+  const telehealthAmount = formatMoney(telehealthAddon?.monthly_price);
+  const resolvedAddons: Addon[] = addons.map((addon) =>
+    addon.name === 'Telehealth' && telehealthAmount !== null
+      ? {
+          ...addon,
+          price: `$${telehealthAmount}${addonMonthlySuffix(
+            telehealthAddon?.billing_basis,
+          )} per clinic`,
+        }
+      : addon,
+  );
+
   return (
     <section className={addonsSection}>
       <div className={addonsContainer}>
@@ -85,7 +108,7 @@ const PricingAddons: React.FC = () => {
           </p>
 
           <div className={addonsGrid}>
-            {addons.map((addon, index) => (
+            {resolvedAddons.map((addon, index) => (
               <motion.div
                 key={addon.name}
                 className={addonCard}
