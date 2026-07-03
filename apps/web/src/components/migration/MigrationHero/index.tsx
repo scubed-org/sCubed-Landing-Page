@@ -4,7 +4,7 @@ import Image from 'next/image';
 import React from 'react';
 
 import billingImg from '../../../images/Billing.jpg';
-import DataCollectionBanner from '../../../images/data-collection/data-collection-banner.jpg';
+import MigrationBanner from '../../../images/migration/aba-software-migration.webp';
 import CalendlyButton from '../../billing/CalendlyButton';
 import { primaryButton } from '../../billing/CalendlyButton/styles.css';
 import {
@@ -76,8 +76,8 @@ const MigrationHero: React.FC = () => {
             transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
           >
             <Image
-              alt="S Cubed ABA platform dashboard"
-              src={DataCollectionBanner}
+              alt="Secure ABA data migration into S Cubed"
+              src={MigrationBanner}
               quality={75}
               placeholder="blur"
               width={2400}

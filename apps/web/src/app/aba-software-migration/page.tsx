@@ -7,6 +7,7 @@ import FAQSection from '../../components/FAQSection';
 import ContentSection from '../../components/data-collection/DataCollectionFeatures';
 import MigrationCTA from '../../components/migration/MigrationCTA';
 import MigrationHero from '../../components/migration/MigrationHero';
+import fullHistoryImg from '../../images/migration/full-history-moved.webp';
 import { getFAQCollection, transformFAQData } from '../../lib/faq-api';
 
 export const metadata: Metadata = {
@@ -87,15 +88,16 @@ export default async function ABASoftwareMigrationPage() {
 
         <ContentSection
           titleText="Your Full History, Moved For You"
-          descriptionText="Migration to <strong>S Cubed</strong> isn’t a copy-paste marathon for your staff. Our team handles the import and validates every record against your current system — clients, documentation, authorizations, and historical sessions — so your data stays accurate and audit-ready from day one."
+          descriptionText="Migration to <strong>S&nbsp;Cubed</strong> isn’t a copy-paste marathon for your staff. Our team handles the import and validates every record against your current system — clients, documentation, authorizations, and historical sessions — so your data stays accurate and audit-ready from day one."
           backgroundColor="#f9fafb"
           imagePosition="left"
+          imageSrc={fullHistoryImg}
           imageAlt="Complete ABA data migration handled for you"
         />
 
         <ContentSection
           titleText="Switch Without Disrupting Therapy"
-          descriptionText="Your clinicians keep working while we move your data in the background. <strong>S Cubed</strong> coordinates the cutover so there’s no gap in care, no lost session data, and no scramble — just a clean transition to a platform that fits how your clinic actually works."
+          descriptionText="Your clinicians keep working while we move your data in the background. <strong>S&nbsp;Cubed</strong> coordinates the cutover so there’s no gap in care, no lost session data, and no scramble — just a clean transition to a platform that fits how your clinic actually works."
           backgroundColor="#ffffff"
           imagePosition="right"
           imageAlt="Seamless ABA software switch with no downtime"
