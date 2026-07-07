@@ -12,15 +12,17 @@ import {
   backgroundOverlay,
   ctaSection,
   heroContainer,
-  heroContent,
   heroDescription,
   heroImage,
-  heroImageContent,
   heroSection,
   heroTextContent,
   heroTitle,
   heroTitleHighlight,
 } from '../../data-collection/DataCollectionHero/styles.css';
+import {
+  migrationHeroContent,
+  migrationHeroImageContent,
+} from './styles.css';
 
 const MigrationHero: React.FC = () => {
   return (
@@ -42,7 +44,7 @@ const MigrationHero: React.FC = () => {
         <div className={backgroundOverlay} />
       </div>
       <div className={heroContainer}>
-        <div className={heroContent}>
+        <div className={migrationHeroContent}>
           <motion.div
             className={heroTextContent}
             initial={{ opacity: 0, x: -50 }}
@@ -70,7 +72,7 @@ const MigrationHero: React.FC = () => {
             </div>
           </motion.div>
           <motion.div
-            className={heroImageContent}
+            className={migrationHeroImageContent}
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.8, delay: 0.2, ease: 'easeOut' }}
