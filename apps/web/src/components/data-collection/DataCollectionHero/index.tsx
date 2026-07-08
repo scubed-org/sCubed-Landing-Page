@@ -17,6 +17,8 @@ import {
   heroContainer,
   heroContent,
   heroDescription,
+  heroValueStack,
+  heroTrustBar,
   heroImage,
   heroImageContent,
   heroSection,
@@ -63,9 +65,17 @@ const DataCollectionHero: React.FC = () => {
                 Built for Real Therapy Work
               </h1>
               <p className={heroDescription}>
-              Track goals, behaviors, and session progress in real time with <strong>S Cubed</strong> - the all-in-one data collection platform made for behavior analysis and therapy practices. From session logging to visual reports, everything you need happens in one secure, easy-to-use place.
-              <br /><br />
-              Start your free trial today and see how effortless therapy data can be.
+                Track goals, behaviors, and session progress in real time with <strong>S Cubed</strong> - the all-in-one data collection platform made for behavior analysis and therapy practices. From session logging to visual reports, everything you need happens in one secure, easy-to-use place.
+              </p>
+
+              {/* NEW: value stack — add this right after the description */}
+              <p className={heroValueStack}>
+                Real-time session logging &nbsp;·&nbsp; Every ABA data method &nbsp;·&nbsp; Audit-ready reports &nbsp;·&nbsp; Built by BCBAs
+              </p>
+
+              {/* NEW: trust bar */}
+              <p className={heroTrustBar}>
+                ✓ HIPAA-Grade Security ✓ Built by BCBAs ✓ Made for ABA Clinics
               </p>
               <div className={ctaSection}>
                 <div>

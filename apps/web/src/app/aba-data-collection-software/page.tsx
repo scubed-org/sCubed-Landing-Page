@@ -106,6 +106,15 @@ export default async function DataCollectionPage() {
           imageAlt="Graphing and reporting for ABA goals"
         />
 
+        <DataCollectionCTA
+          title="See S Cubed Fit Your Clinic's Workflow"
+          description={
+            <>
+              Every data collection method, one platform. See how S Cubed works on the way your team actually runs sessions — <strong>book a quick walkthrough with our team.</strong>
+            </>
+          }
+        />
+
         <ContentSection
           titleText="Automation That Understands ABA"
           descriptionText="<strong>S Cubed</strong> takes care of the details you shouldn’t have to. It times sessions, calculates behavior rates, and organizes your notes instantly. Designed with ABA workflows in mind, it keeps data precise while freeing therapists to stay engaged in real behavior change."
@@ -116,6 +125,15 @@ export default async function DataCollectionPage() {
         />
 
         <DataCollectionTrust />
+
+        <DataCollectionCTA
+          title="Built by BCBAs Who Actually Get It"
+          description={
+            <>
+              See why ABA clinics trust <strong>S Cubed</strong> with their data collection. A therapy-minded team, a platform built for real sessions — <strong>book a 20-minute walkthrough.</strong>
+            </>
+          }
+        />
 
         {faqData.sections.map((section, index) => (
           <FAQSection
