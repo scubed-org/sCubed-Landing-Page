@@ -137,6 +137,34 @@ export const heroDescription = style({
   },
 });
 
+export const heroValueStack = style({
+  fontSize: typography.fontSize.base,
+  fontWeight: typography.fontWeight.semibold,
+  color: colors.primary[600],
+  lineHeight: typography.lineHeight.relaxed,
+  marginTop: `-${spacing.md}`,
+  marginBottom: spacing.md,
+  fontFamily: typography.fontFamily.body,
+  '@media': {
+    'screen and (max-width: 768px)': {
+      fontSize: typography.fontSize.sm,
+    },
+  },
+});
+
+export const heroTrustBar = style({
+  fontSize: typography.fontSize.sm,
+  fontWeight: typography.fontWeight.medium,
+  color: colors.neutral[600],
+  marginBottom: spacing.xl,
+  fontFamily: typography.fontFamily.body,
+  '@media': {
+    'screen and (max-width: 768px)': {
+      fontSize: typography.fontSize.xs,
+    },
+  },
+});
+
 export const ctaSection = style({
   display: 'flex',
   gap: spacing.md,
