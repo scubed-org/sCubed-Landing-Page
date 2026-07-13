@@ -13,7 +13,10 @@ import { Controller, useForm } from 'react-hook-form';
 import isEmail from 'validator/lib/isEmail';
 import isMobilePhone from 'validator/lib/isMobilePhone';
 
-import { DEFAULT_STAFF_COUNT } from '../../constants/formFields';
+import {
+  DEFAULT_STAFF_COUNT,
+  DEFAULT_FREE_STAFF_COUNT,
+} from '../../constants/formFields';
 import { fetchApi } from '../../lib/api-client';
 import { getFieldErrors } from '../../lib/errors';
 import { isApiError } from '../../types/api';
@@ -304,6 +307,11 @@ function Step3ClinicDetailsComponent({
     try {
       const isPaidPlan = data.subscription_plan_id > 1;
 
+      // Free plan has no staff selector and is capped at 5, so provision the full allowance.
+      const effectiveStaffCount = isPaidPlan
+        ? data.staff_count
+        : DEFAULT_FREE_STAFF_COUNT;
+
       // Build form data with string-based location fields (SCM-4402)
       const formData: Step1FormData = {
         clinic_name: data.clinic_name,
@@ -320,7 +328,7 @@ function Step3ClinicDetailsComponent({
         last_name: data.last_name,
         phone: data.phone,
         subscription_plan_id: data.subscription_plan_id,
-        staff_count: data.staff_count,
+        staff_count: effectiveStaffCount,
       };
 
       // Build API payload with string-based location fields (SCM-4402)
@@ -370,7 +378,7 @@ function Step3ClinicDetailsComponent({
       const apiPayload = {
         ...basePayload,
         subscription_plan_id: data.subscription_plan_id,
-        staff_count: data.staff_count,
+        staff_count: effectiveStaffCount,
         success_url,
         cancel_url,
       };

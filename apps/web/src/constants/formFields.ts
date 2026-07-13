@@ -9,6 +9,12 @@
  */
 export const DEFAULT_STAFF_COUNT = 1;
 
+/**
+ * Default staff count for Free plan onboarding.
+ * Free plan is capped at 5 staff, so new Free clinics are provisioned with the full allowance.
+ */
+export const DEFAULT_FREE_STAFF_COUNT = 5;
+
 export const FORM_FIELDS = {
   // Clinic Information
   CLINIC: {
@@ -66,7 +72,7 @@ export const FORM_FIELDS = {
     COMPANY: 'company',
     HOW_DID_YOU_HEAR: 'howDidYouHearAboutUs',
     ROLE: 'role',
-  }
+  },
 } as const;
 
 // Type exports for field groups
@@ -78,7 +84,10 @@ export type FormStateFields = typeof FORM_FIELDS.STATE;
 export type AuthFields = typeof FORM_FIELDS.AUTH;
 
 // Helper functions
-export function getFieldName(category: keyof typeof FORM_FIELDS, field: string): string {
+export function getFieldName(
+  category: keyof typeof FORM_FIELDS,
+  field: string,
+): string {
   const categoryFields = FORM_FIELDS[category];
   return categoryFields[field as keyof typeof categoryFields] || field;
 }
