@@ -20,12 +20,13 @@ import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
 import { getPlanIdByName, PLAN_TYPES } from '@/constants/plans';
 import { SUBSCRIPTION_STEPS } from '@/constants/steps';
 import { fetchApi } from '@/lib/api-client';
-import { showSuccessToast } from '@/lib/errors';
+import { showSuccessToast, showWarningToast } from '@/lib/errors';
 import {
   clearSession,
   loadSession,
   saveSession,
 } from '@/lib/subscriptionSessionManager';
+import { ApiError } from '@/types/api';
 import type {
   AddonApiData,
   OTPVerificationResponse,
@@ -158,12 +159,16 @@ export default function SubscriptionFlow({
 
   // Step 2: Handle OTP verification
   const handleOTPVerified = async (_responseData: OTPVerificationResponse) => {
-    // After OTP verification, fetch existing registration data if available
-    if (formState.clinic_onboarding_request_id) {
+    // After OTP verification, fetch existing registration data if available.
+    // The API requires the OTP-verified email alongside the request ID (SCM-5827).
+    if (formState.clinic_onboarding_request_id && formState.step1Data.email) {
       setLoadingRegistrationData(true);
       try {
         const registrationData = await fetchApi<RegistrationDataResponse>(
-          getRegistrationDataEndpoint(formState.clinic_onboarding_request_id),
+          getRegistrationDataEndpoint(
+            formState.clinic_onboarding_request_id,
+            formState.step1Data.email,
+          ),
           {
             method: 'GET',
             skipErrorToast: true, // Don't show error if no data exists
@@ -231,12 +236,29 @@ export default function SubscriptionFlow({
           }));
         }
       } catch (error) {
-        // If error fetching registration data, proceed normally
-        setFormState((prev) => ({
-          ...prev,
-          otpVerified: true,
-          currentStep: SUBSCRIPTION_STEPS.DETAILS,
-        }));
+        if (
+          error instanceof ApiError &&
+          (error.statusCode === 404 || error.statusCode === 422)
+        ) {
+          // Email doesn't match the request ID (404) or is missing/malformed
+          // (422) — the stored session is stale. Restart email verification.
+          showWarningToast(
+            'We could not verify your signup session. Please verify your email again.',
+          );
+          setFormState((prev) => ({
+            ...prev,
+            clinic_onboarding_request_id: undefined,
+            otpVerified: false,
+            currentStep: SUBSCRIPTION_STEPS.EMAIL,
+          }));
+        } else {
+          // Other errors (e.g. network): proceed without prefill
+          setFormState((prev) => ({
+            ...prev,
+            otpVerified: true,
+            currentStep: SUBSCRIPTION_STEPS.DETAILS,
+          }));
+        }
       } finally {
         setLoadingRegistrationData(false);
       }
