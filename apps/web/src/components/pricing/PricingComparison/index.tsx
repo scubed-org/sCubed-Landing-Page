@@ -32,6 +32,7 @@ import {
   mobileCard,
   mobileCardHeader,
   mobileFeatureItem,
+  mobileFeatureLabel,
   mobileFeatureList,
   originalPriceSmall,
   planHeader,
@@ -181,7 +182,7 @@ const featureComparison: FeatureSection[] = [
         name: 'Clock In, Clock Out',
         description:
           'Track staff hours with GPS verification, automatic timesheets, and payroll-ready reports',
-        starter: 'Add-on $9/license/month',
+        starter: 'Add-on $9/staff/month',
         essential: true,
         growth: true,
       },
@@ -189,16 +190,16 @@ const featureComparison: FeatureSection[] = [
         name: 'Guardian Portal',
         description:
           'Secure family portal for viewing progress reports, session notes, and direct communication with therapists',
-        starter: 'Add-on $19/license/month',
+        starter: 'Add-on $19/staff/month',
         essential: true,
         growth: true,
       },
       {
-        name: 'Billing Portal',
+        name: 'Billing Portal (Clearinghouse Fees Included)',
         description:
           'Electronic claims submission to insurance companies with automated eligibility checks and clearinghouse integration',
-        starter: 'Add-on $49/license/month',
-        essential: 'Add-on $49/license/month',
+        starter: 'Add-on $49/staff/month',
+        essential: 'Add-on $49/staff/month',
         growth: true,
       },
       {
@@ -226,7 +227,7 @@ const featureComparison: FeatureSection[] = [
 const ADVANCED_ADDON_KEYS: Record<string, string> = {
   'Clock In, Clock Out': 'clock_in_out',
   'Guardian Portal': 'guardian_portal',
-  'Billing Portal': 'billing_portal',
+  'Billing Portal (Clearinghouse Fees Included)': 'billing_portal',
   'Telehealth/HIPAA Compliant Meetings': 'telehealth',
 };
 
@@ -509,7 +510,7 @@ const PricingComparison: React.FC<PricingComparisonProps> = ({
                       <h4>{section.category}</h4>
                       {section.features.map((feature) => (
                         <div key={feature.name} className={mobileFeatureItem}>
-                          <span>
+                          <span className={mobileFeatureLabel}>
                             {feature.description ? (
                               <>
                                 {feature.name.substring(0, feature.name.lastIndexOf(' '))}{' '}
