@@ -31,12 +31,12 @@ export function findAddon(
 export function addonMonthlySuffix(
   billingBasis?: 'flat' | 'per_staff',
 ): string {
-  return billingBasis === 'per_staff' ? '/license/month' : '/month';
+  return billingBasis === 'per_staff' ? '/staff/month' : '/month';
 }
 
 /**
  * Build an add-on price label for the comparison table,
- * e.g. "Add-on $9/license/month". Returns `fallback` when the add-on
+ * e.g. "Add-on $9/staff/month". Returns `fallback` when the add-on
  * or its monthly price is unavailable.
  */
 export function addonRowPrice(
