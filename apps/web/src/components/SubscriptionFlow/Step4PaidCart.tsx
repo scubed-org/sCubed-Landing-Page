@@ -336,8 +336,8 @@ export default function Step4PaidCart({
           cancel_url,
           // Include clinic details
           clinic_name: formData.clinic_name,
-          tax_id: formData.tax_id,
-          npi: formData.npi || undefined,
+          tax_id: formData.tax_id ?? '',
+          npi: formData.npi ?? '',
           street_address_line_1: formData.street_address_line_1,
           city,
           state,
