@@ -42,10 +42,10 @@ interface InternalFormData {
   tax_id: string;
   npi: string;
   street_address_line_1: string;
-  state: string; // State name (auto-populated from Google Places)
-  state_code: string; // State code e.g. "OH" (auto-populated from Google Places)
+  state: string; // State/province name (auto-populated from Google Places)
+  state_code: string; // State/province code e.g. "OH" or "ON" (auto-populated from Google Places)
   city: string; // City name (auto-populated from Google Places)
-  zip_code: string; // ZIP code (auto-populated from Google Places)
+  zip_code: string; // ZIP/postal code (auto-populated from Google Places)
   timezone: string; // IANA timezone ID (e.g., "America/New_York")
   email: string;
   first_name: string;
@@ -335,7 +335,7 @@ function Step3ClinicDetailsComponent({
       const basePayload: Record<string, unknown> = {
         clinic_name: data.clinic_name,
         tax_id: data.tax_id,
-        npi: data.npi || undefined,
+        npi: data.npi,
         street_address_line_1: data.street_address_line_1,
         // String-based location fields (SCM-4402)
         city: data.city,
@@ -405,7 +405,6 @@ function Step3ClinicDetailsComponent({
   const formProgress = useMemo(() => {
     const requiredFields = [
       'clinic_name',
-      'tax_id',
       'street_address_line_1',
       'state',
       'city',
@@ -498,15 +497,15 @@ function Step3ClinicDetailsComponent({
         />
 
         <div className={styles.formGrid}>
+          {/* Tax ID and NPI are both optional — the backend accepts an empty
+              string so either value can be left blank or cleared later. */}
           <TextInput
             label="Tax ID (EIN)"
-            required
             placeholder="123456789"
             maxLength={9}
             registration={register('tax_id', {
-              required: 'Tax ID is required',
               pattern: {
-                value: /^\d{9}$/,
+                value: /^(\d{9})?$/,
                 message: 'Tax ID must be exactly 9 digits',
               },
             })}
@@ -518,13 +517,11 @@ function Step3ClinicDetailsComponent({
 
           <TextInput
             label="NPI"
-            required
             placeholder="1234567890"
             maxLength={10}
             registration={register('npi', {
-              required: 'NPI is required',
               pattern: {
-                value: /^\d{10}$/,
+                value: /^(\d{10})?$/,
                 message: 'NPI must be exactly 10 digits',
               },
             })}
@@ -721,6 +718,7 @@ function Step3ClinicDetailsComponent({
             required: 'Phone number is required',
             validate: (phone) =>
               isMobilePhone(phone, 'en-US', { strictMode: false }) ||
+              isMobilePhone(phone, 'en-CA', { strictMode: false }) ||
               'Invalid phone number',
           }}
           render={({ field }) => (
@@ -734,7 +732,7 @@ function Step3ClinicDetailsComponent({
               error={
                 shouldShowError('phone') ? getErrorMessage('phone') : undefined
               }
-              helpText="10-digit US phone number"
+              helpText="10-digit phone number"
             />
           )}
         />

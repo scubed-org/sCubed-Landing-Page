@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-import { ADDRESS_PLACE_TYPES } from '@/constants/places';
+import {
+  ADDRESS_PLACE_TYPES,
+  SUPPORTED_ADDRESS_REGION_CODES,
+} from '@/constants/places';
 
 const PLACES_AUTOCOMPLETE_URL = 'https://places.googleapis.com/v1/places:autocomplete';
 
@@ -57,7 +60,7 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         input: body.input,
-        includedRegionCodes: ['us'],
+        includedRegionCodes: [...SUPPORTED_ADDRESS_REGION_CODES],
         includedPrimaryTypes: body.types || [...ADDRESS_PLACE_TYPES],
         languageCode: 'en',
       }),

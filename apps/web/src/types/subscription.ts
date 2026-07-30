@@ -12,8 +12,10 @@
  */
 export interface ClinicInfo {
   clinic_name: string;
-  tax_id: string; // 9 digits, required
-  npi: string; // 10 digits, required
+  /** Optional. Either 9 digits or an empty string (empty clears a saved value). */
+  tax_id: string;
+  /** Optional. Either 10 digits or an empty string (empty clears a saved value). */
+  npi: string;
 }
 
 /**
@@ -23,9 +25,9 @@ export interface ClinicInfo {
 export interface LocationInfo {
   street_address_line_1: string;
   city: string; // City name (auto-populated from Google Places)
-  state: string; // State name (auto-populated from Google Places)
-  state_code: string; // State code e.g. "OH" (auto-populated from Google Places)
-  zip_code: string; // US zip code (auto-populated from Google Places)
+  state: string; // State/province name (auto-populated from Google Places)
+  state_code: string; // State/province code e.g. "OH" or "ON" (auto-populated from Google Places)
+  zip_code: string; // ZIP/postal code (auto-populated from Google Places)
   timezone: string; // Timezone ID string (e.g., "America/New_York")
 }
 
@@ -36,7 +38,7 @@ export interface AdminInfo {
   email: string;
   first_name: string;
   last_name: string;
-  phone: string; // US phone number
+  phone: string; // US/Canada phone number
 }
 
 /**

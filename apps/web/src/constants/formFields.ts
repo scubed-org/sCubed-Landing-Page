@@ -95,16 +95,17 @@ export function getFieldName(
 // Validation patterns
 export const FIELD_VALIDATION = {
   TAX_ID: {
-    pattern: /^\d{9}$/,
+    pattern: /^(\d{9})?$/,
     message: 'Tax ID must be 9 digits',
   },
   NPI: {
-    pattern: /^\d{10}$/,
+    pattern: /^(\d{10})?$/,
     message: 'NPI must be 10 digits',
   },
   ZIP_CODE: {
-    pattern: /^\d{5}(-\d{4})?$/,
-    message: 'Please enter a valid ZIP code',
+    pattern:
+      /^(?:\d{5}(?:-\d{4})?|[ABCEGHJ-NPRSTVXY]\d[ABCEGHJ-NPRSTV-Z][ -]?\d[ABCEGHJ-NPRSTV-Z]\d)$/i,
+    message: 'Please enter a valid ZIP or postal code',
   },
   PHONE: {
     pattern: /^\+?[1-9]\d{1,14}$/,

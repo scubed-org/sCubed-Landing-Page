@@ -3,6 +3,9 @@
  * Single source of truth for place type configurations
  */
 
+/** Countries supported by address/state autocomplete via Google Places. */
+export const SUPPORTED_ADDRESS_REGION_CODES = ['us', 'ca'] as const;
+
 /** Default types for full address autocomplete (subscribe flow) */
 export const ADDRESS_PLACE_TYPES = [
   'street_address',
