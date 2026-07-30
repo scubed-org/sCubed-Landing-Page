@@ -198,6 +198,12 @@ export const mobileFeatureItem = style({
   },
 });
 
+// Caps the feature name so long labels wrap instead of running into the value.
+export const mobileFeatureLabel = style({
+  maxWidth: '60%',
+  paddingRight: spacing.sm,
+});
+
 export const buyNowButton = style({
   width: '100%',
   padding: `${spacing.sm} ${spacing.md}`,

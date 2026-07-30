@@ -95,6 +95,7 @@ const plans: PricingPlan[] = [
     features: [
       { text: 'Everything in Essential, plus:', included: true },
       { text: 'Billing Portal', included: true },
+      { text: 'Clearinghouse Fees Included', included: true },
       { text: 'Advanced Analytics', included: true },
     ],
     ctaText: 'Buy Now',
