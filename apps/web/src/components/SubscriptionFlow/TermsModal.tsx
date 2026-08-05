@@ -73,6 +73,7 @@ export default function TermsModal({
       closeOnEsc
       closeOnOverlayClick
       showCloseIcon={false}
+      blockScroll={false}
       classNames={{ modal: styles.termsModal, overlay: styles.termsModalOverlay }}
       ariaLabelledby="terms-modal-title"
     >
