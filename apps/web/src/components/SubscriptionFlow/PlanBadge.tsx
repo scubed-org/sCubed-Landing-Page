@@ -9,6 +9,7 @@ import {
   getPlanNameById,
   PLAN_IDS,
 } from '@/constants/plans';
+import { priceSuffix } from '@/lib/pricing-helpers';
 import type { PlanApiData } from '@/types/subscription';
 
 // Helper function to safely parse prices
@@ -64,15 +65,18 @@ export default function PlanBadge({
           {billingCycle === 'yearly' ? (
             <div className={styles.planBadgePriceContainer}>
               <span className={styles.planBadgePriceStrike}>
-                ${parsePrice(planData.yearly_price_per_staff).toFixed(0)}/year
+                ${parsePrice(planData.yearly_price_per_staff).toFixed(0)}
+                {priceSuffix('yearly')}
               </span>
               <span className={styles.planBadgePrice}>
-                ${parsePrice(planData.discounted_yearly_price_per_staff).toFixed(0)}/year
+                ${parsePrice(planData.discounted_yearly_price_per_staff).toFixed(0)}
+                {priceSuffix('yearly')}
               </span>
             </div>
           ) : (
             <div className={styles.planBadgePriceSingle}>
-              ${parsePrice(planData.monthly_price_per_staff).toFixed(0)}/month
+              ${parsePrice(planData.monthly_price_per_staff).toFixed(0)}
+              {priceSuffix('monthly')}
             </div>
           )}
         </>

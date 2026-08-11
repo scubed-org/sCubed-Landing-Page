@@ -27,11 +27,27 @@ export function findAddon(
   return addons?.find((addon) => addon.feature_key === featureKey);
 }
 
+/**
+ * Unit price suffix for a billing cycle and basis, e.g. "/staff/month" for a
+ * per-staff price and "/month" for a flat one. Single source of truth so the
+ * pricing page and the subscribe flow label the same price the same way.
+ */
+export function priceSuffix(
+  billingCycle: 'monthly' | 'yearly',
+  billingBasis: 'flat' | 'per_staff' = 'per_staff',
+): string {
+  const period = billingCycle === 'yearly' ? '/year' : '/month';
+  return billingBasis === 'per_staff' ? `/staff${period}` : period;
+}
+
 /** Monthly price suffix per billing basis. */
 export function addonMonthlySuffix(
   billingBasis?: 'flat' | 'per_staff',
 ): string {
-  return billingBasis === 'per_staff' ? '/staff/month' : '/month';
+  return priceSuffix(
+    'monthly',
+    billingBasis === 'per_staff' ? 'per_staff' : 'flat',
+  );
 }
 
 /**
