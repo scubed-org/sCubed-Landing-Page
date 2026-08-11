@@ -7,6 +7,7 @@ import * as styles from './styles.css';
 
 import { PLAN_IDS, PLAN_NAMES, PLAN_COLORS } from '@/constants/plans';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
+import { priceSuffix } from '@/lib/pricing-helpers';
 import type { PlanApiData } from '@/types/subscription';
 
 // Helper function to safely parse prices
@@ -206,15 +207,18 @@ export default function PlanSelector({
                           {selectedBillingCycle === BILLING_CYCLES.YEARLY ? (
                             <>
                               <div style={{ fontSize: '0.875rem', color: '#6b7280', textDecoration: 'line-through' }}>
-                                ${planData ? parsePrice(planData.yearly_price_per_staff).toFixed(0) : '0'}/year
+                                ${planData ? parsePrice(planData.yearly_price_per_staff).toFixed(0) : '0'}
+                                {priceSuffix(BILLING_CYCLES.YEARLY)}
                               </div>
                               <div style={{ fontSize: '1.25rem', fontWeight: '700', color: colors.text, marginTop: '0.25rem' }}>
-                                ${planData ? parsePrice(planData.discounted_yearly_price_per_staff).toFixed(0) : '0'}/year
+                                ${planData ? parsePrice(planData.discounted_yearly_price_per_staff).toFixed(0) : '0'}
+                                {priceSuffix(BILLING_CYCLES.YEARLY)}
                               </div>
                             </>
                           ) : (
                             <div style={{ fontSize: '1.25rem', fontWeight: '700', color: colors.text }}>
-                              ${planData ? parsePrice(planData.monthly_price_per_staff).toFixed(0) : '0'}/month
+                              ${planData ? parsePrice(planData.monthly_price_per_staff).toFixed(0) : '0'}
+                              {priceSuffix(BILLING_CYCLES.MONTHLY)}
                             </div>
                           )}
                         </div>
