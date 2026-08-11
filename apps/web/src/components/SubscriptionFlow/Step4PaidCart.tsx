@@ -14,6 +14,7 @@ import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
 import { useCurrentTerms } from '@/hooks/useCurrentTerms';
 import { fetchApi } from '@/lib/api-client';
 import { showSuccessToast } from '@/lib/errors';
+import { priceSuffix } from '@/lib/pricing-helpers';
 import { ApiError, isApiError } from '@/types/api';
 import type {
   AddonApiData,
@@ -553,7 +554,8 @@ export default function Step4PaidCart({
                           Monthly
                         </span>
                         <span className={styles.billingCyclePrice}>
-                          ${currentPlan.monthly_price_per_staff}/month per staff
+                          ${currentPlan.monthly_price_per_staff}
+                          {priceSuffix(BILLING_CYCLES.MONTHLY)}
                         </span>
                       </div>
                     </label>
@@ -577,11 +579,12 @@ export default function Step4PaidCart({
                         <span className={styles.billingCycleTitle}>Yearly</span>
                         <div className={styles.billingCyclePriceWrapper}>
                           <span className={styles.billingCycleOriginalPrice}>
-                            ${currentPlan.yearly_price_per_staff}/year
+                            ${currentPlan.yearly_price_per_staff}
+                            {priceSuffix(BILLING_CYCLES.YEARLY)}
                           </span>
                           <span className={styles.billingCycleDiscountedPrice}>
                             ${currentPlan.discounted_yearly_price_per_staff}
-                            /year per staff
+                            {priceSuffix(BILLING_CYCLES.YEARLY)}
                           </span>
                         </div>
                         {savingsPercentage && (
@@ -636,9 +639,11 @@ export default function Step4PaidCart({
                           </p>
                           <div className={styles.addonPriceRow}>
                             <span className={styles.addonPrice}>
-                              ${unit}/
-                              {billingCycle === 'monthly' ? 'month' : 'year'}
-                              {perStaff ? ' per staff' : ''}
+                              ${unit}
+                              {priceSuffix(
+                                billingCycle,
+                                perStaff ? 'per_staff' : 'flat',
+                              )}
                             </span>
                             <span className={styles.addonBilledInfo}>
                               ${billed} billed{' '}
@@ -695,9 +700,11 @@ export default function Step4PaidCart({
                           </p>
                           <div className={styles.addonPriceRow}>
                             <span className={styles.addonPrice}>
-                              ${unit}/
-                              {billingCycle === 'monthly' ? 'month' : 'year'}
-                              {perStaff ? ' per staff' : ''}
+                              ${unit}
+                              {priceSuffix(
+                                billingCycle,
+                                perStaff ? 'per_staff' : 'flat',
+                              )}
                             </span>
                             <span className={styles.addonBilledInfo}>
                               ${billed} billed{' '}
