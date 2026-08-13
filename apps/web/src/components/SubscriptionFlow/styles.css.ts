@@ -2061,6 +2061,21 @@ export const planBadgeContainer = style({
   border: '2px solid',
   boxShadow: enhancedShadows.layered,
   transition: 'all 0.3s ease',
+  // The name and price rows are nowrap flex rows, so without these the badge's
+  // min-content width (~359px for an annual plan: "$228/staff/year
+  // $195/staff/year") holds it wider than the card and it spills out both
+  // sides on a phone. minWidth is the half that matters: a flex item's
+  // automatic minimum is its min-content width, so without it the rows below
+  // never get the chance to wrap.
+  maxWidth: '100%',
+  minWidth: 0,
+  '@media': {
+    // At iPhone SE width the badge still cannot fit its wrapped price inside
+    // 48px of side padding; trim the padding rather than let it spill.
+    'screen and (max-width: 380px)': {
+      padding: `${spacing.sm} ${spacing.md}`,
+    },
+  },
   ':hover': {
     boxShadow: enhancedShadows.elevated,
     transform: 'translateY(-1px)',
@@ -2070,6 +2085,8 @@ export const planBadgeContainer = style({
 export const planBadgeContent = style({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
+  flexWrap: 'wrap',
   gap: spacing.xs,
   fontSize: typography.fontSize.lg,
   fontWeight: typography.fontWeight.bold,
@@ -2101,6 +2118,10 @@ export const planBadgeSubtext = style({
 export const planBadgePriceContainer = style({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
+  // Annual plans print the struck-through original next to the discounted
+  // price; let the pair stack instead of forcing the badge wider than the card.
+  flexWrap: 'wrap',
   gap: spacing.sm,
   marginTop: spacing.xs,
 });

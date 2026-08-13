@@ -17,7 +17,12 @@ import * as styles from './styles.css';
 import { getRegistrationDataEndpoint } from '@/constants/api';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
 import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
-import { getPlanIdByName, PLAN_TYPES } from '@/constants/plans';
+import {
+  getPlanIdByName,
+  getPlanSlugById,
+  PLAN_IDS,
+  PLAN_TYPES,
+} from '@/constants/plans';
 import { SUBSCRIPTION_STEPS } from '@/constants/steps';
 import { fetchApi } from '@/lib/api-client';
 import { showSuccessToast, showWarningToast } from '@/lib/errors';
@@ -336,6 +341,31 @@ export default function SubscriptionFlow({
     }));
   };
 
+  /**
+   * Keep the address bar in step with the selected plan.
+   *
+   * The hydrate effect above treats `plan` in the URL as the source of truth
+   * and wipes the stored session when it is present. Leaving a stale `plan`
+   * behind after an edit means a refresh — or a click back into this tab —
+   * silently reverts the user's choice and discards their progress.
+   */
+  const syncPlanUrl = (planId: number, billingCycle: BillingCycle) => {
+    const params = new URLSearchParams(window.location.search);
+    params.set('plan', getPlanSlugById(planId));
+
+    if (planId === PLAN_IDS.FREE) {
+      params.delete('billing');
+    } else {
+      params.set('billing', billingCycle || BILLING_CYCLES.MONTHLY);
+    }
+
+    window.history.replaceState(
+      window.history.state,
+      '',
+      `${window.location.pathname}?${params.toString()}${window.location.hash}`,
+    );
+  };
+
   // Handle plan change from modal
   const handlePlanChange = (planId: number, billingCycle: BillingCycle) => {
     setFormState((prev) => ({
@@ -346,6 +376,7 @@ export default function SubscriptionFlow({
       },
       billingCycle,
     }));
+    syncPlanUrl(planId, billingCycle);
     setShowPlanSelector(false);
   };
 

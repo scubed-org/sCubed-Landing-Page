@@ -24,6 +24,17 @@ export const PLAN_NAMES = {
   [PLAN_IDS.GROWTH]: 'Growth',
 } as const;
 
+/**
+ * Canonical slugs used in the `?plan=` query param. These are what
+ * getPlanIdByName parses, so the subscribe URL round-trips cleanly.
+ */
+export const PLAN_SLUGS = {
+  [PLAN_IDS.FREE]: 'free',
+  [PLAN_IDS.STARTER]: 'starter',
+  [PLAN_IDS.ESSENTIAL]: 'essential',
+  [PLAN_IDS.GROWTH]: 'growth',
+} as const;
+
 export const PLAN_PRICING = {
   [PLAN_IDS.FREE]: {
     monthly: 0,
@@ -92,6 +103,15 @@ export function getPlanIdByName(planName: string): number {
  */
 export function getPlanNameById(planId: number): string {
   return PLAN_NAMES[planId as keyof typeof PLAN_NAMES] || 'Free Trial';
+}
+
+/**
+ * Get the URL slug for a plan ID
+ */
+export function getPlanSlugById(planId: number): string {
+  return (
+    PLAN_SLUGS[planId as keyof typeof PLAN_SLUGS] || PLAN_SLUGS[PLAN_IDS.FREE]
+  );
 }
 
 /**
