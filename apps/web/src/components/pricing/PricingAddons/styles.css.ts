@@ -48,12 +48,9 @@ export const addonsSubtitle = style({
 
 export const addonsGrid = style({
   display: 'grid',
-  gridTemplateColumns: 'repeat(3, 1fr)',
+  gridTemplateColumns: 'repeat(2, 1fr)',
   gap: spacing.lg,
   '@media': {
-    'screen and (max-width: 1024px)': {
-      gridTemplateColumns: 'repeat(2, 1fr)',
-    },
     'screen and (max-width: 640px)': {
       gridTemplateColumns: '1fr',
     },
