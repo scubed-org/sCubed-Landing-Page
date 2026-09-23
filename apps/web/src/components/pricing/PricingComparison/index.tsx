@@ -136,14 +136,6 @@ const featureComparison: FeatureSection[] = [
         essential: true,
         growth: true,
       },
-      {
-        name: 'VB-MAPP',
-        description:
-          'Comprehensive assessment tool for tracking language and social skills development in children with autism',
-        starter: 'Add-on $15/year per client',
-        essential: 'Add-on $15/year per client',
-        growth: 'Add-on $15/year per client',
-      },
     ],
   },
   {
