@@ -1,7 +1,7 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { ArrowRight, Calendar, CreditCard, Video } from 'lucide-react';
+import { ArrowRight, CreditCard, Video } from 'lucide-react';
 import Link from 'next/link';
 
 import { colors, spacing, typography } from '../../../styles/tokens.css';
@@ -58,17 +58,7 @@ const addons: Addon[] = [
     popular: true,
     tooltipContent:
       'Full-service billing management including claims submission to insurance, tracking, denial management, and reimbursement optimization. Our team handles the entire revenue cycle so you can focus on patient care.',
-    href: '/coming-soon?feature=rcm',
-  },
-  {
-    icon: <Calendar size={24} />,
-    name: 'VB-MAPP Assessment Builder',
-    description:
-      'Comprehensive assessment tool for tracking developmental milestones',
-    price: '$15/year per client',
-    tooltipContent:
-      'Comprehensive digital VB-MAPP assessment tools with automated scoring, progress tracking, detailed reporting, and milestone tracking. Streamlines assessment workflow and provides data-driven insights for treatment planning.',
-    href: '/coming-soon?feature=vb-mapp',
+    href: '/billing',
   },
 ];
 
