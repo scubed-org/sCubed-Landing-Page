@@ -17,8 +17,10 @@ export interface AddressComponents {
   stateCode: string;
   /** ZIP code */
   zipCode: string;
-  /** Country name */
+  /** Country name (e.g., "Canada") */
   country: string;
+  /** Country abbreviation (e.g., "CA") */
+  countryCode: string;
   /** Full formatted address from Google */
   formattedAddress: string;
 }
@@ -83,6 +85,10 @@ export interface AddressAutocompleteProps {
   ) => void;
   /** Callback when timezone is resolved (IANA timezone ID) */
   onTimezoneResolved?: (timezone: string) => void;
+  /** Fired when a search returns no predictions, so the parent can offer manual entry */
+  onNoResults?: (noResults: boolean) => void;
+  /** Fired on every keystroke, for parents that need the raw typed text */
+  onInputChange?: (value: string) => void;
   /** Initial/current value for the input */
   value?: string;
   /** Placeholder text */

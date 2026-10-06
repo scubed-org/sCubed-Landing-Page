@@ -39,8 +39,14 @@ export async function GET(request: NextRequest) {
     }
 
     try {
+      // Forward the optional country filter through; the API defaults to US states
+      const countryId = request.nextUrl.searchParams.get('country_id');
+      const endpoint = countryId
+        ? `states?country_id=${encodeURIComponent(countryId)}`
+        : 'states';
+
       // Forward the request to the admin API using centralized API client
-      const data = await fetchApi<StatesResponse>('states', {
+      const data = await fetchApi<StatesResponse>(endpoint, {
         method: 'GET',
       });
 

@@ -29,6 +29,7 @@ export interface LocationInfo {
   state_code: string; // State/province code e.g. "OH" or "ON" (auto-populated from Google Places)
   zip_code: string; // ZIP/postal code (auto-populated from Google Places)
   timezone: string; // Timezone ID string (e.g., "America/New_York")
+  country_id: number; // Country ID, see COUNTRY_ID in @/constants/countries (derived from Google Places)
 }
 
 /**
@@ -231,6 +232,7 @@ export interface RegistrationDataResponse {
   state_code?: string;
   zip_code?: string;
   timezone?: string;
+  country_id?: number;
   first_name?: string;
   last_name?: string;
   phone?: string;

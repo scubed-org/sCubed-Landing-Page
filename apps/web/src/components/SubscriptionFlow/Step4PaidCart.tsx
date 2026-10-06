@@ -10,6 +10,7 @@ import { useCheckoutSummary } from './useCheckoutSummary';
 
 import { API_ENDPOINTS, getAddonsEndpoint } from '@/constants/api';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
+import { DEFAULT_COUNTRY_ID } from '@/constants/countries';
 import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
 import { useCurrentTerms } from '@/hooks/useCurrentTerms';
 import { fetchApi } from '@/lib/api-client';
@@ -345,6 +346,7 @@ export default function Step4PaidCart({
           state_code: formData.state_code,
           zip_code: formData.zip_code,
           timezone: timezone || 'America/New_York',
+          country_id: formData.country_id || DEFAULT_COUNTRY_ID,
           // Include admin details
           email: formData.email,
           first_name: formData.first_name,

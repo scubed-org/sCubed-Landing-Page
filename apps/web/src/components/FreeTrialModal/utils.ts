@@ -1,5 +1,7 @@
 import { Track } from '@react-input/mask';
 
+import { COUNTRY_ID } from '@/constants/countries';
+
 /**
  * Formats Tax ID input to XX-XXXXXXX format
  */
@@ -67,3 +69,32 @@ export const formatZipCode = (value: string): string => {
   
   return limited;
 };
+
+/**
+ * Format a Canadian postal code as "A1A 1A1".
+ * Keeps letters and digits only so the space is re-inserted as the user types.
+ */
+export const formatCanadianPostalCode = (value: string): string => {
+  const alphanumeric = value
+    .replace(/[^a-zA-Z0-9]/g, '')
+    .toUpperCase()
+    .substring(0, 6);
+
+  if (alphanumeric.length > 3) {
+    return `${alphanumeric.substring(0, 3)} ${alphanumeric.substring(3)}`;
+  }
+
+  return alphanumeric;
+};
+
+/**
+ * Format a postal code for the selected country.
+ * US ZIP codes stay digit-only; Canadian codes keep their letters.
+ */
+export const formatPostalCode = (
+  value: string,
+  countryId: number,
+): string =>
+  countryId === COUNTRY_ID.CA
+    ? formatCanadianPostalCode(value)
+    : formatZipCode(value);

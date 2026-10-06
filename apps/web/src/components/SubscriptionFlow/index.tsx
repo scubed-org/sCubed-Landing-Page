@@ -16,6 +16,7 @@ import * as styles from './styles.css';
 
 import { getRegistrationDataEndpoint } from '@/constants/api';
 import { BILLING_CYCLES, type BillingCycle } from '@/constants/billing';
+import { DEFAULT_COUNTRY_ID } from '@/constants/countries';
 import { DEFAULT_STAFF_COUNT } from '@/constants/formFields';
 import {
   getPlanIdByName,
@@ -225,6 +226,10 @@ export default function SubscriptionFlow({
               state: registrationData.state || prev.step1Data.state || '',
               state_code: registrationData.state_code || prev.step1Data.state_code || '',
               city: registrationData.city || prev.step1Data.city || '',
+              country_id:
+                registrationData.country_id ||
+                prev.step1Data.country_id ||
+                DEFAULT_COUNTRY_ID,
               timezone:
                 registrationData.timezone || prev.step1Data.timezone || '',
             },
@@ -503,6 +508,8 @@ export default function SubscriptionFlow({
                   state_code: formState.step1Data.state_code || '',
                   zip_code: formState.step1Data.zip_code || '',
                   timezone: formState.step1Data.timezone || 'America/New_York',
+                  country_id:
+                    formState.step1Data.country_id || DEFAULT_COUNTRY_ID,
                   email: formState.step1Data.email || '',
                   first_name: formState.step1Data.first_name || '',
                   last_name: formState.step1Data.last_name || '',
@@ -547,6 +554,8 @@ export default function SubscriptionFlow({
                   state_code: formState.step1Data.state_code || '',
                   zip_code: formState.step1Data.zip_code || '',
                   timezone: formState.step1Data.timezone || 'America/New_York',
+                  country_id:
+                    formState.step1Data.country_id || DEFAULT_COUNTRY_ID,
                   email: formState.step1Data.email || '',
                   first_name: formState.step1Data.first_name || '',
                   last_name: formState.step1Data.last_name || '',

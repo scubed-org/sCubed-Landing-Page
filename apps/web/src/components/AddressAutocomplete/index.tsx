@@ -23,6 +23,8 @@ import { useGooglePlacesRest } from './useGooglePlacesRest';
 export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
   onAddressSelect,
   onTimezoneResolved,
+  onNoResults,
+  onInputChange,
   value = '',
   placeholder = 'Start typing an address...',
   disabled = false,
@@ -78,6 +80,7 @@ export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
             stateCode: '',
             zipCode: '',
             country: '',
+            countryCode: '',
             formattedAddress: prediction.description,
           });
           return;
@@ -135,6 +138,7 @@ export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
     const newValue = e.target.value;
     setInputValue(newValue);
     setActiveIndex(-1);
+    onInputChange?.(newValue);
 
     if (newValue.length >= 3) {
       setIsOpen(true);
@@ -171,6 +175,18 @@ export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
     }
   };
 
+  // Mirror the "no results" state to the parent so it can fall back to manual entry
+  const hasNoResults =
+    isOpen &&
+    !loading &&
+    !apiError &&
+    inputValue.length >= 3 &&
+    predictions.length === 0;
+
+  useEffect(() => {
+    onNoResults?.(hasNoResults);
+  }, [hasNoResults, onNoResults]);
+
   // Click outside to close
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -200,6 +216,7 @@ export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
     setInputValue('');
     clearPredictions();
     setIsOpen(false);
+    onInputChange?.('');
     inputRef.current?.focus();
 
     onAddressSelect(
@@ -210,6 +227,7 @@ export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
         stateCode: '',
         zipCode: '',
         country: '',
+        countryCode: '',
         formattedAddress: '',
       },
       undefined,
@@ -305,14 +323,11 @@ export const AddressAutocomplete: FC<AddressAutocompleteProps> = ({
         )}
 
         {/* No results */}
-        {isOpen &&
-          !loading &&
-          inputValue.length >= 3 &&
-          predictions.length === 0 && (
-            <div className={styles.dropdown}>
-              <div className={styles.emptyItem}>{emptyMessage}</div>
-            </div>
-          )}
+        {hasNoResults && (
+          <div className={styles.dropdown}>
+            <div className={styles.emptyItem}>{emptyMessage}</div>
+          </div>
+        )}
 
         {/* API Error */}
         {apiError && (

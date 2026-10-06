@@ -9,8 +9,9 @@ import 'react-responsive-modal/styles.css';
 import isEmail from 'validator/lib/isEmail';
 import isMobilePhone from 'validator/lib/isMobilePhone';
 
-import { REQUIRED_FIELDS } from './constants';
+import { POSTAL_CODE_RULES, REQUIRED_FIELDS } from './constants';
 import {
+  CountryOption,
   FreeTrialInputs,
   StateOption,
   getSelectedStateTimezone,
@@ -53,10 +54,11 @@ import {
   submitButton,
 } from './styles.css';
 import SuccessModal from './SuccessModal';
-import { formatNPI, formatTaxId, formatZipCode, phoneTrack } from './utils';
+import { formatNPI, formatPostalCode, formatTaxId, phoneTrack } from './utils';
 
 import InfiniteSelectDropdown from '@/components/InfiniteSelectDropdown';
 import ReCaptcha, { ReCaptchaRef } from '@/components/ReCaptcha';
+import { COUNTRY_ID, DEFAULT_COUNTRY_ID } from '@/constants/countries';
 import { usePaginatedCities } from '@/hooks/usePaginatedCities';
 
 type Props = {
@@ -66,6 +68,8 @@ type Props = {
 
 const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
   const [isSubmitting, setSubmitting] = useState(false);
+  const [countries, setCountries] = useState<CountryOption[]>([]);
+  const [loadingCountries, setLoadingCountries] = useState(false);
   const [states, setStates] = useState<StateOption[]>([]);
   const [loadingStates, setLoadingStates] = useState(false);
   const [submitResponse, setSubmitResponse] = useState<{
@@ -77,6 +81,7 @@ const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
   const [pendingFormData, setPendingFormData] =
     useState<FreeTrialInputs | null>(null);
   const recaptchaRef = useRef<ReCaptchaRef>(null);
+  const previousCountryRef = useRef<string>('');
   const {
     register,
     handleSubmit,
@@ -89,7 +94,11 @@ const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
     shouldFocusError: false,
   });
 
+  const selectedCountry = watch('country');
   const selectedState = watch('state');
+  const selectedCountryId = Number(selectedCountry) || DEFAULT_COUNTRY_ID;
+  const postalRules =
+    POSTAL_CODE_RULES[selectedCountryId] ?? POSTAL_CODE_RULES[COUNTRY_ID.US];
 
   // Use paginated cities hook for infinite scroll
   const { cities, loading: loadingCities, loadingMore, hasMore, loadMore } =
@@ -108,9 +117,32 @@ const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
 
   useEffect(() => {
     if (isOpen) {
-      fetchStates();
+      fetchCountries();
     }
   }, [isOpen]);
+
+  // Load states for the selected country. The API defaults to the US when
+  // country_id is omitted, so this also covers the pre-selection render.
+  useEffect(() => {
+    if (isOpen && selectedCountry) {
+      fetchStates(selectedCountry);
+    }
+  }, [isOpen, selectedCountry]);
+
+  // Clear the dependent location fields when the country actually changes,
+  // otherwise the form could hold an Ontario state id under a US selection.
+  useEffect(() => {
+    const previousCountry = previousCountryRef.current;
+    previousCountryRef.current = selectedCountry || '';
+
+    if (!previousCountry || !selectedCountry) return;
+    if (previousCountry === selectedCountry) return;
+
+    setStates([]);
+    setValue('state', '');
+    setValue('city', '');
+    setValue('zipCode', '');
+  }, [selectedCountry, setValue]);
 
   // Clear city when state changes
   useEffect(() => {
@@ -119,11 +151,53 @@ const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
     }
   }, [selectedState, setValue]);
 
-  const fetchStates = async () => {
+  const fetchCountries = async () => {
+    setLoadingCountries(true);
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_ADMIN_APP_API_URL}countries`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch countries');
+      }
+
+      const result = await response.json();
+
+      // Tolerate both the paginated envelope used by /states and a bare array.
+      const rows = Array.isArray(result.data?.rows)
+        ? result.data.rows
+        : Array.isArray(result.data)
+          ? result.data
+          : null;
+
+      if (!rows) {
+        throw new Error('Invalid response format');
+      }
+
+      setCountries(rows);
+    } catch (error) {
+      // The countries endpoint is newer than this form. If it is unavailable the
+      // form still works against the API's US default rather than dead-ending.
+      console.error('Error fetching countries:', error);
+      setCountries([]);
+    } finally {
+      setLoadingCountries(false);
+      setValue('country', String(DEFAULT_COUNTRY_ID));
+    }
+  };
+
+  const fetchStates = async (countryId: string) => {
     setLoadingStates(true);
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_ADMIN_APP_API_URL}states`,
+        `${process.env.NEXT_PUBLIC_ADMIN_APP_API_URL}states?country_id=${encodeURIComponent(countryId)}`,
         {
           method: 'GET',
           headers: {
@@ -145,6 +219,7 @@ const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
       }
     } catch (error) {
       console.error('Error fetching states:', error);
+      setStates([]);
     } finally {
       setLoadingStates(false);
     }
@@ -505,6 +580,39 @@ const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
               )}
             </div>
 
+            {/* Hidden when the countries endpoint is unavailable, so the form
+                degrades to the API's US default instead of showing an empty picker. */}
+            {(loadingCountries || countries.length > 0) && (
+              <div className={formGroupFull}>
+                <label className={labelStyle}>
+                  Country<span className={requiredIndicator}>*</span>
+                </label>
+                <InfiniteSelectDropdown
+                  options={countries.map((country) => ({
+                    id: country.id.toString(),
+                    name: country.name,
+                  }))}
+                  value={selectedCountry || ''}
+                  onChange={(val) =>
+                    setValue('country', val, { shouldValidate: true })
+                  }
+                  placeholder={loadingCountries ? 'Loading...' : 'Select Country'}
+                  disabled={loadingCountries}
+                  searchable={false}
+                  size="compact"
+                  error={!!errors.country || !!apiErrors.country}
+                />
+                {errors.country && (
+                  <span className={errorMessage}>
+                    {errors.country?.message}
+                  </span>
+                )}
+              </div>
+            )}
+
+            {/* Registered unconditionally so the value survives a hidden picker */}
+            <input type="hidden" {...register('country')} />
+
             <div className={locationRow}>
               <div className={fieldWrapper}>
                 <label className={labelStyle}>
@@ -573,21 +681,25 @@ const FreeTrialModal: FC<Props> = ({ isOpen, onClose }) => {
 
               <div className={fieldWrapper}>
                 <label className={labelStyle}>
-                  Zip<span className={requiredIndicator}>*</span>
+                  {postalRules.label}
+                  <span className={requiredIndicator}>*</span>
                 </label>
                 <input
                   type="text"
                   className={getInputClassName('zipCode')}
-                  placeholder="XXXXX or XXXXX-XXXX"
-                  maxLength={10}
+                  placeholder={postalRules.placeholder}
+                  maxLength={postalRules.maxLength}
                   {...register('zipCode', {
                     required: true,
                     pattern: {
-                      value: /^\d{5}(-\d{4})?$/,
+                      value: postalRules.pattern,
                       message: 'Invalid',
                     },
                     onChange: (e) => {
-                      const formatted = formatZipCode(e.target.value);
+                      const formatted = formatPostalCode(
+                        e.target.value,
+                        selectedCountryId,
+                      );
                       setValue('zipCode', formatted);
                       return formatted;
                     },
