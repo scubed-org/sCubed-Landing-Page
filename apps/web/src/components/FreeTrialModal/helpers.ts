@@ -6,6 +6,7 @@ export type FreeTrialInputs = {
   taxId: string;
   npi: string;
   addressLine1: string;
+  country: string;
   state: string;
   city: string;
   zipCode: string;
@@ -17,6 +18,12 @@ export type FreeTrialInputs = {
 
   // Consent
   consentToContact: boolean;
+};
+
+export type CountryOption = {
+  id: number;
+  name: string;
+  code: string;
 };
 
 export type StateOption = {

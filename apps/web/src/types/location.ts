@@ -1,7 +1,7 @@
 /**
  * Location Types
  * Type definitions for state/city dropdown components used in FreeTrialModal
- * These types are used by useLocationData and usePaginatedCities hooks
+ * These types are used by the usePaginatedCities hook
  */
 
 /**

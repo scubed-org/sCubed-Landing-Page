@@ -23,6 +23,7 @@ export function useAddressParser() {
         stateCode: '',
         zipCode: '',
         country: '',
+        countryCode: '',
         formattedAddress,
       };
 
@@ -78,7 +79,8 @@ export function useAddressParser() {
 
         // Country
         if (types.includes('country')) {
-          result.country = component.long_name;
+          result.country = component.long_name; // e.g., "Canada"
+          result.countryCode = component.short_name; // e.g., "CA"
         }
       }
 

@@ -25,12 +25,20 @@ import { PhoneInput, TextInput } from './FormComponents';
 import * as styles from './styles.css';
 
 import { AddressAutocomplete } from '@/components/AddressAutocomplete';
+import InfiniteSelectDropdown from '@/components/InfiniteSelectDropdown';
 import type { AddressComponents } from '@/components/AddressAutocomplete/types';
+import {
+  COUNTRY_OPTIONS,
+  DEFAULT_COUNTRY_ID,
+  getCountryIdFromCode,
+  getCountryName,
+} from '@/constants/countries';
 import type {
   RegistrationResponseData,
   Step1FormData,
   Step3Props,
 } from '@/types/subscription';
+import { useStates } from '@/hooks/useStates';
 import { formatPhone } from '@/utils/phoneFormatter';
 
 /**
@@ -47,6 +55,7 @@ interface InternalFormData {
   city: string; // City name (auto-populated from Google Places)
   zip_code: string; // ZIP/postal code (auto-populated from Google Places)
   timezone: string; // IANA timezone ID (e.g., "America/New_York")
+  country_id: number; // Country ID (derived from the Google Places country code)
   email: string;
   first_name: string;
   last_name: string;
@@ -70,6 +79,11 @@ function Step3ClinicDetailsComponent({
   clinic_onboarding_request_id,
 }: Readonly<Step3Props>) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  // Manual entry takes over when Google Places has no match for what was typed.
+  // Country and State become pickers, City and ZIP become free text.
+  const [manualEntry, setManualEntry] = useState(false);
+  const [selectedStateId, setSelectedStateId] = useState('');
+  const [typedAddress, setTypedAddress] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
 
   const scrollToFirstError = useCallback((errorFields: string[]) => {
@@ -128,8 +142,16 @@ function Step3ClinicDetailsComponent({
       state_code: initialData?.state_code || '',
       city: initialData?.city || '',
       timezone: initialData?.timezone || '',
+      country_id: initialData?.country_id || DEFAULT_COUNTRY_ID,
     },
   });
+
+  const watchedCountryId = watch('country_id');
+
+  // Only loaded for the manual fallback; the Places path never needs the list.
+  const { states, loading: loadingStates } = useStates(
+    manualEntry ? watchedCountryId : undefined,
+  );
 
   // Update subscription_plan_id without resetting the entire form
   useEffect(() => {
@@ -165,6 +187,14 @@ function Step3ClinicDetailsComponent({
     // Sync city if API returned it
     if (initialData.city && initialData.city !== currentValues.city) {
       fieldsToSync.city = initialData.city;
+    }
+
+    // Sync country_id if API returned it
+    if (
+      initialData.country_id &&
+      initialData.country_id !== currentValues.country_id
+    ) {
+      fieldsToSync.country_id = initialData.country_id;
     }
 
     // Sync timezone if API returned it
@@ -230,6 +260,7 @@ function Step3ClinicDetailsComponent({
     initialData?.state,
     initialData?.state_code,
     initialData?.city,
+    initialData?.country_id,
     initialData?.timezone,
     initialData?.zip_code,
     initialData?.street_address_line_1,
@@ -254,11 +285,19 @@ function Step3ClinicDetailsComponent({
       setValue('city', address.city);
       setValue('state', address.state);
       setValue('state_code', address.stateCode);
+      setValue('country_id', getCountryIdFromCode(address.countryCode));
 
       if (avoidTrigger) {
+        // Address was cleared rather than parsed; drop back to the search-first state.
         setValue('zip_code', '');
+        setManualEntry(false);
+        setSelectedStateId('');
         return;
       }
+
+      // A parsed result is authoritative, so leave manual entry if it was on.
+      setManualEntry(false);
+      setSelectedStateId('');
 
       // Only set and validate zip_code if it was returned by Google Places
       // If not returned, user can manually enter it before submitting
@@ -281,6 +320,47 @@ function Step3ClinicDetailsComponent({
       setValue('timezone', timezone);
     },
     [setValue],
+  );
+
+  // Latch manual entry on. It is only switched off by picking a real address or
+  // clearing the field, so it survives the dropdown closing.
+  const handleNoResults = useCallback((noResults: boolean) => {
+    if (noResults) setManualEntry(true);
+  }, []);
+
+  const handleAddressInputChange = useCallback((value: string) => {
+    setTypedAddress(value);
+  }, []);
+
+  // Switching country invalidates any state, city and timezone picked under the old one.
+  const handleCountryChange = useCallback(
+    (value: string) => {
+      setValue('country_id', Number(value) || DEFAULT_COUNTRY_ID, {
+        shouldValidate: true,
+      });
+      setSelectedStateId('');
+      setValue('state', '');
+      setValue('state_code', '');
+      setValue('city', '');
+      setValue('timezone', '');
+    },
+    [setValue],
+  );
+
+  // The states API carries each state's timezone, which replaces the one
+  // Places would otherwise have resolved from the address.
+  const handleStateChange = useCallback(
+    (stateId: string) => {
+      setSelectedStateId(stateId);
+
+      const selected = states.find((item) => item.id.toString() === stateId);
+      if (!selected) return;
+
+      setValue('state', selected.name, { shouldValidate: true });
+      setValue('state_code', selected.code);
+      setValue('timezone', selected.timezones?.[0]?.timezone?.timezone || '');
+    },
+    [states, setValue],
   );
 
   // Helper function to determine if error should be shown
@@ -323,6 +403,7 @@ function Step3ClinicDetailsComponent({
         state_code: data.state_code,
         zip_code: data.zip_code,
         timezone: data.timezone || 'America/New_York', // Default timezone if not resolved
+        country_id: Number(data.country_id) || DEFAULT_COUNTRY_ID,
         email: data.email,
         first_name: data.first_name,
         last_name: data.last_name,
@@ -343,6 +424,7 @@ function Step3ClinicDetailsComponent({
         state_code: data.state_code,
         zip_code: data.zip_code,
         timezone: data.timezone || 'America/New_York',
+        country_id: Number(data.country_id) || DEFAULT_COUNTRY_ID,
         email: data.email,
         first_name: data.first_name,
         last_name: data.last_name,
@@ -425,6 +507,26 @@ function Step3ClinicDetailsComponent({
   const watchedState = watch('state');
   const watchedCity = watch('city');
   const watchedStreetAddress = watch('street_address_line_1');
+
+  // In manual entry the typed text is the street address, since no place was matched.
+  useEffect(() => {
+    if (manualEntry) {
+      setValue('street_address_line_1', typedAddress, { shouldValidate: true });
+    }
+  }, [manualEntry, typedAddress, setValue]);
+
+  // Entering manual entry means the previous address no longer applies. Clearing
+  // it stops an empty State picker from sitting on top of a stale stored value.
+  useEffect(() => {
+    if (!manualEntry) return;
+    setSelectedStateId('');
+    setValue('state', '');
+    setValue('state_code', '');
+    setValue('city', '');
+    setValue('timezone', '');
+  }, [manualEntry, setValue]);
+
+  const countryDisplayName = getCountryName(watchedCountryId);
 
   return (
     <form
@@ -512,7 +614,7 @@ function Step3ClinicDetailsComponent({
             error={
               shouldShowError('tax_id') ? getErrorMessage('tax_id') : undefined
             }
-            helpText="9-digit Employer Identification Number"
+            helpText="9-digit Employer Identification Number / Business Number"
           />
 
           <TextInput
@@ -553,6 +655,9 @@ function Step3ClinicDetailsComponent({
             value={watchedStreetAddress}
             onAddressSelect={handleAddressSelect}
             onTimezoneResolved={handleTimezoneResolved}
+            onNoResults={handleNoResults}
+            onInputChange={handleAddressInputChange}
+            emptyMessage="No match found. Enter your address details below."
             error={
               !!errors.street_address_line_1 ||
               !!fieldErrors.street_address_line_1
@@ -573,20 +678,74 @@ function Step3ClinicDetailsComponent({
             )}
         </div>
 
-        {/* Auto-populated location fields (read-only) */}
+        {/* Country and State come from the address, or from pickers when
+            Google Places had no match for what the user typed. */}
         <div className={styles.formGrid}>
+          <div className={styles.formField} data-field="country_id">
+            <label className={styles.label}>
+              Country <span className={styles.requiredIndicator}>*</span>
+            </label>
+            {manualEntry ? (
+              <InfiniteSelectDropdown
+                options={COUNTRY_OPTIONS.map((country) => ({
+                  id: country.id.toString(),
+                  name: country.name,
+                }))}
+                value={watchedCountryId ? watchedCountryId.toString() : ''}
+                onChange={handleCountryChange}
+                placeholder="Select Country"
+                searchable={false}
+                error={!!errors.country_id || !!fieldErrors.country_id}
+              />
+            ) : (
+              <input
+                type="text"
+                value={countryDisplayName}
+                readOnly
+                placeholder="Auto-filled from address"
+                className={`${styles.input} ${styles.inputLarge} ${styles.inputReadOnly}`}
+                tabIndex={-1}
+              />
+            )}
+            <input
+              type="hidden"
+              {...register('country_id', { valueAsNumber: true })}
+            />
+            {shouldShowError('country_id') && getErrorMessage('country_id') && (
+              <div className={styles.errorMessage}>
+                <AlertCircle size={16} className={styles.errorIcon} />
+                <span>{getErrorMessage('country_id')?.message}</span>
+              </div>
+            )}
+          </div>
+
           <div className={styles.formField} data-field="state">
             <label className={styles.label}>
               State <span className={styles.requiredIndicator}>*</span>
             </label>
-            <input
-              type="text"
-              value={watchedState}
-              readOnly
-              placeholder="Auto-filled from address"
-              className={`${styles.input} ${styles.inputLarge} ${styles.inputReadOnly}`}
-              tabIndex={-1}
-            />
+            {manualEntry ? (
+              <InfiniteSelectDropdown
+                options={states.map((item) => ({
+                  id: item.id.toString(),
+                  name: `${item.name} (${item.code})`,
+                }))}
+                value={selectedStateId}
+                onChange={handleStateChange}
+                placeholder={loadingStates ? 'Loading...' : 'Select State'}
+                disabled={loadingStates}
+                searchable={false}
+                error={!!errors.state || !!fieldErrors.state}
+              />
+            ) : (
+              <input
+                type="text"
+                value={watchedState}
+                readOnly
+                placeholder="Auto-filled from address"
+                className={`${styles.input} ${styles.inputLarge} ${styles.inputReadOnly}`}
+                tabIndex={-1}
+              />
+            )}
             <input
               type="hidden"
               {...register('state', { required: 'State is required' })}
@@ -598,23 +757,36 @@ function Step3ClinicDetailsComponent({
               </div>
             )}
           </div>
+        </div>
 
+        <div className={styles.formGrid}>
           <div className={styles.formField} data-field="city">
             <label className={styles.label}>
               City <span className={styles.requiredIndicator}>*</span>
             </label>
-            <input
-              type="text"
-              value={watchedCity}
-              readOnly
-              placeholder="Auto-filled from address"
-              className={`${styles.input} ${styles.inputLarge} ${styles.inputReadOnly}`}
-              tabIndex={-1}
-            />
-            <input
-              type="hidden"
-              {...register('city', { required: 'City is required' })}
-            />
+            {manualEntry ? (
+              <input
+                type="text"
+                placeholder="Enter city"
+                className={`${styles.input} ${styles.inputLarge}`}
+                {...register('city', { required: 'City is required' })}
+              />
+            ) : (
+              <>
+                <input
+                  type="text"
+                  value={watchedCity}
+                  readOnly
+                  placeholder="Auto-filled from address"
+                  className={`${styles.input} ${styles.inputLarge} ${styles.inputReadOnly}`}
+                  tabIndex={-1}
+                />
+                <input
+                  type="hidden"
+                  {...register('city', { required: 'City is required' })}
+                />
+              </>
+            )}
             {shouldShowError('city') && getErrorMessage('city') && (
               <div className={styles.errorMessage}>
                 <AlertCircle size={16} className={styles.errorIcon} />
@@ -622,24 +794,24 @@ function Step3ClinicDetailsComponent({
               </div>
             )}
           </div>
-        </div>
 
-        <div className={styles.formField} data-field="zip_code">
-          <label className={styles.label}>
-            ZIP Code <span className={styles.requiredIndicator}>*</span>
-          </label>
-          <input
-            type="text"
-            placeholder="Enter ZIP code"
-            className={`${styles.input} ${styles.inputLarge}`}
-            {...register('zip_code', { required: 'ZIP code is required' })}
-          />
-          {shouldShowError('zip_code') && getErrorMessage('zip_code') && (
-            <div className={styles.errorMessage}>
-              <AlertCircle size={16} className={styles.errorIcon} />
-              <span>{getErrorMessage('zip_code')?.message}</span>
-            </div>
-          )}
+          <div className={styles.formField} data-field="zip_code">
+            <label className={styles.label}>
+              ZIP Code <span className={styles.requiredIndicator}>*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter ZIP code"
+              className={`${styles.input} ${styles.inputLarge}`}
+              {...register('zip_code', { required: 'ZIP code is required' })}
+            />
+            {shouldShowError('zip_code') && getErrorMessage('zip_code') && (
+              <div className={styles.errorMessage}>
+                <AlertCircle size={16} className={styles.errorIcon} />
+                <span>{getErrorMessage('zip_code')?.message}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Hidden fields */}
