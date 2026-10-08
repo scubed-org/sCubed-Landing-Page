@@ -2398,8 +2398,13 @@ export const otpInput = style({
 // ENHANCED UTILITY STYLES
 // ============================================================================
 
+// `both` keeps elements hidden during their staggered `animationDelay`;
+// without it they render visible, then snap to opacity 0 when the animation
+// starts (visible as a flicker, most noticeably in Safari).
 export const fadeInUpAnimation = style({
-  animation: `${fadeInUp} 0.6s ease-out`,
+  animation: `${fadeInUp} 0.6s ease-out both`,
+  backfaceVisibility: 'hidden',
+  WebkitBackfaceVisibility: 'hidden',
 });
 
 export const scaleInAnimation = style({
@@ -2830,8 +2835,10 @@ export const sectionCard = style({
   borderRadius: radius.lg,
   padding: spacing.lg,
   marginBottom: spacing.lg,
-  animation: `${fadeInUp} 0.6s ease-out`,
-  transition: 'all 0.3s ease',
+  // Declared after fadeInUpAnimation, so this shorthand wins when both
+  // classes are applied — it needs the same `both` fill mode.
+  animation: `${fadeInUp} 0.6s ease-out both`,
+  transition: 'box-shadow 0.3s ease',
   ':hover': {
     boxShadow: enhancedShadows.layered,
   },
