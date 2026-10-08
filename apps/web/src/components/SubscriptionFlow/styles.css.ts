@@ -223,7 +223,11 @@ export const stepCircle = style({
   justifyContent: 'center',
   fontSize: typography.fontSize.xl,
   fontWeight: typography.fontWeight.bold,
-  transition: 'all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+  // Transform is deliberately not transitioned: swapping out the `pulse`
+  // animation on the current step while transitioning transform (with an
+  // overshooting curve) makes Safari/iOS blow the circle up before settling.
+  transition:
+    'background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease',
   zIndex: 2,
   position: 'relative',
   '@media': {
@@ -292,7 +296,7 @@ export const stepLabel = style({
   fontSize: typography.fontSize.sm,
   fontWeight: typography.fontWeight.bold,
   textAlign: 'center',
-  transition: 'all 0.3s ease',
+  transition: 'color 0.3s ease',
   '@media': {
     'screen and (max-width: 600px)': {
       fontSize: typography.fontSize.xs,
