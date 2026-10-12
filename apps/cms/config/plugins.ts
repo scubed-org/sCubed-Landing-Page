@@ -40,4 +40,11 @@ export default ({ env }) => ({
       },
     },
   },
+  documentation: {
+    config: {
+      // Relative URL so Swagger "Try it out" targets whichever host serves the docs
+      // (defaults to server.absoluteUrl, which is http://localhost:1337 when server.url is unset)
+      servers: [{ url: '/api', description: 'Current server' }],
+    },
+  },
 });
