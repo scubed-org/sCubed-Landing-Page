@@ -1,6 +1,7 @@
 export default ({ env }) => [
   'strapi::logger',
   'strapi::errors',
+  'global::docs-basic-auth',
   {
     name: 'strapi::security',
     config: {
