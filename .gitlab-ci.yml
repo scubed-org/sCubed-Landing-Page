@@ -31,6 +31,8 @@ deploy_to_ec2:
         echo 'TRANSFER_TOKEN_SALT=$TRANSFER_TOKEN_SALT' >> .env &&
         echo 'AWS_REGION=$AWS_REGION' >> .env &&
         echo 'AWS_S3_BUCKET=$AWS_S3_BUCKET' >> .env &&
+        echo 'SWAGGER_USER=$SWAGGER_USER' >> .env &&
+        echo 'SWAGGER_PASSWORD=$SWAGGER_PASSWORD' >> .env &&
         npm install &&
         pm2 restart strapi-dev || pm2 start npm --name strapi-dev -- run develop
       "
@@ -65,6 +67,8 @@ deploy_to_ec2_prod:
         echo 'TRANSFER_TOKEN_SALT=$TRANSFER_TOKEN_SALT' >> .env &&
         echo 'AWS_REGION=$AWS_REGION' >> .env &&
         echo 'AWS_S3_BUCKET=$AWS_S3_BUCKET_PROD' >> .env &&
+        echo 'SWAGGER_USER=$SWAGGER_USER_PROD' >> .env &&
+        echo 'SWAGGER_PASSWORD=$SWAGGER_PASSWORD_PROD' >> .env &&
         npm install &&
         NODE_ENV=production NODE_OPTIONS='--max-old-space-size=4096' npm run build &&
         pm2 restart strapi-prod || pm2 start npm --name strapi-prod -- run start
