@@ -108,6 +108,12 @@ const featureComparison: FeatureSection[] = [
         growth: true,
       },
       {
+        name: 'Advanced Analytics',
+        starter: false,
+        essential: false,
+        growth: true,
+      },
+      {
         name: 'Messaging (Staff & Client)',
         starter: true,
         essential: true,
