@@ -335,10 +335,18 @@ export const reviewPlatformsSection = style({
   paddingTop: 0,
   borderTop: `1px solid ${colors.neutral[200]}`,
   textAlign: 'center',
+  display: 'flex',
+  justifyContent: 'center',
+  alignItems: 'flex-start',
+  flexWrap: 'wrap',
+  columnGap: '96px',
+  rowGap: spacing.md,
   '@media': {
     'screen and (max-width: 768px)': {
       marginTop: spacing.sm,
       paddingTop: spacing.sm,
+      flexDirection: 'column',
+      alignItems: 'center',
     },
   },
 });
@@ -390,6 +398,47 @@ export const reviewPlatformLogo = style({
   '@media': {
     'screen and (max-width: 768px)': {
       height: '40px',
+    },
+  },
+});
+
+export const badgeGroup = style({
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+});
+
+export const appGroups = style({
+  display: 'flex',
+  justifyContent: 'center',
+  flexWrap: 'wrap',
+  columnGap: '96px',
+  rowGap: spacing.md,
+  '@media': {
+    'screen and (max-width: 768px)': {
+      flexDirection: 'column',
+      alignItems: 'center',
+    },
+  },
+});
+
+// Doubled selector outranks the shared StoreBadges row styles regardless of CSS load order.
+// minHeight matches reviewPlatformLink (logo + padding) so badges centre against the logos.
+export const appBadges = style({
+  selectors: {
+    '&&': {
+      gap: spacing.xs,
+      justifyContent: 'center',
+      minHeight: '61px',
+    },
+  },
+  '@media': {
+    'screen and (max-width: 768px)': {
+      selectors: {
+        '&&': {
+          minHeight: '56px',
+        },
+      },
     },
   },
 });

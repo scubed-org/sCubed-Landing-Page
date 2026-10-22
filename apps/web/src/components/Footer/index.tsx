@@ -15,8 +15,12 @@ import hipaaImage from '../../images/HIPAA.png';
 import softwareAdviceLogo from '../../images/SoftwareAdvice.png';
 import { formatPhone } from '../../utils/phoneFormatter';
 import NewsletterForm from '../NewsletterForm';
+import StoreBadges from '../StoreBadges';
 
 import {
+  appBadges,
+  appGroups,
+  badgeGroup,
   bottomSection,
   brandDescription,
   brandSection,
@@ -52,6 +56,30 @@ interface ReviewPlatform {
   logo: any;
   height: number;
 }
+
+interface MobileApp {
+  title: string;
+  name: string;
+  appStoreUrl: string;
+  googlePlayUrl: string;
+}
+
+const mobileApps: MobileApp[] = [
+  {
+    title: 'Download Staff App',
+    name: 'S Cubed Staff Portal',
+    appStoreUrl: 'https://apps.apple.com/us/app/s-cubed-staff-portal/id6670171821',
+    googlePlayUrl:
+      'https://play.google.com/store/apps/details?id=com.spectrum.solutions.scubed.admin',
+  },
+  {
+    title: 'Download Guardian App',
+    name: 'S Cubed Guardian Portal',
+    appStoreUrl: 'https://apps.apple.com/us/app/s-cubed-guardian-portal/id6670190478',
+    googlePlayUrl:
+      'https://play.google.com/store/apps/details?id=com.spectrum.solutions.scubed.guardian',
+  },
+];
 
 const reviewPlatforms: ReviewPlatform[] = [
   {
@@ -202,31 +230,49 @@ const Footer: React.FC = () => {
                 </div>
               </div>
             </div>
+
           </div>
         </div>
 
-        {/* Review Platforms Section */}
+        {/* Review Platforms + Mobile Apps Section */}
         <div className={reviewPlatformsSection}>
-          <h3 className={reviewPlatformsSectionTitle}>
-            Recognized On Top Review Platforms
-          </h3>
-          <div className={reviewPlatformsGrid}>
-            {reviewPlatforms.map((platform) => (
-              <a
-                key={platform.name}
-                href={platform.url}
-                target="_blank"
-                rel="nofollow noopener noreferrer"
-                className={reviewPlatformLink}
-                aria-label={`View ${platform.name} reviews`}
-              >
-                <Image
-                  src={platform.logo}
-                  alt={`${platform.name} logo`}
-                  height={platform.height}
-                  className={reviewPlatformLogo}
+          <div className={badgeGroup}>
+            <h3 className={reviewPlatformsSectionTitle}>
+              Recognized On Top Review Platforms
+            </h3>
+            <div className={reviewPlatformsGrid}>
+              {reviewPlatforms.map((platform) => (
+                <a
+                  key={platform.name}
+                  href={platform.url}
+                  target="_blank"
+                  rel="nofollow noopener noreferrer"
+                  className={reviewPlatformLink}
+                  aria-label={`View ${platform.name} reviews`}
+                >
+                  <Image
+                    src={platform.logo}
+                    alt={`${platform.name} logo`}
+                    height={platform.height}
+                    className={reviewPlatformLogo}
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+
+          <div className={appGroups}>
+            {mobileApps.map((app) => (
+              <div key={app.title} className={badgeGroup}>
+                <h3 className={reviewPlatformsSectionTitle}>{app.title}</h3>
+                <StoreBadges
+                  appName={app.name}
+                  appStoreUrl={app.appStoreUrl}
+                  googlePlayUrl={app.googlePlayUrl}
+                  size="small"
+                  className={appBadges}
                 />
-              </a>
+              </div>
             ))}
           </div>
         </div>
