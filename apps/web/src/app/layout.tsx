@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 
 import ConditionalLayout from '../components/ConditionalLayout';
+import MetaPixel from '../components/MetaPixel';
 import ProductReviewSchema from '../components/ProductReviewSchema';
 import { ToastProvider } from '../providers/ToastProvider';
 import '../components/Container/fonts.css';
@@ -136,6 +137,9 @@ gtag('config', 'G-SLJ6PQXV8M');
             </noscript>
           </>
         )}
+
+        {/* Meta pixel - production only, so dev and staging visits stay out of ad audiences */}
+        {isProduction && <MetaPixel />}
 
         <ConditionalLayout>
           {children}
