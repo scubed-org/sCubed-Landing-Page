@@ -10,6 +10,8 @@ import * as styles from './styles.css';
 
 import { SUCCESS_MESSAGES } from '@/constants/messages';
 import { API_ENDPOINTS } from '@/constants/api';
+import { RECAPTCHA_ACTIONS } from '@/constants/recaptcha';
+import { useRecaptchaV3 } from '@/hooks/useRecaptchaV3';
 import { fetchApi } from '@/lib/api-client';
 import { getFieldErrors, showSuccessToast } from '@/lib/errors';
 import { isApiError } from '@/types/api';
@@ -38,6 +40,7 @@ export default function Step1EmailInput({
   initialEmail,
 }: Readonly<Step1EmailProps>) {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+  const executeRecaptchaV3 = useRecaptchaV3();
 
   const {
     register,
@@ -77,12 +80,20 @@ export default function Step1EmailInput({
     setFieldErrors({});
 
     try {
+      // The admin API verifies this token before it emails a code
+      const recaptchaToken = await executeRecaptchaV3(
+        RECAPTCHA_ACTIONS.VERIFY_EMAIL,
+      );
+
       // Call the verify-email/request endpoint
       const result = await fetchApi<EmailVerificationResponse>(
         API_ENDPOINTS.SUBSCRIPTION.VERIFY_EMAIL_REQUEST,
         {
           method: 'POST',
-          body: { email: data.email },
+          body: {
+            email: data.email,
+            ...(recaptchaToken && { recaptcha_token: recaptchaToken }),
+          },
         },
       );
 
@@ -97,8 +108,13 @@ export default function Step1EmailInput({
     } catch (error) {
       // Extract field errors for inline display
       if (isApiError(error)) {
-        const extractedFieldErrors = getFieldErrors(error);
-        setFieldErrors(extractedFieldErrors);
+        const { recaptcha, ...extractedFieldErrors } = getFieldErrors(error);
+        // There is no reCAPTCHA widget here, so its error shows under the email field
+        setFieldErrors(
+          recaptcha
+            ? { ...extractedFieldErrors, email: recaptcha }
+            : extractedFieldErrors,
+        );
       }
       // General errors are automatically shown as toasts by fetchApi
     }

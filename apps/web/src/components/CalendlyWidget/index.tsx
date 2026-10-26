@@ -5,7 +5,8 @@ import { PopupModal } from 'react-calendly';
 import { useRouter } from 'next/navigation';
 
 import Button from '../Button/button';
-import { container, buttonStyle } from '../ModalForm/styles.css';
+
+import { container, buttonStyle } from './styles.css';
 
 type Props = {
   buttonColor: string;

@@ -49,7 +49,6 @@ import {
   tryForFreeLink,
 } from './styles.css';
 
-import { useFreeTrialModal } from '@/contexts/FreeTrialModalContext';
 
 interface NavigationProps {
   menuItemColor?: string;
@@ -65,7 +64,6 @@ const Navigation: React.FC<NavigationProps> = ({
   const [menuOpen, setMenuOpen] = useState<boolean>(false);
   const pathname = usePathname();
   const router = useRouter();
-  const { openModal } = useFreeTrialModal();
 
   // Get environment variables for contact information
   const rawPhone = process.env.NEXT_PUBLIC_PHONE_NUMBER;

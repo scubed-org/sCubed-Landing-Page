@@ -87,6 +87,9 @@ import { AddressAutocomplete } from '@/components/AddressAutocomplete';
 import { STATE_PLACE_TYPES } from '@/constants/places';
 import type { AddressComponents } from '@/components/AddressAutocomplete/types';
 import { SUCCESS_MESSAGES } from '@/constants/messages';
+import { RECAPTCHA_ACTIONS } from '@/constants/recaptcha';
+import { validateName, validateNoHtml } from '@/constants/validation';
+import { useRecaptchaV3 } from '@/hooks/useRecaptchaV3';
 
 interface FormData {
   name: string;
@@ -135,6 +138,7 @@ const GetStartedForm: React.FC = () => {
   const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
   const recaptchaRef = useRef<ReCaptchaRef>(null);
+  const executeRecaptchaV3 = useRecaptchaV3();
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
   const [formSessionId, setFormSessionId] = useState<string | null>(null);
 
@@ -311,9 +315,13 @@ const GetStartedForm: React.FC = () => {
         }
       }
 
-      // Step 1: Email
+      // Step 1: Email + reCAPTCHA v3 (this step creates the record that receives reminder emails)
       if (step === 1) {
         requestBody.email_id = formData.email;
+        const v3Token = await executeRecaptchaV3(
+          RECAPTCHA_ACTIONS.CONTACT_STEP1,
+        );
+        if (v3Token) requestBody.recaptcha_token = v3Token;
       }
 
       // Step 2: Name and Phone
@@ -389,6 +397,12 @@ const GetStartedForm: React.FC = () => {
           errors: [],
           status_code: response.status,
         }));
+
+        // A v2 token is single-use; the admin API has consumed it
+        if (step === 3) {
+          setRecaptchaToken(null);
+          recaptchaRef.current?.reset();
+        }
 
         // Handle specific error codes
         if (errorData.status_code === 404) {
@@ -933,6 +947,7 @@ const GetStartedForm: React.FC = () => {
                                 value: MAX_LENGTHS.name,
                                 message: `Name must not exceed ${MAX_LENGTHS.name} characters`,
                               },
+                              validate: validateName,
                             })}
                           />
                           {renderFieldError(errors.name, 'name')}
@@ -982,6 +997,7 @@ const GetStartedForm: React.FC = () => {
                                 value: MAX_LENGTHS.companyName,
                                 message: `Company name must not exceed ${MAX_LENGTHS.companyName} characters`,
                               },
+                              validate: validateNoHtml,
                             })}
                           />
                           {renderFieldError(
@@ -1026,28 +1042,12 @@ const GetStartedForm: React.FC = () => {
                                 value: MAX_LENGTHS.comments,
                                 message: `Comments must not exceed ${MAX_LENGTHS.comments} characters`,
                               },
+                              validate: validateNoHtml,
                             })}
                           />
                           {renderFieldError(errors.comments, 'comments')}
                         </div>
                       </div>
-
-                      {submitError && (
-                        <div
-                          className={errorMessage}
-                          style={{
-                            textAlign: 'center',
-                            marginTop: '20px',
-                            padding: '1rem',
-                            background: '#fef2f2',
-                            borderRadius: '0.75rem',
-                            border: '1px solid #fecaca',
-                          }}
-                        >
-                          <AlertCircle size={20} />
-                          {submitError}
-                        </div>
-                      )}
 
                       {/* reCAPTCHA */}
                       <div className="pt-4">
@@ -1056,10 +1056,28 @@ const GetStartedForm: React.FC = () => {
                           onVerify={handleRecaptchaChange}
                           onError={handleRecaptchaError}
                           onExpired={handleRecaptchaExpired}
-                          error={recaptchaError}
+                          error={recaptchaError || apiFieldErrors.recaptcha}
                         />
                       </div>                     
                     </>
+                  )}
+
+                  {submitError && (
+                    <div
+                      className={errorMessage}
+                      style={{
+                        textAlign: 'center',
+                        marginTop: '20px',
+                        padding: '1rem',
+                        background: '#fef2f2',
+                        borderRadius: '0.75rem',
+                        border: '1px solid #fecaca',
+                      }}
+                    >
+                      <AlertCircle size={20} />
+                      {/* Steps 1-2 have no reCAPTCHA widget to show its error under */}
+                      {(currentStep !== 3 && apiFieldErrors.recaptcha) || submitError}
+                    </div>
                   )}
 
   <p id="submit-help" className={bottomHelperText}>

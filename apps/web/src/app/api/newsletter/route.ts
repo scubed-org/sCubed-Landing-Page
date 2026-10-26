@@ -3,6 +3,9 @@ import crypto from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import mailchimp from '@mailchimp/mailchimp_marketing';
 
+import { RECAPTCHA_ACTIONS } from '@/constants/recaptcha';
+import { requireRecaptchaV3 } from '@/lib/recaptcha';
+
 interface NewsletterFormData {
   email: string;
   recaptcha_token?: string;
@@ -21,46 +24,6 @@ interface ApiErrorResponse {
 interface ApiSuccessResponse {
   success: boolean;
   message: string;
-}
-
-async function verifyRecaptcha(token: string): Promise<boolean> {
-  // Use V3 secret key for newsletter (invisible reCAPTCHA)
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY_V3;
-  
-  if (!secretKey) {
-    console.error('RECAPTCHA_SECRET_KEY_V3 environment variable is not set');
-    return false;
-  }
-
-  if (!token || token.trim() === '') {
-    console.error('reCAPTCHA token is empty or null');
-    return false;
-  }
-
-  try {
-    const params = new URLSearchParams();
-    params.append('secret', secretKey);
-    params.append('response', token);
-    
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
-    });
-
-    const data = await response.json();
-    
-    if (!data.success && data['error-codes']) {
-      console.error('reCAPTCHA API Error Codes:', data['error-codes']);
-    }
-    
-    return data.success === true;
-  } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
-    return false;
-  }
 }
 
 function initializeMailchimp() {
@@ -104,26 +67,11 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!body.recaptcha_token) {
-      return NextResponse.json<ApiErrorResponse>(
-        {
-          errors: [{ field: 'recaptcha', message: 'Please complete the reCAPTCHA verification' }],
-          status_code: 400,
-        },
-        { status: 400 }
-      );
-    }
-
-    const isRecaptchaValid = await verifyRecaptcha(body.recaptcha_token);
-    if (!isRecaptchaValid) {
-      return NextResponse.json<ApiErrorResponse>(
-        {
-          errors: [{ field: 'recaptcha', message: 'reCAPTCHA verification failed. Please try again.' }],
-          status_code: 400,
-        },
-        { status: 400 }
-      );
-    }
+    const recaptchaError = await requireRecaptchaV3(
+      body.recaptcha_token,
+      RECAPTCHA_ACTIONS.NEWSLETTER,
+    );
+    if (recaptchaError) return recaptchaError;
 
     const listId = process.env.MAILCHIMP_LIST_ID;
     
