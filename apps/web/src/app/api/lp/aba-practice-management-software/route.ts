@@ -3,6 +3,8 @@ import { join } from 'node:path';
 
 import { NextRequest } from 'next/server';
 
+import { isRecaptchaDisabled } from '@/lib/recaptcha';
+
 export async function GET(request: NextRequest) {
   try {
     // Read the HTML file from the public directory
@@ -11,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     // Get reCAPTCHA site key from environment variables
     const recaptchaSiteKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY_V3;
-    const disableRecaptcha = process.env.DISABLE_RECAPTCHA === 'true';
+    const disableRecaptcha = isRecaptchaDisabled();
 
     // Fix relative image paths to point to /lp/images/
     htmlContent = htmlContent.replace(/src="\.\/images\//g, 'src="/lp/images/');

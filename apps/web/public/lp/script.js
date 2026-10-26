@@ -321,11 +321,12 @@ document.addEventListener('DOMContentLoaded', () => {
       setLoading(submitBtn, emailInput, true);
 
       // Execute reCAPTCHA if available and properly configured (matching React component approach)
-      if (window.grecaptcha && window.RECAPTCHA_SITE_KEY) {
+      var newsletterV3Key = window.RECAPTCHA_SITE_KEY_V3 || window.RECAPTCHA_SITE_KEY;
+      if (window.grecaptcha && newsletterV3Key) {
         try {
           window.grecaptcha.ready(function() {
-            // Use the same approach as React component - direct execute with site key and action
-            window.grecaptcha.execute(window.RECAPTCHA_SITE_KEY, {action: 'newsletter'}).then(function(token) {
+            // v3 execute needs the v3 key; the practice page also holds a v2 key in RECAPTCHA_SITE_KEY
+            window.grecaptcha.execute(newsletterV3Key, {action: 'newsletter'}).then(function(token) {
               if (token) {
                 submitToAPI(email, token, submitBtn, emailInput, successBox, errorBox, successMsgEl, errorMsgEl);
               } else {
@@ -485,6 +486,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return regex.test(email);
   }
 
+  // Mirrors src/constants/validation.ts; the admin API rejects < and > too
+  var NAME_PATTERN = /^[\p{L}\p{M}][\p{L}\p{M} .'\u2019-]*$/u;
+  var NO_HTML_PATTERN = /^[^<>]*$/;
+  var NAME_ERROR_MESSAGE = 'Name can only contain letters, spaces, apostrophes, hyphens and periods.';
+  var NO_HTML_ERROR_MESSAGE = 'This field cannot contain < or > characters.';
+
   // Phone validation
   function isValidPhone(phone) {
     // Clean the phone number and check if it has exactly 10 digits
@@ -578,6 +585,9 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (name.length > 255) {
         showError('name', 'Name must not exceed 255 characters');
         isValid = false;
+      } else if (!NAME_PATTERN.test(name)) {
+        showError('name', NAME_ERROR_MESSAGE);
+        isValid = false;
       }
 
       if (!phone) {
@@ -602,10 +612,16 @@ document.addEventListener('DOMContentLoaded', () => {
       if (companyName && companyName.length > 255) {
         showError('companyName', 'Company name must not exceed 255 characters');
         isValid = false;
+      } else if (!NO_HTML_PATTERN.test(companyName)) {
+        showError('companyName', NO_HTML_ERROR_MESSAGE);
+        isValid = false;
       }
 
       if (comments && comments.length > 1000) {
         showError('comments', 'Comments must not exceed 1000 characters');
+        isValid = false;
+      } else if (!NO_HTML_PATTERN.test(comments)) {
+        showError('comments', NO_HTML_ERROR_MESSAGE);
         isValid = false;
       }
 
@@ -799,6 +815,8 @@ document.addEventListener('DOMContentLoaded', () => {
           } else if (data.status_code === 409) {
             showError('email', 'This form has already been completed.');
           } else if (data.errors && data.errors.length > 0) {
+            // The recaptcha error box sits in step 3; earlier steps show general errors on their first field
+            var generalField = body.step === 3 ? 'recaptcha' : (body.step === 2 ? 'name' : 'email');
             var fieldMap = {
               email_id: 'email',
               first_name: 'name',
@@ -807,8 +825,8 @@ document.addEventListener('DOMContentLoaded', () => {
               company_name: 'companyName',
               state: 'state',
               comments: 'comments',
-              recaptcha: 'recaptcha',
-              recaptcha_token: 'recaptcha'
+              recaptcha: generalField,
+              recaptcha_token: generalField
             };
 
             data.errors.forEach(function(error) {
@@ -816,12 +834,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 var formFieldName = fieldMap[error.field] || error.field;
                 showError(formFieldName, error.message);
               } else if (error.message) {
-                showError('recaptcha', error.message);
+                showError(generalField, error.message);
               }
             });
           } else {
-            showError('recaptcha', 'Something went wrong. Please try again.');
+            showError(body.step === 3 ? 'recaptcha' : 'email', 'Something went wrong. Please try again.');
           }
+
+          // A v2 token is single-use; the admin API has consumed it
+          if (body.step === 3) resetContactRecaptcha();
 
           cb(false);
         }
@@ -847,8 +868,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (submitBtn) submitBtn.classList.add('contact-loading');
 
+    // Step 1 creates the record that receives reminder emails, so it carries a v3 token
+    if (step === 1) {
+      getContactStep1Token(function(token) {
+        if (token) requestBody.recaptcha_token = token;
+        submitToContactAPI(requestBody, callback, btns);
+      });
+      return;
+    }
+
     // Use the helper function for API submission
     submitToContactAPI(requestBody, callback, btns);
+  }
+
+  // Resolves null when v3 is not configured or fails; the admin API then rejects the step
+  function getContactStep1Token(cb) {
+    var v3Key = window.RECAPTCHA_SITE_KEY_V3;
+    if (!window.grecaptcha || !v3Key) {
+      cb(null);
+      return;
+    }
+    try {
+      window.grecaptcha.ready(function() {
+        window.grecaptcha.execute(v3Key, {action: 'contact_step1'}).then(cb, function() {
+          cb(null);
+        });
+      });
+    } catch (error) {
+      cb(null);
+    }
+  }
+
+  function resetContactRecaptcha() {
+    recaptchaToken = null;
+    if (window.grecaptcha && window.contactFormRecaptchaWidgetId !== undefined) {
+      try {
+        window.grecaptcha.reset(window.contactFormRecaptchaWidgetId);
+      } catch (error) {
+        // Widget not rendered
+      }
+    }
   }
 
   // Next button handler

@@ -1,11 +1,9 @@
 'use client';
 
 import { AlertCircle, CheckCircle } from 'lucide-react';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import isEmail from 'validator/lib/isEmail';
-
-import ReCaptcha, { ReCaptchaRef } from '../ReCaptcha';
 
 import {
   container,
@@ -21,6 +19,9 @@ import {
   successMessage,
 } from './styles.css';
 
+import { RECAPTCHA_ACTIONS } from '@/constants/recaptcha';
+import { useRecaptchaV3 } from '@/hooks/useRecaptchaV3';
+
 interface FormData {
   email: string;
 }
@@ -35,8 +36,7 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ className }) => {
   const [submitMessage, setSubmitMessage] = useState('');
   const [apiError, setApiError] = useState<string | null>(null);
   const [recaptchaError, setRecaptchaError] = useState<string | null>(null);
-  const [pendingFormData, setPendingFormData] = useState<FormData | null>(null);
-  const recaptchaRef = useRef<ReCaptchaRef>(null);
+  const executeRecaptchaV3 = useRecaptchaV3();
 
   const {
     register,
@@ -45,7 +45,7 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ className }) => {
     reset,
   } = useForm<FormData>();
 
-  const submitToAPI = async (email: string, token: string) => {
+  const submitToAPI = async (email: string, token: string | null) => {
     try {
       const response = await fetch('/api/newsletter', {
         method: 'POST',
@@ -64,9 +64,7 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ className }) => {
         setSubmitSuccess(true);
         setSubmitMessage(result.message || 'Thank you for subscribing to our newsletter!');
         reset();
-        recaptchaRef.current?.reset();
-        setPendingFormData(null);
-        
+
         setTimeout(() => {
           setSubmitSuccess(false);
           setSubmitMessage('');
@@ -82,14 +80,10 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ className }) => {
         } else {
           setApiError('Failed to subscribe. Please try again later.');
         }
-        recaptchaRef.current?.reset();
-        setPendingFormData(null);
       }
     } catch (error) {
       console.error('Newsletter submission error:', error);
       setApiError('Network error. Please check your connection and try again.');
-      recaptchaRef.current?.reset();
-      setPendingFormData(null);
     } finally {
       setIsSubmitting(false);
     }
@@ -99,33 +93,10 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ className }) => {
     setIsSubmitting(true);
     setApiError(null);
     setRecaptchaError(null);
-    setPendingFormData(data);
 
-    // Execute invisible reCAPTCHA
-    recaptchaRef.current?.execute();
-  };
-
-  const handleRecaptchaVerify = useCallback((token: string | null) => {
-    if (token && pendingFormData) {
-      // reCAPTCHA verified, now submit the form
-      submitToAPI(pendingFormData.email, token);
-    } else if (!token) {
-      setRecaptchaError('reCAPTCHA verification failed. Please try again.');
-      setIsSubmitting(false);
-      setPendingFormData(null);
-    }
-  }, [pendingFormData]);
-
-  const handleRecaptchaError = () => {
-    setRecaptchaError('reCAPTCHA error. Please try again.');
-    setIsSubmitting(false);
-    setPendingFormData(null);
-  };
-
-  const handleRecaptchaExpired = () => {
-    setRecaptchaError('reCAPTCHA expired. Please try again.');
-    setIsSubmitting(false);
-    setPendingFormData(null);
+    // A null token is still sent; /api/newsletter rejects it with a reCAPTCHA error
+    const token = await executeRecaptchaV3(RECAPTCHA_ACTIONS.NEWSLETTER);
+    await submitToAPI(data.email, token);
   };
 
   return (
@@ -162,15 +133,6 @@ const NewsletterForm: React.FC<NewsletterFormProps> = ({ className }) => {
               'Subscribe'
             )}
           </button>
-
-          <ReCaptcha
-            ref={recaptchaRef}
-            size="invisible"
-            siteKey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY_V3}
-            onVerify={handleRecaptchaVerify}
-            onError={handleRecaptchaError}
-            onExpired={handleRecaptchaExpired}
-          />
         </form>
         
         {submitSuccess && (

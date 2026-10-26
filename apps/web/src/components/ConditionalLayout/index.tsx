@@ -5,8 +5,6 @@ import { ReactNode } from 'react';
 
 import Layout from '../Layout';
 
-import { FreeTrialModalProvider } from '@/contexts/FreeTrialModalContext';
-
 interface ConditionalLayoutProps {
   children: ReactNode;
 }
@@ -54,13 +52,9 @@ export default function ConditionalLayout({
     pathname === '/aba-authorization-software' ||
     pathname === '/subscribe';
 
-  return (
-    <FreeTrialModalProvider>
-      {shouldUseLayout ? (
-        <Layout fullWidth={shouldUseFullWidth}>{children}</Layout>
-      ) : (
-        <>{children}</>
-      )}
-    </FreeTrialModalProvider>
+  return shouldUseLayout ? (
+    <Layout fullWidth={shouldUseFullWidth}>{children}</Layout>
+  ) : (
+    <>{children}</>
   );
 }

@@ -24,6 +24,8 @@ import {
   requiredMark
 } from './styles.css';
 
+import { validateName, validateNoHtml } from '@/constants/validation';
+
 interface FormData {
   fullName: string;
   email: string;
@@ -161,6 +163,10 @@ const BlogContactForm: React.FC = () => {
           status_code: response.status,
         }));
 
+        // A v2 token is single-use; the admin API has consumed it
+        setRecaptchaToken(null);
+        recaptchaRef.current?.reset();
+
         if (
           errorData.errors &&
           Array.isArray(errorData.errors) &&
@@ -171,8 +177,6 @@ const BlogContactForm: React.FC = () => {
           errorData.errors.forEach((error: ApiError) => {
             if (error.field === 'recaptcha') {
               setRecaptchaError(error.message);
-              setRecaptchaToken(null);
-              recaptchaRef.current?.reset();
             } else {
               const formFieldName = mapApiFieldToFormField(error.field);
               fieldErrors[formFieldName] = error.message;
@@ -293,6 +297,7 @@ const BlogContactForm: React.FC = () => {
                   value: MAX_LENGTHS.fullName,
                   message: `Name must not exceed ${MAX_LENGTHS.fullName} characters`,
                 },
+                validate: validateName,
               })}
             />
             {renderFieldError(errors.fullName, 'fullName')}
@@ -348,6 +353,7 @@ const BlogContactForm: React.FC = () => {
                   value: MAX_LENGTHS.companyName,
                   message: `Company name must not exceed ${MAX_LENGTHS.companyName} characters`,
                 },
+                validate: validateNoHtml,
               })}
             />
             {renderFieldError(errors.companyName, 'companyName')}
@@ -377,6 +383,7 @@ const BlogContactForm: React.FC = () => {
                 value: MAX_LENGTHS.message,
                 message: `Message must not exceed ${MAX_LENGTHS.message} characters`,
               },
+              validate: validateNoHtml,
             })}
           />
           {renderFieldError(errors.message, 'message')}

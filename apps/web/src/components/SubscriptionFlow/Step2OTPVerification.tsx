@@ -14,6 +14,8 @@ import OTPCodeInput from './OTPCodeInput';
 import * as styles from './styles.css';
 
 import { API_ENDPOINTS } from '@/constants/api';
+import { RECAPTCHA_ACTIONS } from '@/constants/recaptcha';
+import { useRecaptchaV3 } from '@/hooks/useRecaptchaV3';
 import { fetchApi } from '@/lib/api-client';
 import { fetchOnboardingApi } from '@/lib/onboarding-api-client';
 import { showSuccessToast } from '@/lib/errors';
@@ -38,6 +40,7 @@ export default function Step2OTPVerification({
   const [resendingOtp, setResendingOtp] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
   const [resendSuccess, setResendSuccess] = useState(false);
+  const executeRecaptchaV3 = useRecaptchaV3();
   const [resendCooldown, setResendCooldown] = useState(0);
   const [otpValue, setOtpValue] = useState('');
   const cooldownInterval = useRef<NodeJS.Timeout | null>(null);
@@ -86,12 +89,20 @@ export default function Step2OTPVerification({
     setResendSuccess(false);
 
     try {
+      // The admin API verifies this token before it emails a new code
+      const recaptchaToken = await executeRecaptchaV3(
+        RECAPTCHA_ACTIONS.VERIFY_EMAIL_RESEND,
+      );
+
       // Resend OTP via new API endpoint
       await fetchApi<{ clinic_onboarding_request_id: number; message: string }>(
         API_ENDPOINTS.SUBSCRIPTION.VERIFY_EMAIL_RESEND,
         {
           method: 'POST',
-          body: { clinic_onboarding_request_id },
+          body: {
+            clinic_onboarding_request_id,
+            ...(recaptchaToken && { recaptcha_token: recaptchaToken }),
+          },
         },
       );
 

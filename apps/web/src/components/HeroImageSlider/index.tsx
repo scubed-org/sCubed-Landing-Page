@@ -45,7 +45,6 @@ import {
   heroSliderBackgroundWrapper,
 } from './styles.css';
 
-import { useFreeTrialModal } from '@/contexts/FreeTrialModalContext';
 import { formatEventDate } from '@/lib/events-api';
 
 
@@ -138,7 +137,6 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
   const [touchStart, setTouchStart] = useState<number | null>(null);
   const [touchEnd, setTouchEnd] = useState<number | null>(null);
   const [isDragging, setIsDragging] = useState(false);
-  const { openModal } = useFreeTrialModal();
 
   // Calendly scheduling popup (mirrors the BillingHero CalendlyButton behavior)
   const [isCalendlyOpen, setIsCalendlyOpen] = useState(false);
@@ -684,13 +682,6 @@ const HeroImageSlider: React.FC<HeroImageSliderProps> = ({
                         {currentLinkText}
                         <ExternalLink size={20} />
                       </a>
-                    ) : currentItem.link.href === '/get-started' ? (
-                      <button
-                        onClick={openModal}
-                        className={heroSliderButton}
-                      >
-                        {currentLinkText}
-                      </button>
                     ) : (
                       <Link href={currentItem.link.href} className={heroSliderButton}>
                         {currentLinkText}

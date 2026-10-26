@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { fetchApi } from '@/lib/api-client';
 import { isApiError } from '@/types/api';
 
-interface ContactFormStepData {
+type ContactFormStepData = {
   step: 1 | 2 | 3;
   form_session_id?: string;
 
@@ -25,9 +25,9 @@ interface ContactFormStepData {
   other_software_experience?: boolean;
   software_name?: string;
 
-  // reCAPTCHA (only for step 3)
+  // reCAPTCHA: v3 on step 1, v2 checkbox on step 3; verified by the admin API
   recaptcha_token?: string;
-}
+};
 
 interface ApiError {
   field?: string;
@@ -48,47 +48,6 @@ interface StepSuccessResponse {
     next_step: number | null;
     completion_status: 'incomplete' | 'completed';
   };
-}
-
-// Function to verify reCAPTCHA token
-async function verifyRecaptcha(token: string): Promise<boolean> {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-  
-  if (!secretKey) {
-    console.error('RECAPTCHA_SECRET_KEY environment variable is not set');
-    return false;
-  }
-
-  if (!token || token.trim() === '') {
-    console.error('reCAPTCHA token is empty or null');
-    return false;
-  }
-
-  try {
-    // Use URLSearchParams for proper encoding
-    const params = new URLSearchParams();
-    params.append('secret', secretKey);
-    params.append('response', token);
-    
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
-    });
-
-    const data = await response.json();
-    
-    if (!data.success && data['error-codes']) {
-      console.error('reCAPTCHA API Error Codes:', data['error-codes']);
-    }
-    
-    return data.success === true;
-  } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
-    return false;
-  }
 }
 
 export async function POST(request: NextRequest) {
@@ -152,7 +111,7 @@ export async function POST(request: NextRequest) {
         );
       }
     } else if (body.step === 3) {
-      // Step 3: Session ID and reCAPTCHA validation
+      // Step 3: Session ID validation
       if (!body.form_session_id) {
         return NextResponse.json(
           {
@@ -163,27 +122,6 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      // Verify reCAPTCHA token
-      if (!body.recaptcha_token) {
-        return NextResponse.json(
-          {
-            errors: [{ message: 'Please complete the reCAPTCHA verification' }],
-            status_code: 422,
-          },
-          { status: 422 }
-        );
-      }
-
-      const isRecaptchaValid = await verifyRecaptcha(body.recaptcha_token);
-      if (!isRecaptchaValid) {
-        return NextResponse.json(
-          {
-            errors: [{ message: 'reCAPTCHA verification failed. Please try again.' }],
-            status_code: 422,
-          },
-          { status: 422 }
-        );
-      }
     }
 
     // Get the admin API URL from environment variables
@@ -200,15 +138,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Remove recaptcha_token before forwarding to admin API
-    const { recaptcha_token, ...bodyForApi } = body;
 
     try {
       // Forward the request to the admin API using the new endpoint
-      const data = await fetchApi<StepSuccessResponse>('pages/contact-us/submit-step', {
-        method: 'POST',
-        body: bodyForApi,
-      });
+      const data = await fetchApi<StepSuccessResponse>(
+        'pages/contact-us/submit-step',
+        {
+          method: 'POST',
+          body,
+        },
+      );
 
       return NextResponse.json(data, { status: 200 });
     } catch (error) {
