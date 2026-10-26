@@ -25,47 +25,6 @@ interface ApiErrorResponse {
   status_code: number;
 }
 
-// Function to verify reCAPTCHA token
-async function verifyRecaptcha(token: string): Promise<boolean> {
-  const secretKey = process.env.RECAPTCHA_SECRET_KEY;
-  
-  if (!secretKey) {
-    console.error('RECAPTCHA_SECRET_KEY environment variable is not set');
-    return false;
-  }
-
-  if (!token || token.trim() === '') {
-    console.error('reCAPTCHA token is empty or null');
-    return false;
-  }
-
-  try {
-    // Use URLSearchParams for proper encoding
-    const params = new URLSearchParams();
-    params.append('secret', secretKey);
-    params.append('response', token);
-    
-    const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: params.toString(),
-    });
-
-    const data = await response.json();
-    
-    if (!data.success && data['error-codes']) {
-      console.error('reCAPTCHA API Error Codes:', data['error-codes']);
-    }
-    
-    return data.success === true;
-  } catch (error) {
-    console.error('reCAPTCHA verification error:', error);
-    return false;
-  }
-}
-
 export async function POST(request: NextRequest) {
   try {
     // Parse the request body
@@ -85,27 +44,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify reCAPTCHA token
-    if (!body.recaptcha_token) {
-      return NextResponse.json(
-        {
-          errors: [{ field: 'recaptcha', message: 'Please complete the reCAPTCHA verification' }],
-          status_code: 400,
-        },
-        { status: 400 }
-      );
-    }
-
-    const isRecaptchaValid = await verifyRecaptcha(body.recaptcha_token);
-    if (!isRecaptchaValid) {
-      return NextResponse.json(
-        {
-          errors: [{ field: 'recaptcha', message: 'reCAPTCHA verification failed. Please try again.' }],
-          status_code: 400,
-        },
-        { status: 400 }
-      );
-    }
 
     // Email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -133,8 +71,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Remove recaptcha_token before forwarding to admin API
-    const { recaptcha_token, ...bodyForApi } = body;
 
     // Forward the request to the admin API
     const response = await fetch(`${adminApiUrl}pages/contact-us`, {
@@ -143,7 +79,7 @@ export async function POST(request: NextRequest) {
         'Content-Type': 'application/json',
         // Add any additional headers if needed
       },
-      body: JSON.stringify(bodyForApi),
+      body: JSON.stringify(body),
     });
 
     if (response.ok) {

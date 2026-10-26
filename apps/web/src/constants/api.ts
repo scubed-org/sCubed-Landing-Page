@@ -23,7 +23,6 @@ export const API_ENDPOINTS = {
   PUBLIC: {
     CONTACT: '/api/contact',
     NEWSLETTER: '/api/newsletter',
-    FREE_TRIAL: '/api/free-trial',
     LP_ABA: '/api/lp/aba-practice-management-software',
   },
 

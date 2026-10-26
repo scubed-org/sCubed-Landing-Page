@@ -5,8 +5,6 @@ import { ReactNode } from 'react';
 
 import Layout from '../Layout';
 
-import { FreeTrialModalProvider } from '@/contexts/FreeTrialModalContext';
-
 interface ConditionalLayoutProps {
   children: ReactNode;
 }
@@ -56,13 +54,9 @@ export default function ConditionalLayout({
     pathname === '/subscribe' ||
     pathname === '/start';
 
-  return (
-    <FreeTrialModalProvider>
-      {shouldUseLayout ? (
-        <Layout fullWidth={shouldUseFullWidth}>{children}</Layout>
-      ) : (
-        <>{children}</>
-      )}
-    </FreeTrialModalProvider>
+  return shouldUseLayout ? (
+    <Layout fullWidth={shouldUseFullWidth}>{children}</Layout>
+  ) : (
+    <>{children}</>
   );
 }

@@ -30,7 +30,7 @@ interface InfiniteSelectDropdownProps {
   searchable?: boolean;
   className?: string;
   error?: boolean;
-  /** Size variant: 'default' (56px) or 'compact' (42px for FreeTrialModal) */
+  /** Size variant: 'default' (56px) or 'compact' (42px) */
   size?: 'default' | 'compact';
 }
 

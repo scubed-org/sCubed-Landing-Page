@@ -38,6 +38,7 @@ import type {
   Step1FormData,
   Step3Props,
 } from '@/types/subscription';
+import { validateName, validateNoHtml } from '@/constants/validation';
 import { useStates } from '@/hooks/useStates';
 import { formatPhone } from '@/utils/phoneFormatter';
 
@@ -587,6 +588,7 @@ function Step3ClinicDetailsComponent({
             required: 'Clinic name is required',
             minLength: { value: 2, message: 'Minimum 2 characters' },
             maxLength: { value: 200, message: 'Maximum 200 characters' },
+            validate: validateNoHtml,
           })}
           error={
             shouldShowError('clinic_name')
@@ -766,7 +768,10 @@ function Step3ClinicDetailsComponent({
                 type="text"
                 placeholder="Enter city"
                 className={`${styles.input} ${styles.inputLarge}`}
-                {...register('city', { required: 'City is required' })}
+                {...register('city', {
+                  required: 'City is required',
+                  validate: validateNoHtml,
+                })}
               />
             ) : (
               <>
@@ -855,6 +860,7 @@ function Step3ClinicDetailsComponent({
               required: 'First name is required',
               minLength: { value: 2, message: 'Minimum 2 characters' },
               maxLength: { value: 100, message: 'Maximum 100 characters' },
+              validate: validateName,
             })}
             error={
               shouldShowError('first_name')
@@ -871,6 +877,7 @@ function Step3ClinicDetailsComponent({
               required: 'Last name is required',
               minLength: { value: 2, message: 'Minimum 2 characters' },
               maxLength: { value: 100, message: 'Maximum 100 characters' },
+              validate: validateName,
             })}
             error={
               shouldShowError('last_name')
