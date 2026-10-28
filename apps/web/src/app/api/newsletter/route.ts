@@ -5,6 +5,7 @@ import mailchimp from '@mailchimp/mailchimp_marketing';
 
 import { RECAPTCHA_ACTIONS } from '@/constants/recaptcha';
 import { requireRecaptchaV3 } from '@/lib/recaptcha';
+import { invalidBodyResponse, readJsonBody } from '@/lib/route-errors';
 
 interface NewsletterFormData {
   email: string;
@@ -44,7 +45,8 @@ function initializeMailchimp() {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: NewsletterFormData = await request.json();
+    const body = await readJsonBody<NewsletterFormData>(request);
+    if (!body) return invalidBodyResponse();
 
     if (!body.email) {
       return NextResponse.json<ApiErrorResponse>(

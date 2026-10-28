@@ -189,7 +189,11 @@ async function handleErrorResponse(
 
   // Show error toast ONLY for non-field errors (unless skipped)
   // Field errors should be handled inline by the component
-  if (!skipErrorToast && !skipErrorStatuses.includes(response.status)) {
+  if (
+    canShowToast() &&
+    !skipErrorToast &&
+    !skipErrorStatuses.includes(response.status)
+  ) {
     // Check if all errors have field properties (field validation errors)
     const hasOnlyFieldErrors = apiError.errors.every((err) => err.field);
 
@@ -227,6 +231,11 @@ async function handleErrorResponse(
   throw apiError;
 }
 
+// Toasts only exist in the browser; API routes reuse fetchApi on the server.
+function canShowToast(): boolean {
+  return typeof window !== 'undefined';
+}
+
 /**
  * Handle network errors (connection issues, timeouts, etc.)
  */
@@ -242,7 +251,7 @@ async function handleNetworkError(
   );
 
   // Show network error toast
-  if (!skipErrorToast) {
+  if (canShowToast() && !skipErrorToast) {
     await showErrorToast(apiError);
   }
 

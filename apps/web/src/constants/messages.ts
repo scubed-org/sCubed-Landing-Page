@@ -36,6 +36,8 @@ export const ERROR_MESSAGES = {
   ONBOARDING_SERVICE_UNAVAILABLE:
     'We could not reach the signup service. Please try again in a moment.',
   INVALID_REQUEST_BODY: 'Invalid JSON in request body.',
+  BLOCKED_CONTENT:
+    'This entry contains content that cannot be submitted. Please remove it and try again.',
   INVALID_ONBOARDING_REQUEST: 'Invalid onboarding request.',
   INVALID_CREDENTIALS: 'Invalid email or password.',
 
