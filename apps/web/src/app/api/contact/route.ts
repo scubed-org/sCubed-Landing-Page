@@ -1,6 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 import { fetchApi } from '@/lib/api-client';
+import {
+  blockedContentResponse,
+  invalidBodyResponse,
+  isFirewallBlock,
+  readJsonBody,
+} from '@/lib/route-errors';
 import { isApiError } from '@/types/api';
 
 type ContactFormStepData = {
@@ -53,7 +59,8 @@ interface StepSuccessResponse {
 export async function POST(request: NextRequest) {
   try {
     // Parse the request body
-    const body: ContactFormStepData = await request.json();
+    const body = await readJsonBody<ContactFormStepData>(request);
+    if (!body) return invalidBodyResponse();
 
     // Validate step parameter
     if (!body.step || ![1, 2, 3].includes(body.step)) {
@@ -153,12 +160,23 @@ export async function POST(request: NextRequest) {
     } catch (error) {
       // Handle API errors
       if (isApiError(error)) {
+        if (
+          isFirewallBlock(
+            error.statusCode,
+            error.response?.headers.get('content-type'),
+          )
+        ) {
+          return blockedContentResponse();
+        }
+
+        // A network failure has no status of its own
+        const status = error.statusCode || 502;
         return NextResponse.json(
           {
             errors: error.errors,
-            status_code: error.statusCode,
+            status_code: status,
           },
-          { status: error.statusCode }
+          { status }
         );
       }
 

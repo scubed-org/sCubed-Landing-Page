@@ -42,7 +42,7 @@ const MAX_LENGTHS = {
 };
 
 interface ApiError {
-  field: string;
+  field?: string;
   message: string;
 }
 
@@ -174,16 +174,22 @@ const BlogContactForm: React.FC = () => {
         ) {
           // Handle field-specific errors
           const fieldErrors: Record<string, string> = {};
+          // Errors without a form field (e.g. blocked content) have no input to show under
+          let generalError: string | null = null;
           errorData.errors.forEach((error: ApiError) => {
             if (error.field === 'recaptcha') {
               setRecaptchaError(error.message);
+            } else if (!error.field || error.field === 'general') {
+              generalError ??= error.message;
             } else {
               const formFieldName = mapApiFieldToFormField(error.field);
               fieldErrors[formFieldName] = error.message;
             }
           });
           setApiFieldErrors(fieldErrors);
-          setSubmitError('Please correct the errors below and try again.');
+          setSubmitError(
+            generalError ?? 'Please correct the errors below and try again.',
+          );
         } else {
           throw new Error(
             errorData.errors?.[0]?.message ||

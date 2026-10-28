@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import { invalidBodyResponse, readJsonBody } from '@/lib/route-errors';
 import {
   ADDRESS_PLACE_TYPES,
   SUPPORTED_ADDRESS_REGION_CODES,
@@ -46,7 +47,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const body: AutocompleteRequest = await request.json();
+    const body = await readJsonBody<AutocompleteRequest>(request);
+    if (!body) return invalidBodyResponse();
 
     if (!body.input || body.input.length < 3) {
       return NextResponse.json({ suggestions: [] }, { status: 200 });
