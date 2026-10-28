@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+import {
+  blockedContentResponse,
+  invalidBodyResponse,
+  isFirewallBlock,
+  readJsonBody,
+} from '@/lib/route-errors';
+
 interface ContactFormData {
   first_name: string;
   last_name: string;
@@ -28,7 +35,8 @@ interface ApiErrorResponse {
 export async function POST(request: NextRequest) {
   try {
     // Parse the request body
-    const body: ContactFormData = await request.json();
+    const body = await readJsonBody<ContactFormData>(request);
+    if (!body) return invalidBodyResponse();
 
     // Basic server-side validation
     if (!body.first_name || !body.email_id) {
@@ -86,6 +94,10 @@ export async function POST(request: NextRequest) {
       const data = await response.json();
       return NextResponse.json(data, { status: 200 });
     } else {
+      if (isFirewallBlock(response.status, response.headers.get('content-type'))) {
+        return blockedContentResponse();
+      }
+
       // Handle API errors
       let errorData: ApiErrorResponse;
       try {
