@@ -37,7 +37,8 @@ export default function ConditionalLayout({
     pathname === '/aba-authorization-software' ||
     pathname === '/subscribe' ||
     pathname.startsWith('/subscribe/') ||
-    pathname === '/telehealth-platform';
+    pathname === '/telehealth-platform' ||
+    pathname === '/start';
 
   // Determine if the page should use full width layout
   const shouldUseFullWidth =
@@ -52,7 +53,8 @@ export default function ConditionalLayout({
     pathname === '/events' ||
     pathname === '/scheduling-and-appointments' ||
     pathname === '/aba-authorization-software' ||
-    pathname === '/subscribe';
+    pathname === '/subscribe' ||
+    pathname === '/start';
 
   return (
     <FreeTrialModalProvider>
