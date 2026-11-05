@@ -103,7 +103,7 @@ const featureComparison: FeatureSection[] = [
       },
       {
         name: 'Smart Dashboard (Advanced, Customizable)',
-        starter: true,
+        starter: false,
         essential: true,
         growth: true,
       },
