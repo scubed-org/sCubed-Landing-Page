@@ -180,6 +180,9 @@ const Footer: React.FC = () => {
                 <Link href="/billing" className={footerLink}>
                   Billing
                 </Link>
+                <Link href="/clinical-compass" className={footerLink}>
+                  The Clinical Compass
+                </Link>
                 <Link href="/aba-practice-management-software" className={footerLink}>
                 Practice Management
                 </Link>
