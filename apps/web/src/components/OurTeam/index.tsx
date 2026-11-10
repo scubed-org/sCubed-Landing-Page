@@ -15,10 +15,9 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useRef, useState, useCallback, useEffect } from 'react';
 
-import lizImg from '../../images/Liz.jpg';
-import maryImg from '../../images/Mary.jpg';
+import jaceImg from '../../images/Jace.jpg';
 import stephanieImg from '../../images/Stephanie.jpg';
-import taylorImg from '../../images/Taylor.jpg';
+import uroosaImg from '../../images/Uroosa.jpg';
 
 import * as styles from './styles.css';
 
@@ -136,22 +135,16 @@ const OurTeam = () => {
       bio: "Stephanie is a dedicated leader and Board Certified Behavior Analyst (BCBA) with a passion for building innovative and compassionate services for individuals and families. With a Master's degree in Education and extensive experience in applied behavior analysis, she has spent her career driving meaningful change in the field. As CEO and President, Stephanie combines clinical expertise with visionary leadership, ensuring that the organization delivers high-quality care while fostering a culture of growth and collaboration. Guided by both professional dedication and personal commitment, she continues to shape programs that empower families and create lasting impact.",
     },
     {
-      name: 'Mary Shabunia',
-      title: 'Director of Operations',
-      image: maryImg,
-      bio: "Mary is a seasoned healthcare professional with over 30 years of experience in the medical industry. She currently serves as the Director of Operations for Trevor's Place. With a certification in Human Resources and a deep understanding of healthcare operations, she leads with both strategic vision and empathy. Throughout her career, she has successfully started and managed multiple medical specialty offices, demonstrating her expertise in practice development and operational. A passionate advocate for quality care and community engagement, she has served on multiple community boards, using her experience to drive positive change and support underserved populations.",
+      name: 'Jace Thomas',
+      title: 'Head of Growth and Technology',
+      image: jaceImg,
+      bio: 'Jace leads growth at S Cubed. He built the AI-powered system behind how S Cubed finds and supports new clinics, and he shaped the sales, demo and onboarding experience alongside the team. He works closely with Stephanie, the team and our partners to keep the company growing and to make sure every clinic feels supported from the first conversation on.',
     },
     {
-      name: 'Liz De La Rocha',
-      title: 'Director of Billing Operations',
-      image: lizImg,
-      bio: "Liz leads the Billing Operations department with precision, dedication, and a deep understanding of the financial side of healthcare services. She has built her career around ensuring accuracy, compliance, and transparency in billing practices, making her an invaluable part of the team. With her focus on streamlining processes and supporting families through often complex billing systems, Liz works tirelessly to create a smoother experience for clients while strengthening the organization's financial health. Her commitment ensures that care remains accessible and sustainable.",
-    },
-    {
-      name: 'Taylor Beagle',
-      title: 'M.S., LBA, BCBA – Director of Product Experience',
-      image: taylorImg,
-      bio: 'Taylor is a Board Certified Behavior Analyst (BCBA) with a Master of Science degree and a passion for enhancing the way therapy services are delivered. As Director of Product Experience, Taylor bridges clinical expertise with innovation, ensuring that programs, tools, and resources meet the highest standards of effectiveness and usability. With a background rooted in applied behavior analysis and a forward-thinking approach, Taylor is dedicated to creating products and experiences that empower families, practitioners, and the broader community.',
+      name: 'Uroosa Ahmed',
+      title: 'Clinical Engagement and Customer Experience Manager',
+      image: uroosaImg,
+      bio: 'Uroosa holds a Master’s degree in Applied Behavior Analysis and has a background in clinical practice, behavioral health, and healthcare technology. With experience as a Registered Behavior Technician and in client support, she brings an understanding of the challenges providers face and the importance of having the right tools and resources. She is passionate about supporting the ABA community, improving everyday workflows, and helping make technology more accessible and useful for practitioners and families.',
     },
   ];
 
@@ -326,16 +319,9 @@ const OurTeam = () => {
                         src={member.image}
                         alt={`${member.name} - ${member.title}`}
                         className={styles.teamImage}
-                        width={100}
-                        height={100}
+                        width={160}
+                        height={160}
                         placeholder="blur"
-                        style={
-                          ['Mary Shabunia', 'Liz De La Rocha'].includes(
-                            member.name,
-                          )
-                            ? { objectPosition: 'center 20%' }
-                            : undefined
-                        }
                       />
                     </motion.div>
                     <div className={styles.teamInfo}>
