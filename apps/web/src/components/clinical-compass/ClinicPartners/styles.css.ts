@@ -14,11 +14,12 @@ export const partnersGrid = style({
   },
 });
 
-export const imageWrapper = style({
+export const illustrationPanel = style({
   position: 'relative',
   minHeight: '340px',
   borderRadius: radius.lg,
   overflow: 'hidden',
+  background: colors.primary[600],
   '@media': {
     'screen and (max-width: 767px)': {
       minHeight: '240px',
@@ -26,10 +27,12 @@ export const imageWrapper = style({
   },
 });
 
-// Keeps both the clinician's and the child's face in frame for tall and wide crops.
-export const partnersImage = style({
-  objectFit: 'cover',
-  objectPosition: '41% 25%',
+export const partnersIllustration = style({
+  position: 'absolute',
+  inset: 0,
+  width: '100%',
+  height: '100%',
+  overflow: 'visible',
 });
 
 export const partnersText = style({

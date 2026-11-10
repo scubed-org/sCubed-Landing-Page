@@ -1,4 +1,4 @@
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, SVGProps } from 'react';
 
 import { needle } from './styles.css';
 
@@ -54,7 +54,9 @@ const ARCS = [
   { color: COMPASS_ACCENTS.coral, rotation: 12 },
 ];
 
-interface CompassDialProps {
+// x, y, width and height place the dial when it is nested inside another svg.
+interface CompassDialProps
+  extends Pick<SVGProps<SVGSVGElement>, 'x' | 'y' | 'width' | 'height'> {
   variant: keyof typeof GEOMETRY;
   className?: string;
   needleClassName?: string;
@@ -68,11 +70,17 @@ const CompassDial: React.FC<CompassDialProps> = ({
   needleClassName,
   needleStyle,
   needleColor = COMPASS_ACCENTS.purple,
+  ...placement
 }) => {
   const geometry = GEOMETRY[variant];
 
   return (
-    <svg className={className} viewBox="0 0 148 148" aria-hidden="true">
+    <svg
+      {...placement}
+      className={className}
+      viewBox="0 0 148 148"
+      aria-hidden="true"
+    >
       <circle
         cx="74"
         cy="74"

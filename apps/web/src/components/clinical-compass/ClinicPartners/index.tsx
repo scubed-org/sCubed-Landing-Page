@@ -1,6 +1,6 @@
-import Image from 'next/image';
 import React from 'react';
 
+import PartnersIllustration from '../PartnersIllustration';
 import {
   sectionContainer,
   sectionTitle,
@@ -8,14 +8,12 @@ import {
 } from '../shared.css';
 
 import {
-  imageWrapper,
+  illustrationPanel,
   partnersGrid,
-  partnersImage,
+  partnersIllustration,
   partnersParagraph,
   partnersText,
 } from './styles.css';
-
-import clinicImage from '@/images/transform-clinic.png';
 
 const ClinicPartners: React.FC = () => (
   <section className={tintedSection}>
@@ -24,16 +22,8 @@ const ClinicPartners: React.FC = () => (
         Supporting Individuals &amp; Partnering with Clinics
       </h2>
       <div className={partnersGrid}>
-        <div className={imageWrapper}>
-          <Image
-            src={clinicImage}
-            alt="A clinician smiling and working with a young child in a clinic"
-            fill
-            sizes="(max-width: 1024px) 100vw, 40vw"
-            placeholder="blur"
-            quality={75}
-            className={partnersImage}
-          />
+        <div className={illustrationPanel}>
+          <PartnersIllustration className={partnersIllustration} />
         </div>
         <div className={partnersText}>
           <p className={partnersParagraph}>
