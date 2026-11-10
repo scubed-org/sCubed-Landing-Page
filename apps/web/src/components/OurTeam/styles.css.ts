@@ -1,4 +1,4 @@
-import { style, keyframes } from '@vanilla-extract/css';
+import { globalStyle, style, keyframes } from '@vanilla-extract/css';
 
 import { colors, typography, spacing, shadows, radius } from '../../styles/tokens.css';
 
@@ -353,17 +353,6 @@ export const cardText = style({
 export const teamGrid = style({
   display: 'grid',
   gap: spacing.lg,
-  '@media': {
-    'screen and (min-width: 640px)': {
-      gridTemplateColumns: 'repeat(1, 1fr)',
-    },
-    'screen and (min-width: 768px)': {
-      gridTemplateColumns: 'repeat(2, 1fr)',
-    },
-    'screen and (min-width: 1280px)': {
-      gap: spacing['2xl'],
-    },
-  },
 });
 
 export const teamCard = style({
@@ -384,7 +373,24 @@ export const teamCard = style({
 export const teamCardLayout = style({
   display: 'flex',
   flexDirection: 'column',
-  height: '100%',
+  '@media': {
+    // Tablet: photo beside the name and title, bio across the full card
+    'screen and (min-width: 769px)': {
+      display: 'grid',
+      gridTemplateColumns: '120px minmax(0, 1fr)',
+      gridTemplateAreas: '"photo head" "bio bio"',
+      columnGap: spacing.md,
+      rowGap: spacing.sm,
+      padding: spacing.lg,
+    },
+    // Desktop: photo on the left, name, title and bio on the right
+    'screen and (min-width: 1025px)': {
+      gridTemplateColumns: '160px minmax(0, 1fr)',
+      gridTemplateAreas: '"photo head" "photo bio"',
+      columnGap: '2.5rem',
+      rowGap: '0.75rem',
+    },
+  },
 });
 
 export const teamCardHeader = style({
@@ -398,6 +404,10 @@ export const teamCardHeader = style({
       flexDirection: 'column',
       alignItems: 'center',
       textAlign: 'center',
+    },
+    // Lets the photo and name become direct items of the card grid
+    'screen and (min-width: 769px)': {
+      display: 'contents',
     },
   },
 });
@@ -416,9 +426,15 @@ export const teamImageWrapper = style({
       width: '120px',
       height: '120px',
     },
-    'screen and (min-width: 1441px)': {
-      width: '128px',
-      height: '128px',
+    'screen and (min-width: 769px)': {
+      gridArea: 'photo',
+      alignSelf: 'center',
+      width: '120px',
+      height: '120px',
+    },
+    'screen and (min-width: 1025px)': {
+      width: '160px',
+      height: '160px',
     },
   },
 });
@@ -431,20 +447,26 @@ export const teamImage = style({
 
 export const teamInfo = style({
   flex: 1,
+  '@media': {
+    'screen and (min-width: 769px)': {
+      gridArea: 'head',
+      alignSelf: 'center',
+    },
+    'screen and (min-width: 1025px)': {
+      alignSelf: 'end',
+    },
+  },
 });
 
 export const teamName = style({
-  fontSize: typography.fontSize.lg,
+  fontSize: typography.fontSize.xl,
   fontWeight: typography.fontWeight.bold,
   fontFamily: typography.fontFamily.heading,
   color: colors.primary[600],
   marginBottom: spacing.xs,
   '@media': {
-    'screen and (max-width: 768px)': {
-      fontSize: typography.fontSize.xl,
-    },
-    'screen and (min-width: 1441px)': {
-      fontSize: typography.fontSize.xl,
+    'screen and (min-width: 769px)': {
+      marginTop: 0,
     },
   },
 });
@@ -453,6 +475,11 @@ export const teamTitle = style({
   fontSize: typography.fontSize.sm,
   fontWeight: typography.fontWeight.medium,
   color: colors.primary[500],
+  '@media': {
+    'screen and (min-width: 769px)': {
+      margin: 0,
+    },
+  },
 });
 
 export const teamBio = style({
@@ -461,9 +488,20 @@ export const teamBio = style({
   lineHeight: typography.lineHeight.relaxed,
   color: colors.neutral[600],
   '@media': {
-    'screen and (min-width: 769px) and (max-width: 1440px)': {
-      fontSize: typography.fontSize.xs,
-      lineHeight: typography.lineHeight.normal,
+    'screen and (min-width: 769px)': {
+      gridArea: 'bio',
+      alignSelf: 'start',
+      padding: 0,
+      fontSize: typography.fontSize.base,
+      maxWidth: '52rem',
+    },
+  },
+});
+
+globalStyle(`${teamBio} p`, {
+  '@media': {
+    'screen and (min-width: 769px)': {
+      margin: 0,
     },
   },
 });
