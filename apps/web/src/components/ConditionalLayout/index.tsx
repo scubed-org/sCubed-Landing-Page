@@ -23,6 +23,7 @@ export default function ConditionalLayout({
     pathname === '/terms-conditions' ||
     pathname === '/get-started' ||
     pathname === '/billing' ||
+    pathname === '/clinical-compass' ||
     pathname === '/aba-practice-management-software' ||
     pathname === '/guardian-portal' ||
     pathname === '/aba-data-collection-software' ||
@@ -42,6 +43,7 @@ export default function ConditionalLayout({
   const shouldUseFullWidth =
     pathname === '/get-started' ||
     pathname === '/billing' ||
+    pathname === '/clinical-compass' ||
     pathname === '/aba-practice-management-software' ||
     pathname === '/guardian-portal' ||
     pathname === '/telehealth-platform' ||

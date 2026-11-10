@@ -108,6 +108,11 @@ const Navigation: React.FC<NavigationProps> = ({
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
+  const billingDropdownItems: DropdownItem[] = [
+    { label: 'Billing Services', href: '/billing' },
+    { label: 'The Clinical Compass', href: '/clinical-compass' },
+  ];
+
   const featuresDropdownItems: DropdownItem[] = [
     { label: 'Practice Management', href: '/aba-practice-management-software' },
     {
@@ -297,24 +302,21 @@ const Navigation: React.FC<NavigationProps> = ({
               )}
             </Link>
 
-            <Link
-              href="/billing"
-              className={`${navStyle} ${pathname === '/billing' || pathname === '/billing/' ? mobileActiveNavStyle : ''}`}
-              style={{
-                color:
-                  pathname === '/billing' || pathname === '/billing/'
-                    ? activeMenuItemColor
-                    : menuItemColor,
-              }}
-            >
-              Billing{' '}
-              {(pathname === '/billing' || pathname === '/billing/') && (
-                <span
-                  className={activeLinkStyle}
-                  style={{ backgroundColor: activeLinkAccentColor }}
-                />
-              )}
-            </Link>
+            <NavDropdown
+              label="Billing"
+              items={billingDropdownItems}
+              menuItemColor={menuItemColor}
+              activeMenuItemColor={activeMenuItemColor}
+              activeLinkAccentColor={activeLinkAccentColor}
+            />
+
+            <MobileNavDropdown
+              label="Billing"
+              items={billingDropdownItems}
+              menuItemColor={menuItemColor}
+              activeMenuItemColor={activeMenuItemColor}
+              activeLinkAccentColor={activeLinkAccentColor}
+            />
 
             <NavDropdown
               label="Features"
