@@ -43,6 +43,7 @@ export default async function SitemapPage() {
           links: [
             { url: '/', label: 'Home' },
             { url: '/billing', label: 'Billing' },
+            { url: '/clinical-compass', label: 'The Clinical Compass' },
             { url: '/aba-data-collection-software', label: 'Data Collection' },
             { url: '/aba-practice-management-software', label: 'Practice Management' },
             { url: '/guardian-portal', label: 'Guardian Portal' },
