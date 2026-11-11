@@ -190,6 +190,9 @@ const Footer: React.FC = () => {
                 <Link href="/guardian-portal" className={footerLink}>
                   Guardian Portal
                 </Link>
+                <Link href="/our-team" className={footerLink}>
+                  Our Team
+                </Link>
               </div>
 
               {/* Resources */}
