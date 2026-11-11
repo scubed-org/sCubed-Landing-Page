@@ -1,6 +1,6 @@
+import Image from 'next/image';
 import React from 'react';
 
-import PartnersIllustration from '../PartnersIllustration';
 import {
   sectionContainer,
   sectionTitle,
@@ -8,12 +8,15 @@ import {
 } from '../shared.css';
 
 import {
-  illustrationPanel,
+  imageWrapper,
   partnersGrid,
-  partnersIllustration,
+  partnersImage,
   partnersParagraph,
   partnersText,
+  partnersTextFull,
 } from './styles.css';
+
+import partnersImageSrc from '@/images/clinical-compass-partners.webp';
 
 const ClinicPartners: React.FC = () => (
   <section className={tintedSection}>
@@ -22,8 +25,15 @@ const ClinicPartners: React.FC = () => (
         Supporting Individuals &amp; Partnering with Clinics
       </h2>
       <div className={partnersGrid}>
-        <div className={illustrationPanel}>
-          <PartnersIllustration className={partnersIllustration} />
+        <div className={imageWrapper}>
+          <Image
+            src={partnersImageSrc}
+            alt="A trainee and a clinic linked by a path through The Clinical Compass, with curriculum, evaluations, mentorship and supervision steps leading up to a BCBA flag"
+            sizes="(max-width: 1024px) 560px, (max-width: 1480px) 500px, 560px"
+            placeholder="blur"
+            quality={85}
+            className={partnersImage}
+          />
         </div>
         <div className={partnersText}>
           <p className={partnersParagraph}>
@@ -39,6 +49,8 @@ const ClinicPartners: React.FC = () => (
             evaluations, and mentorship to a dedicated team focused on
             developing future behavior analysts.
           </p>
+        </div>
+        <div className={partnersTextFull}>
           <p className={partnersParagraph}>
             This allows clinic leadership and clinical teams to remain focused
             on delivering exceptional client care while providing trainees with
