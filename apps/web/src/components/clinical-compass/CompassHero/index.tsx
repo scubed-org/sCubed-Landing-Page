@@ -1,9 +1,7 @@
 import React from 'react';
 
-import CalendlyButton from '../../billing/CalendlyButton';
-import { primaryButton } from '../../billing/CalendlyButton/styles.css';
 import CompassDial from '../CompassDial';
-import { sectionContainer } from '../shared.css';
+import { ctaButton, sectionContainer } from '../shared.css';
 
 import {
   dial,
@@ -17,6 +15,11 @@ import {
   heroTitleHighlight,
   settlingNeedle,
 } from './styles.css';
+
+const contactEmail = process.env.NEXT_PUBLIC_EMAIL || '';
+const contactHref = `mailto:${contactEmail}?subject=${encodeURIComponent(
+  'The Clinical Compass Inquiry'
+)}`;
 
 const CompassHero: React.FC = () => (
   <section className={heroSection}>
@@ -37,10 +40,9 @@ const CompassHero: React.FC = () => (
             experience, and guidance from experienced professionals who are
             invested in your success.
           </p>
-          <CalendlyButton
-            buttonText="Book a 20-Minute Demo"
-            className={primaryButton}
-          />
+          <a href={contactHref} className={ctaButton}>
+            Get in Touch
+          </a>
         </div>
         <div className={dialWrapper}>
           <CompassDial

@@ -108,11 +108,6 @@ const Navigation: React.FC<NavigationProps> = ({
 
   const toggleMenu = () => setMenuOpen(!menuOpen);
 
-  const billingDropdownItems: DropdownItem[] = [
-    { label: 'Billing Services', href: '/billing' },
-    { label: 'The Clinical Compass', href: '/clinical-compass' },
-  ];
-
   const featuresDropdownItems: DropdownItem[] = [
     { label: 'Practice Management', href: '/aba-practice-management-software' },
     {
@@ -302,21 +297,24 @@ const Navigation: React.FC<NavigationProps> = ({
               )}
             </Link>
 
-            <NavDropdown
-              label="Billing"
-              items={billingDropdownItems}
-              menuItemColor={menuItemColor}
-              activeMenuItemColor={activeMenuItemColor}
-              activeLinkAccentColor={activeLinkAccentColor}
-            />
-
-            <MobileNavDropdown
-              label="Billing"
-              items={billingDropdownItems}
-              menuItemColor={menuItemColor}
-              activeMenuItemColor={activeMenuItemColor}
-              activeLinkAccentColor={activeLinkAccentColor}
-            />
+            <Link
+              href="/billing"
+              className={`${navStyle} ${pathname === '/billing' || pathname === '/billing/' ? mobileActiveNavStyle : ''}`}
+              style={{
+                color:
+                  pathname === '/billing' || pathname === '/billing/'
+                    ? activeMenuItemColor
+                    : menuItemColor,
+              }}
+            >
+              Billing{' '}
+              {(pathname === '/billing' || pathname === '/billing/') && (
+                <span
+                  className={activeLinkStyle}
+                  style={{ backgroundColor: activeLinkAccentColor }}
+                />
+              )}
+            </Link>
 
             <NavDropdown
               label="Features"
@@ -370,17 +368,19 @@ const Navigation: React.FC<NavigationProps> = ({
             </Link>
 
             <Link
-              href="/our-team"
-              className={`${navStyle} ${pathname === '/our-team' || pathname === '/our-team/' ? mobileActiveNavStyle : ''}`}
+              href="/clinical-compass"
+              className={`${navStyle} ${pathname === '/clinical-compass' || pathname === '/clinical-compass/' ? mobileActiveNavStyle : ''}`}
               style={{
                 color:
-                  pathname === '/our-team' || pathname === '/our-team/'
+                  pathname === '/clinical-compass' ||
+                  pathname === '/clinical-compass/'
                     ? activeMenuItemColor
                     : menuItemColor,
               }}
             >
-              Our Team
-              {(pathname === '/our-team' || pathname === '/our-team/') && (
+              The Clinical Compass{' '}
+              {(pathname === '/clinical-compass' ||
+                pathname === '/clinical-compass/') && (
                 <span
                   className={activeLinkStyle}
                   style={{ backgroundColor: activeLinkAccentColor }}
