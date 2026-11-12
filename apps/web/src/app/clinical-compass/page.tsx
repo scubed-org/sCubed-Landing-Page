@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 
 import BreadcrumbSchema from '@/components/BreadcrumbSchema';
 import ClinicPartners from '@/components/clinical-compass/ClinicPartners';
+import CompassClosing from '@/components/clinical-compass/CompassClosing';
 import CompassFeatures from '@/components/clinical-compass/CompassFeatures';
 import CompassHero from '@/components/clinical-compass/CompassHero';
 import FieldworkPlans from '@/components/clinical-compass/FieldworkPlans';
@@ -31,6 +32,7 @@ export default function ClinicalCompassPage() {
         <ProgramRoute />
         <FieldworkPlans />
         <CompassFeatures />
+        <CompassClosing flushTop />
         <ClinicPartners />
       </Container>
     </>

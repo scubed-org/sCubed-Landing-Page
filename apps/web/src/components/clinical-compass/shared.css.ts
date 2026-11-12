@@ -2,6 +2,16 @@ import { style } from '@vanilla-extract/css';
 
 import { colors, radius, spacing, typography } from '../../styles/tokens.css';
 
+// Breakpoints used across The Clinical Compass page.
+export const BREAKPOINTS = {
+  // The section container narrows from 1400px to 1000px.
+  narrowContainer: 'screen and (max-width: 1480px)',
+  // Two-column layouts stack.
+  stacked: 'screen and (max-width: 968px)',
+  mobile: 'screen and (max-width: 767px)',
+  phone: 'screen and (max-width: 480px)',
+} as const;
+
 export const sectionContainer = style({
   maxWidth: '1400px',
   margin: '0 auto',
