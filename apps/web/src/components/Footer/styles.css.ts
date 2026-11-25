@@ -290,6 +290,9 @@ export const iconStyle = style({
 export const logosRow = style({
   display: 'flex',
   alignItems: 'center',
+  justifyContent: 'center',
+  // Match brandDescription's width so the logos centre over the text below
+  maxWidth: '400px',
   gap: spacing.xl,
   // marginTop: spacing.md,
   '@media': {
