@@ -304,20 +304,6 @@ export const logosRow = style({
   },
 });
 
-export const certificationImage = style({
-  height: '70px',
-  width: '70px',
-  objectFit: 'cover',
-  borderRadius: '50%',
-  border: `2px solid ${colors.neutral[200]}`,
-  '@media': {
-    'screen and (max-width: 768px)': {
-      height: '60px',
-      width: '60px',
-    },
-  },
-});
-
 export const hipaaLogo = style({
   height: '70px',
   width: 'auto',

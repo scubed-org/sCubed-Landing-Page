@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
 
-import bacbaImage from '../../images/BACBA.jpg';
 import capterraLogo from '../../images/Capterra.png';
 import g2Logo from '../../images/G2.png';
 import getAppLogo from '../../images/GetApp.png';
@@ -24,7 +23,6 @@ import {
   bottomSection,
   brandDescription,
   brandSection,
-  certificationImage,
   columnTitle,
   contactInfo,
   contactItem,
@@ -143,13 +141,6 @@ const Footer: React.FC = () => {
                 src={hipaaImage}
                 alt="HIPAA Compliant"
                 className={hipaaLogo}
-                quality={75}
-              />
-              <Image
-                src={bacbaImage}
-                alt="BACBA Certification"
-                className={certificationImage}
-                placeholder="blur"
                 quality={75}
               />
             </div>
